@@ -210,6 +210,14 @@ MainSection:NewButton("Flight", "makes you fly", function()
 	startFlying()
 end)
 
+MainSection:NewButton("Chat Bypass", "gives you a chat bypass gui", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/BakaPraselol/MRCBV4LSB4KRS/main/Loader"))()
+end)
+
+MainSection:NewButton("Turtle Spy", "gives you a remote spy gui", function()
+	loadstring(game:HttpGet("https://pastebin.com/raw/BDhSQqUU", true))()
+end)
+
 MainSection:NewSlider("Walkspeed", "changes how fast you walk, default: 16", 250, 16, function(s) -- 500 (MaxValue) | 0 (MinValue)
 	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
 end)
