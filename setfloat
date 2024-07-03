@@ -1,0 +1,10 @@
+local floatName = "float"
+local pchar = game.Players.LocalPlayer.Character
+local Float = Instance.new('Part')
+Float.Name = floatName
+Float.Parent = pchar
+Float.Transparency = 1
+Float.Size = Vector3.new(2048,2048,2048)
+Float.Anchored = true
+local FloatValue = -1027.1
+Float.CFrame = getRoot(pchar).CFrame * CFrame.new(0,FloatValue,0)
