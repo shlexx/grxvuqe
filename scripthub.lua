@@ -107,6 +107,10 @@ MainSection:NewButton("Aimbot", "gives you an aimbot script", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Mick-gordon/Hyper-Escape/main/DeleteMobCheatEngine.lua"))()
 end)
 
+MainSection:NewButton("Aimbot V2", "aimbot but better ig", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/PawsThePaw/Neutron.lua/main/MainNeutron.lua"))()
+end)
+
 MainSection:NewButton("Flight", "makes you fly", function()
 	local player = game.Players.LocalPlayer
 	local userInputService = game:GetService("UserInputService")
@@ -354,6 +358,10 @@ end)
  
 --//fsddfsdf
 notif("Loaded successfully! Created by scuba#0001", 5)
+end)
+
+MainSection:NewButton("Dex", "gives you dex lol", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
 end)
 
 MainSection:NewSlider("Walkspeed", "changes how fast you walk, default: 16", 250, 16, function(s) -- 500 (MaxValue) | 0 (MinValue)
