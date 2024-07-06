@@ -364,6 +364,10 @@ MainSection:NewButton("Dex", "gives you dex lol", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
 end)
 
+MainSection:NewButton("Simple Spy V3", "works on wave ngl", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
+end)
+
 MainSection:NewSlider("Walkspeed", "changes how fast you walk, default: 16", 250, 16, function(s) -- 500 (MaxValue) | 0 (MinValue)
 	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
 end)
