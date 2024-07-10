@@ -13,6 +13,7 @@ local lightning = Instance.new("TextButton")
 local blinded = Instance.new("TextButton")
 
 epifguii.Name = "epifguii"
+epifguii.ResetOnSpawn = false
 epifguii.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 freem.Name = "freem"
