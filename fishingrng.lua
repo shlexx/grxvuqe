@@ -1,92 +1,111 @@
 local epicguii = Instance.new("ScreenGui")
-local fram = Instance.new("Frame")
-local UICorner = Instance.new("UICorner")
+local frem = Instance.new("Frame")
 local lebel = Instance.new("TextLabel")
-local lin = Instance.new("TextLabel")
-local getfihsbuton = Instance.new("TextButton")
-local fihstekest = Instance.new("TextBox")
+local UICorner = Instance.new("UICorner")
+local lien = Instance.new("TextLabel")
+local fishnametxt = Instance.new("TextBox")
+local numtxt = Instance.new("TextBox")
+local getfishbtn = Instance.new("TextButton")
 
 epicguii.Name = "epicguii"
 epicguii.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-fram.Name = "fram"
-fram.Parent = epicguii
-fram.BackgroundColor3 = Color3.fromRGB(63, 63, 63)
-fram.BorderColor3 = Color3.fromRGB(0, 0, 0)
-fram.BorderSizePixel = 0
-fram.Position = UDim2.new(0.144968316, 0, 0.0513784476, 0)
-fram.Size = UDim2.new(0, 129, 0, 111)
-
-UICorner.Parent = fram
+frem.Name = "frem"
+frem.Parent = epicguii
+frem.BackgroundColor3 = Color3.fromRGB(69, 69, 69)
+frem.BorderColor3 = Color3.fromRGB(0, 0, 0)
+frem.BorderSizePixel = 0
+frem.Position = UDim2.new(0.140239611, 0, 0.0526315793, 0)
+frem.Size = UDim2.new(0, 172, 0, 80)
 
 lebel.Name = "lebel"
-lebel.Parent = fram
+lebel.Parent = frem
 lebel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 lebel.BackgroundTransparency = 1.000
 lebel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 lebel.BorderSizePixel = 0
-lebel.Size = UDim2.new(0, 128, 0, 20)
+lebel.Size = UDim2.new(0, 172, 0, 20)
 lebel.Font = Enum.Font.SourceSansBold
 lebel.Text = "fishing rng gui o_0"
 lebel.TextColor3 = Color3.fromRGB(255, 255, 255)
 lebel.TextSize = 14.000
 
-lin.Name = "lin"
-lin.Parent = fram
-lin.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-lin.BorderColor3 = Color3.fromRGB(0, 0, 0)
-lin.BorderSizePixel = 0
-lin.Position = UDim2.new(0, 0, 0.171554253, 0)
-lin.Size = UDim2.new(0, 128, 0, 1)
-lin.Font = Enum.Font.SourceSans
-lin.Text = ""
-lin.TextColor3 = Color3.fromRGB(0, 0, 0)
-lin.TextSize = 14.000
+UICorner.Parent = frem
 
-fihstekest.Name = "fihstekest"
-fihstekest.Parent = fram
-fihstekest.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-fihstekest.BackgroundTransparency = 1.000
-fihstekest.BorderColor3 = Color3.fromRGB(0, 0, 0)
-fihstekest.BorderSizePixel = 0
-fihstekest.Position = UDim2.new(0, 0, 0.279279292, 0)
-fihstekest.Size = UDim2.new(0, 128, 0, 40)
-fihstekest.Font = Enum.Font.SourceSansBold
-fihstekest.PlaceholderText = "enter fish name here"
-fihstekest.Text = ""
-fihstekest.TextColor3 = Color3.fromRGB(255, 255, 255)
-fihstekest.TextScaled = true
-fihstekest.TextSize = 14.000
-fihstekest.TextWrapped = true
+lien.Name = "lien"
+lien.Parent = frem
+lien.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+lien.BorderColor3 = Color3.fromRGB(0, 0, 0)
+lien.BorderSizePixel = 0
+lien.Position = UDim2.new(0, 0, 0.262499988, 0)
+lien.Size = UDim2.new(0, 172, 0, -1)
+lien.Font = Enum.Font.SourceSans
+lien.Text = ""
+lien.TextColor3 = Color3.fromRGB(0, 0, 0)
+lien.TextSize = 14.000
 
-getfihsbuton.Name = "getfihsbuton"
-getfihsbuton.Parent = fram
-getfihsbuton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-getfihsbuton.BackgroundTransparency = 1.000
-getfihsbuton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-getfihsbuton.BorderSizePixel = 0
-getfihsbuton.Position = UDim2.new(0, 0, 0.639639616, 0)
-getfihsbuton.Size = UDim2.new(0, 128, 0, 40)
-getfihsbuton.Font = Enum.Font.SourceSansBold
-getfihsbuton.Text = "get fish"
-getfihsbuton.TextColor3 = Color3.fromRGB(255, 255, 255)
-getfihsbuton.TextScaled = true
-getfihsbuton.TextSize = 14.000
-getfihsbuton.TextWrapped = true
-getfihsbuton.MouseButton1Click:Connect(function()
+fishnametxt.Name = "fishnametxt"
+fishnametxt.Parent = frem
+fishnametxt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+fishnametxt.BackgroundTransparency = 1.000
+fishnametxt.BorderColor3 = Color3.fromRGB(0, 0, 0)
+fishnametxt.BorderSizePixel = 0
+fishnametxt.Position = UDim2.new(0, 0, 0.262499988, 0)
+fishnametxt.Size = UDim2.new(0, 86, 0, 30)
+fishnametxt.Font = Enum.Font.SourceSansBold
+fishnametxt.PlaceholderText = "enter fish name here"
+fishnametxt.Text = ""
+fishnametxt.TextColor3 = Color3.fromRGB(255, 255, 255)
+fishnametxt.TextScaled = true
+fishnametxt.TextSize = 14.000
+fishnametxt.TextWrapped = true
+
+numtxt.Name = "numtxt"
+numtxt.Parent = frem
+numtxt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+numtxt.BackgroundTransparency = 1.000
+numtxt.BorderColor3 = Color3.fromRGB(0, 0, 0)
+numtxt.BorderSizePixel = 0
+numtxt.Position = UDim2.new(0.5, 0, 0.262499988, 0)
+numtxt.Size = UDim2.new(0, 86, 0, 30)
+numtxt.Font = Enum.Font.SourceSansBold
+numtxt.PlaceholderText = "enter number here"
+numtxt.Text = ""
+numtxt.TextColor3 = Color3.fromRGB(255, 255, 255)
+numtxt.TextScaled = true
+numtxt.TextSize = 14.000
+numtxt.TextWrapped = true
+
+getfishbtn.Name = "getfishbtn"
+getfishbtn.Parent = frem
+getfishbtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+getfishbtn.BackgroundTransparency = 1.000
+getfishbtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+getfishbtn.BorderSizePixel = 0
+getfishbtn.Position = UDim2.new(0, 0, 0.6875, 0)
+getfishbtn.Size = UDim2.new(0, 172, 0, 25)
+getfishbtn.Font = Enum.Font.SourceSansBold
+getfishbtn.Text = "get fish(es)"
+getfishbtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+getfishbtn.TextScaled = true
+getfishbtn.TextSize = 14.000
+getfishbtn.TextWrapped = true
+getfishbtn.MouseButton1Click:Connect(function()
 	local plrname = game.Players.LocalPlayer:GetFullName()
-	local fishname = fihstekest.Text
+	local fishname = fishnametxt.Text
+	local num = numtxt.Text
 	function getNil(name,class) for _,v in next, getnilinstances() do if v.ClassName==class and v.Name==name then return v;end end end
 
 	local args = {
 		[1] = {
-			[fishname] = 1
+			[fishname] = tonumber(num)
 		},
 		[2] = {
-			[1] = getNil("Part", "Part"),
-			[2] = getNil("Fish", "Part"),
-			[3] = workspace:WaitForChild("Part"),
-			[4] = getNil(plrname .. "_Lure", "Part")
+			[1] = getNil(plrname .. "_Lure", "Part"),
+			[2] = workspace:WaitForChild("Part"),
+			[3] = workspace:WaitForChild("Maps"):WaitForChild("The Pond"):WaitForChild("Assets"):WaitForChild("Model"):WaitForChild("Model"):WaitForChild("Part"),
+			[4] = getNil("Part", "Part"),
+			[5] = getNil("Fish", "Part")
 		}
 	}
 
