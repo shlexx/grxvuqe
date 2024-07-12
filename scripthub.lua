@@ -387,7 +387,7 @@ OwnScriptsSection:NewButton("Admin Test", "admin test fenx gui", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexx/grxvuqe/main/admintest.lua"))()
 end)
 
-OwnScriptsSection:NewButton("Telekinesis", "gives you a telekinesis tool for unanchored parts", function()
+OwnScriptsSection:NewButton("Delete Tool", "gives you a delete tool", function()
 	local Players = game:GetService("Players")
 	local player = Players.LocalPlayer
 	local backpack = player:WaitForChild("Backpack")
