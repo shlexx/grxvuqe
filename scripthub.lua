@@ -377,17 +377,17 @@ MainSection:NewSlider("JumpPower", "changes how fast you jump, default: 50", 250
 end)
 
 local OwnScripts = Window:NewTab("Own Scripts")
-local OwnScriptsSection = Main:NewSection("Own Scripts")
+local OwnScriptsSection = OwnScripts:NewSection("Own Scripts")
 
-MainSection:NewButton("Telekinesis", "gives you a telekinesis tool for unanchored parts", function()
+OwnScriptsSection:NewButton("Telekinesis", "gives you a telekinesis tool for unanchored parts", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexx/grxvuqe/main/telekinesis.lua"))()
 end)
 
-MainSection:NewButton("Admin Test", "admin test fenx gui", function()
+OwnScriptsSection:NewButton("Admin Test", "admin test fenx gui", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexx/grxvuqe/main/admintest.lua"))()
 end)
 
-MainSection:NewButton("Telekinesis", "gives you a telekinesis tool for unanchored parts", function()
+OwnScriptsSection:NewButton("Telekinesis", "gives you a telekinesis tool for unanchored parts", function()
 	local Players = game:GetService("Players")
 	local player = Players.LocalPlayer
 	local backpack = player:WaitForChild("Backpack")
@@ -410,7 +410,7 @@ MainSection:NewButton("Telekinesis", "gives you a telekinesis tool for unanchore
 	tool.Activated:Connect(onActivated)
 end)
 
-MainSection:NewButton("UNC Test", "does a unc test (check console)", function()
+OwnScriptsSection:NewButton("UNC Test (NOT MINE)", "does a unc test (check console)", function()
 	local passes, fails, undefined = 0, 0, 0
 local running = 0
  
