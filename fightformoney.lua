@@ -81,5 +81,63 @@ TextButton.MouseButton1Click:Connect(function()
 		elseif wnum == 4 then
 			rpart.CFrame = CFrame.new(5.305574417114258, 48.773460388183594, 7771.18212890625)
 		end
+	elseif args[1] == "hatch" then
+		local petlist = {
+			["Doggy"] = "Starter",
+			["Kitty"] = "Starter",
+			["Mouse"] = "Starter",
+			["Piggy"] = "Grass",
+			["Bird"] = "Grass",
+			["Crocodile"] = "Wild",
+			["Ant"] = "Wild",
+			["Stegosaurus"] = "Wild",
+			["Fish"] = "Cyro",
+			["Shark"] = "Cyro",
+			["Reindeer"] = "Cyro",
+			["Glacier"] = "Frostflare",
+			["Sloth"] = "Sand",
+			["Bolt"] = "Sand",
+			["Flamingo"] = "Tropical",
+			["Parrot"] = "Exotic",
+			["Banana"] = "Exotic",
+			["Tiger"] = "Exotic",
+			["Celestia"] = "Exotic",
+			["Crow"] = "Sinister",
+			["Sugarflare"] = "Sinister",
+			["Enchantico"] = "Nethera",
+			["Demon"] = "Abyss",
+			["Phoenix"] = "Abyss",
+			["Flamethrower"] = "Abyss",
+		}
+		
+		local spacepetlist = {
+			["Sapphire Dragon"] = "Grass",
+			["Fairy Chihuahua"] = "Wild",
+			["Blue Dominus"] = "Frostflare",
+			["Arctic Golem"] = "Frostflare",
+			["Mutant Purp"] = "Subo",
+			["Space Kitty"] = "Subo",
+			["Crystal Lord"] = "Subo",
+			["Soul Golem"] = "Subo",
+			["Sand Spider"] = "Sand",
+			["Pineapple Cat"] = "Tropical",
+			["King Ant"] = "Tropical",
+			["Witch Dragon"] = "Sinister",
+			["Mystery Cat"] = "Nethera",
+			["Magma Golem"] = "Nethera",
+			["Soul Warden"] = "Abyss",
+		}
+		
+		for i,v in pairs(petlist) do
+			if args[2] == i then
+				game.ReplicatedStorage.PEV.Hatch:FireServer(v,i,1)
+			end
+		end
+		
+		for a,b in pairs(spacepetlist) do
+			if args[2] .. " " .. args[3] == a then
+				game.ReplicatedStorage.PEV.Hatch:FireServer(b,a,1)
+			end
+		end
 	end
 end)
