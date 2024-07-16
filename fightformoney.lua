@@ -52,6 +52,8 @@ TextButton.MouseButton1Click:Connect(function()
 			for i,v in pairs(game.Players:GetPlayers()) do
 				game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(tostring(v.Name)))
 			end
+		elseif args[3] == "me" then
+			game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(tostring(game.Players.LocalPlayer.Name)))
 		else
 			local msg = tostring(args[3])
 
