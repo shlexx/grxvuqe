@@ -48,6 +48,23 @@ TextButton.MouseButton1Click:Connect(function()
 	elseif args[1] == "rebirth" then
 		game.ReplicatedStorage.Event.HealthAdd:FireServer(0)
 	elseif args[1] == "equipsword" then
-		game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(tostring(args[3])))
+		if args[3] == "all" then
+			for i,v in pairs(game.Players:GetPlayers()) do
+				game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(tostring(v.Name)))
+			end
+		else
+			local msg = tostring(args[3])
+
+			local function findPlayer(stringg)
+				for _, v in pairs(game.Players:GetPlayers()) do
+					if stringg:lower() == (v.Name:lower()):sub(1, #stringg) then
+						return v
+					end
+				end
+			end
+
+			local player = findPlayer(msg)
+			game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(player.Name))
+		end
 	end
 end)
