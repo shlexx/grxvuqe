@@ -108,6 +108,10 @@ TextButton.MouseButton1Click:Connect(function()
 			["Demon"] = "Abyss",
 			["Phoenix"] = "Abyss",
 			["Flamethrower"] = "Abyss",
+			["Sundo"] = "Shop1",
+			["Hotdog"] = "Shop1",
+			["Seraph"] = "Shop1",
+			["Warpeeler"] = "Shop1",
 		}
 		
 		local spacepetlist = {
