@@ -48,14 +48,14 @@ TextButton.MouseButton1Click:Connect(function()
 	elseif args[1] == "rebirth" then
 		game.ReplicatedStorage.Event.HealthAdd:FireServer(0)
 	elseif args[1] == "equipsword" then
-		if args[3] == "all" then
+		if args[2] == "all" then
 			for i,v in pairs(game.Players:GetPlayers()) do
-				game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(tostring(v.Name)))
+				game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[3]), workspace:WaitForChild(tostring(v.Name)))
 			end
-		elseif args[3] == "me" then
-			game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(tostring(game.Players.LocalPlayer.Name)))
+		elseif args[2] == "me" then
+			game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[3]), workspace:WaitForChild(tostring(game.Players.LocalPlayer.Name)))
 		else
-			local msg = tostring(args[3])
+			local msg = tostring(args[2])
 
 			local function findPlayer(stringg)
 				for _, v in pairs(game.Players:GetPlayers()) do
@@ -66,7 +66,20 @@ TextButton.MouseButton1Click:Connect(function()
 			end
 
 			local player = findPlayer(msg)
-			game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[2]), workspace:WaitForChild(player.Name))
+			game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[3]), workspace:WaitForChild(player.Name))
+		end
+	elseif args[1] == "tpw" then
+		local wnum = tonumber(args[2])
+		local rpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+		game:GetService("ReplicatedStorage").PEV.PTP:FireServer("W" .. wnum)
+		if wnum == 1 then
+			rpart.CFrame = CFrame.new(-2.281571388244629, 38.41089630126953, -405.0544738769531)
+		elseif wnum == 2 then
+			rpart.CFrame = CFrame.new(-141.9577178955078, 38.077117919921875, 1948.8775634765625)
+		elseif wnum == 3 then
+			rpart.CFrame = CFrame.new(-2.68959379196167, 49.52509689331055, 4555.0810546875)
+		elseif wnum == 4 then
+			rpart.CFrame = CFrame.new(5.305574417114258, 48.773460388183594, 7771.18212890625)
 		end
 	end
 end)
