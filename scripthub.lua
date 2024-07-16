@@ -361,7 +361,7 @@ notif("Loaded successfully! Created by scuba#0001", 5)
 end)
 
 MainSection:NewButton("Dex", "gives you dex lol", function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/MariyaFurmanova/Library/main/dex2.0", true))()
 end)
 
 MainSection:NewButton("Simple Spy V3", "works on wave ngl", function()
