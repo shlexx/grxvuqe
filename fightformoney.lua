@@ -47,7 +47,7 @@ TextButton.MouseButton1Click:Connect(function()
 		game.ReplicatedStorage.Event.WinGain:FireServer(sarg)
 	elseif args[1] == "rebirth" then
 		game.ReplicatedStorage.Event.HealthAdd:FireServer(0)
-	elseif args[1] == "equipsword" then
+	elseif args[1] == "sword" then
 		if args[2] == "all" then
 			for i,v in pairs(game.Players:GetPlayers()) do
 				game.ReplicatedStorage.Event.EquipEffect:FireServer(tostring(args[3]), workspace:WaitForChild(tostring(v.Name)))
