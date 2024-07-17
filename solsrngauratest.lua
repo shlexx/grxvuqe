@@ -40,7 +40,7 @@ TextButton.TextSize = 14.000
 TextButton.MouseButton1Click:Connect(function()
 	local t = TextBox.Text
 	local args = t:split(" ")
-	if args[1] == "equipaura" then
+	if args[1] == "equip" then
 		if args[2] == "Apex" then
 			game.ReplicatedStorage.Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage"):WaitForChild("Auras"):WaitForChild("Apex"))
 		elseif args[2] == "RGBBlossom" then
