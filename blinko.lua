@@ -41,6 +41,10 @@ TextButton.MouseButton1Click:Connect(function()
 	local t = TextBox.Text
 	local args = t:split(" ")
 	if args[1] == "add" then
-  	game:GetService("ReplicatedStorage"):WaitForChild("SpawnBallEvent"):FireServer("AddMoney", tonumber(args[2]))
-  end
+  		game:GetService("ReplicatedStorage"):WaitForChild("SpawnBallEvent"):FireServer("AddMoney", tonumber(args[2]))
+	elseif t == "chip" then
+		game:GetService("ReplicatedStorage"):WaitForChild("SpawnBallEvent"):FireServer("AddMoney", 1000000000000000000)
+		wait()
+		game:GetService("ReplicatedStorage"):WaitForChild("CurrencyConversion"):FireServer()
+	end
 end)
