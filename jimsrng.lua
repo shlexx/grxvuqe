@@ -40,89 +40,50 @@ TextButton.TextSize = 14.000
 TextButton.MouseButton1Click:Connect(function()
 	local t = TextBox.Text
 	local args = t:split(" ")
-	local auras = {
+	local nsauras = {
 		"Ancient",
-		"Ancient Prophecy",
-		"The Conceited, Devourer of Gods",
 		"Arcade",
 		"Gluttony",
 		"Baseplate",
-		"Bey, The Gambling One",
 		"Nebula",
 		"Earth",
-		"Rifter : Classic",
-		"Wishing Star : Classic",
-		"Supreme Calamitas",
 		"Abomination",
 		"Polychrome",
 		"Asgore",
-		"Brick Wall",
 		"Cubed",
-		"Arcade : Classic",
 		"Greed",
 		"Divinity",
 		"Elderic",
 		"Epic",
 		"Exotica",
-		"Exotica : FULL POWER",
-		"Exotica Maxinus",
-		"Exotica : OVERDRIVE",
-		"The Bloxxer",
-		"Brick Wall : Legacy",
-		"Black Flame",
 		"1x1x1x1x1",
 		"Fractal",
-		"Fractal : Singularity",
-		"Singularity Point : TON 618",
-		"Fractured Time",
-		"Gabriel Judge Of Hell",
-		"Gabriel The Apostate Of Hate",
 		"Gambler",
-		"1 Grand : 2009",
-		"Void : Chaos",
 		"Void",
-		"Brick Wall : Nature",
-		"Jazz Zone",
 		"Pride",
 		"Legendary",
 		"Limbo",
 		"Portal",
-		"Exotica : APEX",
-		"Arcade : グラインド地区",
-		"Made In Heaven",
 		"Menacing",
-		"Exotica : PRIME APEX",
 		"Moyai",
 		"Mythic",
 		"Mythical",
-		"Mythical Constellations",
-		"Formatical : BEAT BREAKER",
-		"Wishing Star",
 		"Godlike",
 		"Sakura",
 		"Rare",
 		"Remarkable",
-		"Exotica : TAKEOVER",
 		"Flame",
-		"Solar System",
 		"Speedster",
 		"Speedy",
 		"Steve",
-		"The Brick Wall",
-		"Wave - Form",
 		"Sloth",
-		"The Rifter",
-		"The Seven Deadly Sins",
 		"Uncommon",
 		"Unusual",
-		"Unusual : Cosmical",
 		"V2",
 		"Cosmical",
-		"Brick Gate",
 		"Wrath",
 		"Pi",
 		"Rizzy",
-		"Abomination : BoyKisser",
 		"Envy",
 		"Cheese",
 		"Ruler",
@@ -134,84 +95,171 @@ TextButton.MouseButton1Click:Connect(function()
 		"Saturn",
 		"Mars",
 		"Smited",
-		"FORMATICAL : BARRACUDA",
 		"Planet",
-		"Flaming Overseer",
 		"Justice",
-		"[Accurate : TON 618]",
 		"BoyKisser",
-		"1 Grand : Robux",
-		"The Angel of Death",
-		"Light House",
-		"Devourer of Gods",
-		"Brick Gate : Legacy",
 		"Lust",
 		"Cold",
-		"Jazzy Hazard",
-		"Gear : 5th",
-		"Arcade : BOSSFIGHT",
 		"Common",
-		"1 Grand",
-		"ArchAngle, The Geometric Degrees",
-		"Bad To The Bone",
-		"Cheese : Moon",
-		"Cosmic Being",
 		"Cupid",
-		"Darken Heart : Illuminated Illumina",
-		"Fish Hunter",
 		"Fisher",
-		"Formatical : Jokester",
-		"Formatical : Lover",
-		"Formatical : Singularity Point",
-		"Formatical : Thank You!",
-		"Fractured Reality : Singularity Point",
-		"HELP ME", -- not a message lol, its an aura
-		"Im Peached",
-		"Imaginary Technique : The 2nd Amendment",
 		"Insanity",
-		"Jimbo : Big Stick",
-		"Limbo : Isolation",
 		"Liquified",
 		"MSpaint",
-		"Mr. BEASTT!!!!!!!!!!!!!!",
-		"19 Dolla Giftcard",
 		"Ommetaphobia",
 		"Peached",
-		"Poseidon's Wrath",
 		"Rancher",
-		"Retro Baller",
-		"SK8R B01!",
+		"Timeless",
+		"Waltuh",
+		"ClutterFunk",
+		"<[DEBUGGER]>",
+		"Fireworks",
+		"Sparkler",
+		"Barbaque",
+	}
+
+	local onesauras = {
+		"Ancient Prophecy",
+		"Supreme Calamitas",
+		"Brick Wall",
+		"Exotica Maxinus",
+		"The Bloxxer",
+		"Black Flame",
+		"Jazz Zone",
+		"Wishing Star",
+		"Solar System",
+		"The Rifter",
+		"Brick Gate",
+		"Flaming Overseer",
+		"Light House",
+		"Jazzy Hazard",
+		"Mythical Constellations",
+		"HELP ME", -- not a message lol, its an aura
+		"Fractal Ruling",
+		"Restless Gambler",
+		"Insanity v2",
+		"Soul Snatcher",
+		"The Aegleseeker",
 		"Sand Castle",
 		"!!THE WATCHER!!",
-		"The Aegleseeker",
+		"Retro Baller",
+		"SK8R B01!",
+		"Poseidon's Wrath",
+		"Mr. BEASTT!!!!!!!!!!!!!!",
+		"Im Peached",
+		"Fish Hunter",
+		"Cosmic Being",
+		"1 Grand",
+		"Fractured Time",
+	}
+	
+	local twosauras = {
+		"Liquified : Surfer",
+		"Arcade : Fireworks",
+		"Arcade : Chroma",
+		"Arcade : Hallowed",
+		"Liquified : Waste",
 		"The Almighty Divine",
 		"The Leviathan Hunter",
 		"The Leviathan Slayer",
-		"Timeless",
-		"Waltuh",
-		"The True Common, The Conquerer of all",
-		"Cosmical Planet : Shaper",
-		"ClutterFunk",
-		"Liquified : Waste",
-		"<[DEBUGGER]>",
-		"Soul Snatcher",
-		"The Myth Of Demise",
-		"Arcade : Hallowed",
-		"Restless Gambler",
-		"Insanity v2",
-		"Insanity : Lost Soul",
-		"Arcade : Fireworks",
-		"Arcade : Chroma",
-		"Fireworks",
-		"Sparkler",
-		"Fractal Ruling",
+		"19 Dolla Giftcard",
+		"Limbo : Isolation",
+		"Formatical : Jokester",
+		"Formatical : Lover",
+		"Cheese : Moon",
+		"Gear : 5th",
+		"Arcade : BOSSFIGHT",
+		"Devourer of Gods",
+		"FORMATICAL : BARRACUDA",
+		"Abomination : BoyKisser",
+		"Unusual : Cosmical",
+		"The Brick Wall",
+		"Wave - Form",
+		"Exotica : TAKEOVER",
+		"Exotica : APEX",
+		"Arcade : グラインド地区",
+		"Made In Heaven",
+		"Void : Chaos",
+		"Fractal : Singularity",
+		"Exotica : OVERDRIVE",
+		"Arcade : Classic",
+		"Rifter : Classic",
+	}
+	
+	local threesauras = {
 		"Divinity : Biblically Accurate",
-		"Liquified : Surfer",
-		"Barbaque",
+		"The Myth Of Demise",
+		"Insanity : Lost Soul",
+		"Cosmical Planet : Shaper",
+		"Jimbo : Big Stick",
+		"Formatical : Singularity Point",
+		"Formatical : Thank You!",
+		"ArchAngle, The Geometric Degrees",
+		"Bad To The Bone",
+		"1 Grand : Robux",
+		"The Angel of Death",
+		"Brick Gate : Legacy",
+		"[Accurate : TON 618]",
+		"The Seven Deadly Sins",
+		"Formatical : BEAT BREAKER",
+		"Exotica : PRIME APEX",
+		"Brick Wall : Nature",
+		"1 Grand : 2009",
+		"Gabriel Judge Of Hell",
+		"Exotica : FULL POWER",
+		"Brick Wall : Legacy",
+		"Wishing Star : Classic",
+		"Bey, The Gambling One",
+	}
+
+	local foursauras = {
+		"Fractured Reality : Singularity Point",
+		"Darken Heart : Illuminated Illumina",
+		"Singularity Point : TON 618",
+		"Gabriel The Apostate Of Hate",
+		"The Conceited, Devourer of Gods",
+	}
+
+	local fivesauras = {
+		"Imaginary Technique : The 2nd Amendment",
+	}
+
+	local sixsauras = {
+		"The True Common, The Conquerer of all",
 	}
 	if args[1] == "equip" then
-		for i, v in auras do
+		for i, v in nsauras do
 			if v == args[2] then
+				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
+			end
+		end
+		for i, v in onesauras do
+			if v == args[2] .. " " .. args[3] then
+				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
+			end
+		end
+		for i, v in twosauras do
+			if v == args[2] .. " " .. args[3] .. " " .. args[4] then
+				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
+			end
+		end
+		for i, v in threesauras do
+			if v == args[2] .. " " .. args[3] .. " " .. args[4] .. " " .. args[5] then
+				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
+			end
+		end
+		for i, v in foursauras do
+			if v == args[2] .. " " .. args[3] .. " " .. args[4] .. " " .. args[5] .. " " .. args[6] then
+				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
+			end
+		end
+		for i, v in fivesauras do
+			if v == args[2] .. " " .. args[3] .. " " .. args[4] .. " " .. args[5] .. " " .. args[6] .. " " .. args[7] then
+				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
+			end
+		end
+		for i, v in sixsauras do
+			if v == args[2] .. " " .. args[3] .. " " .. args[4] .. " " .. args[5] .. " " .. args[6] .. " " .. args[7] .. " " .. args[8] then
 				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
 			end
 		end
