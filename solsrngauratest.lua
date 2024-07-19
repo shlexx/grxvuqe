@@ -89,6 +89,8 @@ TextButton.MouseButton1Click:Connect(function()
 			game.ReplicatedStorage.Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage"):WaitForChild("Auras"):WaitForChild("Layers"))
 		elseif args[2] == "Symphony" then
 			game.ReplicatedStorage.Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage"):WaitForChild("Auras"):WaitForChild("Symphony"))
+		elseif args[2] == "Oblivion" then
+			game.ReplicatedStorage.Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage"):WaitForChild("Auras"):WaitForChild("Oblivion"))
 		end
 	elseif t == "unequip" then
 		game.ReplicatedStorage.Remotes.AuraUnequipAll:FireServer()
