@@ -91,7 +91,7 @@ TextButton.MouseButton1Click:Connect(function()
 	}
 
 	if args[1] == "equip" then
-		for i, v in nsauras do
+		for i, v in auras do
 			if v == args[2] then
 				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
 			end
