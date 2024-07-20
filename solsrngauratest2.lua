@@ -1,4 +1,4 @@
-slocal ScreenGui = Instance.new("ScreenGui")
+local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local TextButton = Instance.new("TextButton")
 local TextBox = Instance.new("TextBox")
@@ -40,4 +40,54 @@ TextButton.TextSize = 14.000
 TextButton.MouseButton1Click:Connect(function()
 	local t = TextBox.Text
 	local args = t:split(" ")
+	local auras = {
+		"ChromaticExotic",
+		"Apex",
+		"Genesis",
+		"Matrix",
+		"OvertureHistory",
+		"Overture",
+		"Radiant",
+		"radiantimpeached",
+		"Cheatreal",
+		"Chronos",
+		"Eternal",
+		"Matrix_",
+		"Hades",
+		"Undefined",
+		"Starscourge",
+		"Cataclysm",
+		"Oppression",
+		"AbyssalHunter",
+		"Galaxy",
+		"Glitch",
+		"CheatrealEasy",
+		"Gargantua",
+		"Bloodlust",
+		"impeach",
+		"Depression",
+		"Archangel",
+		"imonion",
+		"Dutchman",
+		"CheatrealGlitchy",
+		"Defined",
+		"OvertureERROR",
+		"Car",
+		"Godly",
+		"truck",
+		"Impeached",
+		"apeximpeached",
+		"house",
+		"CheatrealTrueEasy",
+	}
+
+	if args[1] == "equip" then
+		for i, v in nsauras do
+			if v == args[2] then
+				game:GetService("ReplicatedStorage").Remotes.AuraEquip:FireServer(game:GetService("ReplicatedStorage").Auras:FindFirstChild(v))
+			end
+		end
+	elseif t == "unequip" then
+		game:GetService("ReplicatedStorage").Remotes.AuraUnequipAll:FireServer()
+	end
 end)
