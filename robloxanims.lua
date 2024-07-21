@@ -21,7 +21,7 @@ TextBox.BorderSizePixel = 0
 TextBox.Position = UDim2.new(-4.2317708e-05, 0, -0.0245114136, 0)
 TextBox.Size = UDim2.new(0, 150, 0, 25)
 TextBox.Font = Enum.Font.SourceSansBold
-TextBox.PlaceholderText = "ENTER CHEAT CODE"
+TextBox.PlaceholderText = "enter anim id"
 TextBox.Text = ""
 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextBox.TextSize = 14.000
@@ -34,14 +34,20 @@ TextButton.BorderSizePixel = 0
 TextButton.Position = UDim2.new(-4.2317708e-05, 0, 0.474089652, 0)
 TextButton.Size = UDim2.new(0, 150, 0, 25)
 TextButton.Font = Enum.Font.SourceSansBold
-TextButton.Text = "execute"
+TextButton.Text = "play"
 TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextButton.TextSize = 14.000
 TextButton.MouseButton1Click:Connect(function()
 	local t = TextBox.Text
-	local args = t:split(" ")
-	local anims = {
-		[""] = "rbxassetid://"
-	}
-  
+	local player = game.Players.LocalPlayer
+	repeat wait() until player.Character.Humanoid
+	local humanoid = player.Character.Humanoid
+	local character = player.Character or player.CharacterAdded:Wait()
+	local UserInputService = game:GetService("UserInputService")
+	
+	local anim = Instance.new("Animation")
+	anim.AnimationId = "rbxassetid://" .. t
+	
+	local playAnim = humanoid:LoadAnimation(anim)
+	playAnim:Play()
 end)
