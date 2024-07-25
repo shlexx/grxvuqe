@@ -2018,6 +2018,10 @@ _G.Settings = {
 loadstring(game:HttpGet("https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/FPSBooster.lua"))()
 end)
 
+MainSection:NewButton("Universal Vehicle GUI", "epic ahh", function()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/Documantation12/Universal-Vehicle-Script/main/Main.lua'))()
+end)
+
 local Credits = Window:NewTab("Credits")
 local CreditsSection = Credits:NewSection("Credits")
 
