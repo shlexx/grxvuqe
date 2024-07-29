@@ -144,5 +144,7 @@ TextButton.MouseButton1Click:Connect(function()
 				game.ReplicatedStorage.PEV.Hatch:FireServer(b,a,1)
 			end
 		end
+	elseif args[1] == "getsword" then
+		game:GetService("ReplicatedStorage").Event.BuyPower:FireServer(tostring(args[2]), 0)
 	end
 end)
