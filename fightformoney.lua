@@ -4,6 +4,7 @@ local TextButton = Instance.new("TextButton")
 local TextBox = Instance.new("TextBox")
 
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
 
 Frame.Parent = ScreenGui
 Frame.AnchorPoint = Vector2.new(1, 1)
