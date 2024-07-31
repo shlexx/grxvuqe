@@ -162,6 +162,7 @@ removelimbs.TextWrapped = true
 removelimbs.MouseButton1Click:Connect(function()
 	if msg == "all" then
 		for _,v in pairs(game.Players:GetPlayers()) do
+			repeat wait() until v.Character
 			local char = v.Character
 			local hum = char:FindFirstChildOfClass("Humanoid")
 			if hum.RigType == Enum.RigType.R15 then
@@ -179,6 +180,7 @@ removelimbs.MouseButton1Click:Connect(function()
 	elseif msg == "others" then
 		for _,v in pairs(game.Players:GetPlayers()) do
 			if v.Name == game.Players.LocalPlayer.Name then else
+				repeat wait() until v.Character
 				local char = v.Character
 				local hum = char:FindFirstChildOfClass("Humanoid")
 				if hum.RigType == Enum.RigType.R15 then
@@ -195,6 +197,7 @@ removelimbs.MouseButton1Click:Connect(function()
 			end
 		end
 	else
+		repeat wait() until oplayer.Character
 		local char = oplayer.Character
 		local hum = char:FindFirstChildOfClass("Humanoid")
 		if hum.RigType == Enum.RigType.R15 then
@@ -228,6 +231,7 @@ removelegs.TextWrapped = true
 removelegs.MouseButton1Click:Connect(function()
 	if msg == "all" then
 		for _,v in pairs(game.Players:GetPlayers()) do
+			repeat wait() until v.Character
 			local char = v.Character
 			local hum = char:FindFirstChildOfClass("Humanoid")
 			if hum.RigType == Enum.RigType.R15 then
@@ -245,7 +249,8 @@ removelegs.MouseButton1Click:Connect(function()
 	elseif msg == "others" then
 		for _,v in pairs(game.Players:GetPlayers()) do
 			if v.Name == game.Players.LocalPlayer.Name then else
-				local char = oplayer.Character
+				repeat wait() until v.Character
+				local char = v.Character
 				local hum = char:FindFirstChildOfClass("Humanoid")
 				if hum.RigType == Enum.RigType.R15 then
 					del(char.LeftFoot)
@@ -261,6 +266,7 @@ removelegs.MouseButton1Click:Connect(function()
 			end
 		end
 	else
+		repeat wait() until oplayer.Character
 		local char = oplayer.Character
 		local hum = char:FindFirstChildOfClass("Humanoid")
 		if hum.RigType == Enum.RigType.R15 then
@@ -294,6 +300,7 @@ nked.TextWrapped = true
 nked.MouseButton1Click:Connect(function()
 	if msg == "all" then
 		for _,v in pairs(game.Players:GetPlayers()) do
+			repeat wait() until v.Character
 			local char = v.Character
 			del(char:FindFirstChildOfClass("Shirt"))
 			del(char:FindFirstChildOfClass("Pants"))
@@ -302,6 +309,7 @@ nked.MouseButton1Click:Connect(function()
 	elseif msg == "others" then
 		for _,v in pairs(game.Players:GetPlayers()) do
 			if v.Name == game.Players.LocalPlayer.Name then else
+				repeat wait() until v.Character
 				local char = v.Character
 				del(char:FindFirstChildOfClass("Shirt"))
 				del(char:FindFirstChildOfClass("Pants"))
@@ -309,6 +317,7 @@ nked.MouseButton1Click:Connect(function()
 			end
 		end
 	else
+		repeat wait() until oplayer.Character
 		local char = oplayer.Character
 		del(char:FindFirstChildOfClass("Shirt"))
 		del(char:FindFirstChildOfClass("Pants"))
@@ -333,15 +342,18 @@ kill.TextWrapped = true
 kill.MouseButton1Click:Connect(function()
 	if msg == "all" then
 		for _,v in pairs(game.Players:GetPlayers()) do
+			repeat wait() until v.Character
 			del(v.Character.Head)
 		end
 	elseif msg == "others" then
 		for _,v in pairs(game.Players:GetPlayers()) do
 			if v.Name == game.Players.LocalPlayer.Name then else
+				repeat wait() until v.Character
 				del(v.Character.Head)
 			end
 		end
 	else
+		repeat wait() until oplayer.Character
 		del(oplayer.Character.Head)
 	end
 end)
@@ -363,15 +375,18 @@ ragdoll.TextWrapped = true
 ragdoll.MouseButton1Click:Connect(function()
 	if msg == "all" then
 		for _,v in pairs(game.Players:GetPlayers()) do
+			repeat wait() until v.Character
 			del(v.Character:FindFirstChildOfClass("Humanoid"))
 		end
 	elseif msg == "others" then
 		for _,v in pairs(game.Players:GetPlayers()) do
 			if v.Name == game.Players.LocalPlayer.Name then else
+				repeat wait() until v.Character
 				del(v.Character:FindFirstChildOfClass("Humanoid"))
 			end
 		end
 	else
+		repeat wait() until oplayer.Character
 		del(oplayer.Character:FindFirstChildOfClass("Humanoid"))
 	end
 end)
@@ -393,6 +408,7 @@ bald.TextWrapped = true
 bald.MouseButton1Click:Connect(function()
 	if msg == "all" then
 		for _,v in pairs(game.Players:GetPlayers()) do
+			repeat wait() until v.Character
 			repeat
 				del(v.Character:FindFirstChildOfClass("Accessory"))
 			until v.Character:FindFirstChildOfClass("Accessory") == nil
@@ -400,12 +416,14 @@ bald.MouseButton1Click:Connect(function()
 	elseif msg == "others" then
 		for _,v in pairs(game.Players:GetPlayers()) do
 			if v.Name == game.Players.LocalPlayer.Name then else
+				repeat wait() until v.Character
 				repeat
 					del(v.Character:FindFirstChildOfClass("Accessory"))
 				until v.Character:FindFirstChildOfClass("Accessory") == nil
 			end
 		end
 	else
+		repeat wait() until oplayer.Character
 		repeat
 			del(oplayer.Character:FindFirstChildOfClass("Accessory"))
 		until oplayer.Character:FindFirstChildOfClass("Accessory") == nil
