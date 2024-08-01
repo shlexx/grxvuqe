@@ -42,7 +42,7 @@ local Players = game:GetService("Players")
 
 function Destroy(ins)
 	spawn(function()
-		for _,v in pairs(game:GetService("ReplicatedStorage"):GetDescendants()) do
+		for _,v in pairs(game:GetDescendants()) do
 			if v:IsA("RemoveEvent") and v.Name == "DestroySegway" then
 				v:FireServer(ins)
 			end
@@ -9395,6 +9395,8 @@ openScript(scr5)
 				Destroy(p.Character.LowerTorso.Root)
 			end
 		end
+	elseif args[1] == "cmds" then
+		cmd.Visible = true
 	else
 		print("Invalid command")
 	end
@@ -9827,6 +9829,9 @@ clos.BorderColor3 = Color3.fromRGB(0, 0, 0)
 clos.BorderSizePixel = 0
 clos.Size = UDim2.new(0, 20, 0, 20)
 clos.Image = "http://www.roblox.com/asset/?id=8530043932"
+clos.MouseButton1Click:Connect(function()
+	cmd.Visible = false
+end)
 
 serch.Name = "serch"
 serch.Parent = cmd
