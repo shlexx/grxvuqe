@@ -9395,6 +9395,8 @@ openScript(scr5)
 				Destroy(p.Character.LowerTorso.Root)
 			end
 		end
+	elseif args[1] == "cmds" then
+		cmd.Visible = true
 	else
 		print("Invalid command")
 	end
@@ -9827,6 +9829,9 @@ clos.BorderColor3 = Color3.fromRGB(0, 0, 0)
 clos.BorderSizePixel = 0
 clos.Size = UDim2.new(0, 20, 0, 20)
 clos.Image = "http://www.roblox.com/asset/?id=8530043932"
+clos.MouseButton1Click:Connect(function()
+	cmd.Visible = false
+end)
 
 serch.Name = "serch"
 serch.Parent = cmd
