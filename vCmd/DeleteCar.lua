@@ -42,7 +42,7 @@ local Players = game:GetService("Players")
 
 function Destroy(ins)
 	spawn(function()
-		for _,v in pairs(game:GetDescendants()) do
+		for _,v in pairs(game.ReplicatedStorage:GetDescendants()) do
 			if v.Name == "DeleteCar" and v.ClassName == "RemoteEvent" then
 				v:FireServer(ins)
 			end
