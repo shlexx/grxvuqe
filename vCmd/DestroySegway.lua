@@ -43,7 +43,7 @@ local Players = game:GetService("Players")
 function Destroy(ins)
 	spawn(function()
 		for _,v in pairs(game:GetDescendants()) do
-			if v.Name == "DestroySegway" and v.ClassName == "RemoteEvent" then
+			if v.Name == "DestroySegway" then
 				v:FireServer(ins)
 			end
 		end
