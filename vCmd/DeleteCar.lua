@@ -109,6 +109,7 @@ exe.MouseButton1Click:Connect(function()
 		if args[2] == "all" then
 			for _,v in pairs(game.Players:GetPlayers()) do
 				repeat
+					wait(0.1)
 					Destroy(v.Character:FindFirstChildOfClass("Accessory"))
 				until v.Character:FindFirstChildOfClass("Accessory") == nil
 			end
@@ -116,12 +117,14 @@ exe.MouseButton1Click:Connect(function()
 			for _,v in pairs(game.Players:GetPlayers()) do
 				if v.Name == game.Players.LocalPlayer.Name then else
 					repeat
+						wait(0.1)
 						Destroy(v.Character:FindFirstChildOfClass("Accessory"))
 					until v.Character:FindFirstChildOfClass("Accessory") == nil
 				end
 			end
 		else
 			repeat
+				wait(0.1)
 				Destroy(p.Character:FindFirstChildOfClass("Accessory"))
 			until p.Character:FindFirstChildOfClass("Accessory") == nil
 		end
