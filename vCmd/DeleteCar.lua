@@ -50,6 +50,11 @@ function Destroy(ins)
 	end)
 end
 
+function getChar(plr)
+	local chr = plr.Character or player.CharacterAdded:Wait()
+	return chr
+end
+
 function getRoot(char)
 	local rootPart = char:FindFirstChild('HumanoidRootPart') or char:FindFirstChild('Torso') or char:FindFirstChild('UpperTorso')
 	return rootPart
