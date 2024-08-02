@@ -109,6 +109,7 @@ exe.MouseButton1Click:Connect(function()
 	end
 
 	local p = findPlayer(msg)
+	local pchar = getChar(p)
 	local args = msg:split(" ")
 	if args[1] == "bald" then
 		if args[2] == "all" then
