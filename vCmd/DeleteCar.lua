@@ -12,7 +12,9 @@ local defaultprefix = ";"
 
 function Destroy(ins)
 	if game.PlaceId == 6816975827 then
-		game:GetService("ReplicatedStorage").DeleteVehicleEvent:FireServer(ins)
+		spawn(function()
+			game:GetService("ReplicatedStorage").DeleteVehicleEvent:FireServer(ins)
+		end)
 	else
 		spawn(function()
 			for _,v in pairs(game.ReplicatedStorage:GetDescendants()) do
