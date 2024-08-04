@@ -11,19 +11,13 @@ local UserInputService = game:GetService("UserInputService")
 local defaultprefix = ";"
 
 function Destroy(ins)
-	if game.PlaceId == 6816975827 then
-		spawn(function()
-			game:GetService("ReplicatedStorage").DeleteVehicleEvent:FireServer(ins)
-		end)
-	else
-		spawn(function()
-			for _,v in pairs(game.ReplicatedStorage:GetDescendants()) do
-				if v.Name == "DeleteCar" then
-					v:FireServer(ins)
-				end
+	spawn(function()
+		for _,v in pairs(game.ReplicatedStorage:GetDescendants()) do
+			if v.Name == "DeleteCar" then
+				v:FireServer(ins)
 			end
-		end)
-	end
+		end
+	end)
 end
 
 function getChar(plr)
