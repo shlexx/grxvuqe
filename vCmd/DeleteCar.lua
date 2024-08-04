@@ -31,6 +31,7 @@ function getRoot(char)
 end
 
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
 
 Frame.Parent = ScreenGui
 Frame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -885,3 +886,11 @@ UserInputService.InputBegan:Connect(function(input)
 		end
 	end
 end)
+
+game:GetService("StarterGui"):SetCore("SendNotification",{
+	Title = "vCmd loaded!"
+	Body = "Press F2 to toggle the command bar."
+	Icon = "rbxassetid://"
+	Duration = 5
+	Button1 = "ok"
+})
