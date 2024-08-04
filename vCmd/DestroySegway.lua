@@ -890,7 +890,7 @@ end)
 game:GetService("StarterGui"):SetCore("SendNotification",{
 	Title = "vCmd loaded!"
 	Body = "Press F2 to toggle the command bar."
-	Icon = "rbxassetid://"
+	Icon = "rbxassetid://12818448717"
 	Duration = 5
 	Button1 = "ok"
 })
