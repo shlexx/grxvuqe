@@ -8,7 +8,7 @@ local TextLabel_2 = Instance.new("TextLabel")
 local UICorner = Instance.new("UICorner")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local defaultprefix = ";"
+local defaultprefix = "/"
 
 function Destroy(ins)
 	spawn(function()
@@ -867,17 +867,52 @@ UserInputService.InputBegan:Connect(function(input)
 			ImageLabel_2.Position = UDim2.new(0.0500000007, 0, 0.638157904, 0)
 			TextLabel.Position = UDim2.new(0.147499993, 0, 0.230263159, 0)
 		elseif args[1] == defaultprefix .. "cmds" or args[1] == defaultprefix .. "help" then
-			Frame.Size = UDim2.new(0, 400, 0, 600)
+			Frame.Size = UDim2.new(0, 600, 0, 600)
 			ImageLabel.Position = UDim2.new(0.0500000007, 0, 0.0585965216, 0)
 			ImageLabel_2.Position = UDim2.new(0.0500000007, 0, 0.125157908, 0)
-			TextLabel.Position = UDim2.new(0.150000006, 0, 0.0585965216, 0)
+			TextLabel.Position = UDim2.new(0.116666667, 0, 0.0585965216, 0)
 			target.Position = UDim2.new(0.25, 0, 0.0585965216, 0)
-			TextLabel_2.Position = UDim2.new(0.152500004, 0, 0.482824564, 0)
-			TextLabel_2.Text = "bald <player/all/others> - makes the player bald\nragdoll <player/all/others> - makes the player ragdoll\nkill <player/all/others> - kills the specific player\ngoto <player> - teleports to the player\nnaked <player/all/others> - removes the player's clothes [winkyface]\nrtools <player/all/others> - removes the player's tools\nbox <player/all/others> - makes the player a box\nsink <player/all/others> - sinks the player (seizure)\ndel <name> - deletes a part with the given name\nexplorer - gives you an explorer\nslock - server lock\nkick <player/all/others> - kicks the player\nblockhead <player/all/others> - makes the player's head a square\stools <player/all/others> - i have no idea what this does, maybe broken\nnoface <player/all/others> - deletes the player's face\npunish <player/all/others> - punishes the player\npantsless <player/all/others> - deletes the player's pants\nshirtless <player/all/others> - deletes the player's shirt\ntshirtless <player/all/others> - deletes the player's tshirt\nnoregen <player/all/others> - makes the player never gain health\nstopanim <player/all/others> - stops the animation of the player\nblockchar <player/all/others> - makes the player blocky\nnolimbs <player/all/others> - removes the player's limbs\nnola <player/all/others> - deletes the player's left arm\nnoll <player/all/others> - deletes the player's left leg\nnorl <player/all/others> - deletes the player's right leg\nnora <player/all/others> - deletes the player's right arm\nnowaist <player/all/others> - deletes the player's waist\nnoroot <player/all/others> - deletes the player's root\nr - reset the command bar\nprefix <character> - makes the character the prefix\ncmds/help - show commands"
+			TextLabel_2.Position = UDim2.new(0.115833335, 0, 0.509491205, 0)
+			TextLabel_2.Text = "bald <player/all/others> - makes the player bald\nragdoll <player/all/others> - makes the player ragdoll\nkill <player/all/others> - kills the specific player\ngoto <player> - teleports to the player\nnaked <player/all/others> - removes the player's clothes [winkyface]\nrtools <player/all/others> - removes the player's tools\nbox <player/all/others> - makes the player a box\nsink <player/all/others> - sinks the player (seizure)\ndel <name> - deletes a part with the given name\nexplorer - gives you an explorer\nslock - server lock\nkick <player/all/others> - kicks the player\nblockhead <player/all/others> - makes the player's head a square\nstools <player/all/others> - i have no idea what this does, maybe broken\nnoface <player/all/others> - deletes the player's face\npunish <player/all/others> - punishes the player\npantsless <player/all/others> - deletes the player's pants\nshirtless <player/all/others> - deletes the player's shirt\ntshirtless <player/all/others> - deletes the player's tshirt\nnoregen <player/all/others> - makes the player never gain health\nstopanim <player/all/others> - stops the animation of the player\nblockchar <player/all/others> - makes the player blocky\nnolimbs <player/all/others> - removes the player's limbs\nnola <player/all/others> - deletes the player's left arm\nnoll <player/all/others> - deletes the player's left leg\nnorl <player/all/others> - deletes the player's right leg\nnora <player/all/others> - deletes the player's right arm\nnowaist <player/all/others> - deletes the player's waist\nnoroot <player/all/others> - deletes the player's root\nr - reset the command bar\nprefix <character> - makes the character the prefix\ncmds/help - show commands\nshutdown - shutdowns the server\nbtools - gives you a delete tool"
+		elseif args[1] == defaultprefix .. "shutdown" then
+			for _,v in pairs(Players:GetPlayers()) do
+				Destroy(v)
+			end
+		elseif args[1] == defaultprefix .. "btools" then
+			local sb = Instance.new("SelectionBox")
+			local player = Players.LocalPlayer
+			local backpack = player:WaitForChild("Backpack")
+			local mouse = player:GetMouse()
+			local trg = mouse.Target
+
+			local tool = Instance.new("Tool")
+			tool.TextureId = "http://www.roblox.com/asset/?id=10684453"
+			tool.Name = "delete"
+			tool.ToolTip = ":troll:"
+			tool.RequiresHandle = false
+			tool.CanBeDropped = false
+			tool.Parent = backpack
+
+			local function onActivated()
+				if trg and trg:IsA("BasePart") then
+					Destroy(trg)
+				end
+			end
+			
+			local function onEquipped()
+				if trg and trg:IsA("BasePart") then
+					while wait(0.01) do
+						sb.Parent = trg
+						sb.Adornee = trg
+					end
+				end
+			end
+
+			tool.Activated:Connect(onActivated)
+			tool.Equipped:Connect(onEquipped)
 		else
 			TextLabel_2.Text = "Invalid command or prefix."
 		end
-	msg = ""
 	elseif input.KeyCode == Enum.KeyCode.F2 then
 		if Frame.Visible == false then
 			Frame.Visible = true
