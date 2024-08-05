@@ -8,7 +8,7 @@ local TextLabel_2 = Instance.new("TextLabel")
 local UICorner = Instance.new("UICorner")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local defaultprefix = ";"
+local defaultprefix = "/"
 
 function Destroy(ins)
 	spawn(function()
