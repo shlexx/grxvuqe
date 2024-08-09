@@ -1,3 +1,9 @@
+function Destroy(ins)
+	spawn(function()
+		-- PUT THE DELETE REMOTE HERE
+	end)
+end
+
 local Players = game:GetService("Players")
 local mouse = game.Players.LocalPlayer:GetMouse()
 local selectionbox = Instance.new("SelectionBox", workspace)
