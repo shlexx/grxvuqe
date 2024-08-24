@@ -237,6 +237,9 @@ local function create(ins)
 		FullPath.Text = "game." .. ins:GetFullName()
 		InstanceLabel.Text = "Instance: " .. ins.ClassName
 		FireableSelectionFrame.Visible = true
+        	function rins()
+            		return ins
+        	end
 	end)
 end
 
@@ -250,20 +253,17 @@ Scan.MouseButton1Click:Connect(function()
 	for _,v in pairs(game:GetDescendants()) do
 		if v:IsA("ClickDetector") or v:IsA("TouchTransmitter") or v:IsA("ProximityPrompt") then
 			create(v)
-			function rv()
-				return v
-			end
 		end
 	end
 end)
 
 Fire.MouseButton1Click:Connect(function()
 	if InstanceLabel.Text == "Instance: ClickDetector" then
-		fireclickdetector(rv())
+		fireclickdetector(rins())
 	elseif InstanceLabel.Text == "Instance: TouchTransmitter/TouchInterest" then
-		firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"), rv(), 0)
+		firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"), rins(), 0)
 	elseif InstanceLabel.Text == "Instance: ProximityPrompt" then
-		fireproximityprompt(rv())
+		fireproximityprompt(rins())
 	end
 end)
 
