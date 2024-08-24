@@ -2022,6 +2022,10 @@ MainSection:NewButton("Universal Vehicle GUI", "epic ahh", function()
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/Documantation12/Universal-Vehicle-Script/main/Main.lua'))()
 end)
 
+MainSection:NewButton("Infinite Yield Reborn", "reborn frfr", function()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/Documantation12/Universal-Vehicle-Script/main/Main.lua'))()
+end)
+
 local Credits = Window:NewTab("Credits")
 local CreditsSection = Credits:NewSection("Credits")
 
