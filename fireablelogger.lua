@@ -228,7 +228,8 @@ local function create(ins)
 	button.BorderSizePixel = 0
 	button.BackgroundColor3 = Color3.fromRGB(50,50,50)
 	button.Size = UDim2.new(1,0,0,20)
-	button.Text = ins.Name
+	button.TextTruncate = Enum.TextTruncate.AtEnd
+	button.Text = "game." .. ins:GetFullName()
 	button.TextColor3 = Color3.new(255,255,255)
 	button.Font = Enum.Font.SourceSansSemibold
 	button.TextSize = 14.000
