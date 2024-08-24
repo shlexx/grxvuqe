@@ -2023,7 +2023,7 @@ MainSection:NewButton("Universal Vehicle GUI", "epic ahh", function()
 end)
 
 MainSection:NewButton("Infinite Yield Reborn", "reborn frfr", function()
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/Documantation12/Universal-Vehicle-Script/main/Main.lua'))()
+	loadstring(game:HttpGet("https://github.com/fuckusfm/infiniteyield-reborn/raw/master/source"))()
 end)
 
 local Credits = Window:NewTab("Credits")
