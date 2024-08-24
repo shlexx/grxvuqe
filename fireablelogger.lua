@@ -260,7 +260,7 @@ end)
 Fire.MouseButton1Click:Connect(function()
 	if InstanceLabel.Text == "Instance: ClickDetector" then
 		fireclickdetector(rins())
-	elseif InstanceLabel.Text == "Instance: TouchTransmitter/TouchInterest" then
+	elseif InstanceLabel.Text == "Instance: TouchTransmitter" then
 		firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"), rins(), 0)
 	elseif InstanceLabel.Text == "Instance: ProximityPrompt" then
 		fireproximityprompt(rins())
