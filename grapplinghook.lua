@@ -17,6 +17,8 @@ end)
 
 grappling.Activated:Connect(function()
 	if equipped == true then
-		TweenService:Create(game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"), TweenInfo.new(tweenSpeed, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = mouse.Hit + Vector3.new(0, 2, 0)}):Play()
+		if mouse.Target then
+			TweenService:Create(game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"), TweenInfo.new(tweenSpeed, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = mouse.Hit + Vector3.new(0, 2, 0)}):Play()
+		end
 	else end
 end)
