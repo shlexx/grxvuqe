@@ -209,3 +209,4 @@ game.Players.LocalPlayer.Chatted:Connect(function(message)
 		end)
 	end
 end)
+print("Gears loaded!")
