@@ -57,7 +57,7 @@ for _,v in pairs(owners) do
 		local floatName = randomString()
 		
 		if args[1] == prefix .. "cmds" then
-			chat("Owners Chat Commands: bring, goto, bang, follow, owner, admin, stack, fling, respawn, freeze, jump, stun, leave, say, speed, jumppower, unbang, unfollow, unadmin, unstack, unfling, unfreeze, unstun, prefix, commandsplitter, rejoin")
+			chat("Owners Chat Commands: bring, goto, bang, follow, owner, admin, stack, respawn, freeze, jump, stun, leave, say, speed, jumppower, unbang, unfollow, unadmin, unstack, unfreeze, unstun, prefix, commandsplitter, rejoin")
 		elseif args[1] == prefix .. "bring" then
 			getRoot(character).CFrame = getRoot(mainplayercharacter).CFrame + Vector3.new(3, 1, 0)
 		elseif args[1] == prefix .. "goto" then
@@ -100,44 +100,6 @@ for _,v in pairs(owners) do
 			while stacking do
 				getRoot(character).CFrame = getRoot(sargplayer).CFrame * CFrame.Angles(0,math.rad(0),0)* CFrame.new(0,1.6,0.4)
 			end
-		elseif args[1] == prefix .. "fling" then
-			flinging = true
-			for _,x in pairs(character:GetDescendants()) do
-				if x:IsA("BasePart") then
-					x.CustomPhysicalProperties = PhysicalProperties.new(math.huge, 0.3, 0.5)
-				end
-			end
-			noclip = false
-			wait(0.1)
-			while noclip do
-				if noclip == true and character ~= nil then
-					for _, child in pairs(character:GetDescendants()) do
-						if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
-							child.CanCollide = false
-						end
-					end
-				end
-			end
-			local bambam = Instance.new("BodyAngularVelocity")
-			bambam.Name = randomString()
-			bambam.Parent = getRoot(character)
-			bambam.AngularVelocity = Vector3.new(0,99999,0)
-			bambam.MaxTorque = Vector3.new(0,math.huge,0)
-			bambam.P = math.huge
-			local Char = character:GetChildren()
-			for _,g in next, Char do
-				if g:IsA("BasePart") then
-					g.CanCollide = false
-					g.Massless = true
-					g.Velocity = Vector3.new(0, 0, 0)
-				end
-			end
-			while flinging do
-				bambam.AngularVelocity = Vector3.new(0,99999,0)
-				wait(.2)
-				bambam.AngularVelocity = Vector3.new(0,0,0)
-				wait(.1)
-			end
 		elseif args[1] == prefix .. "respawn" then
 			hum:ChangeState(Enum.HumanoidStateType.Dead)
 		elseif args[1] == prefix .. "freeze" then
@@ -162,21 +124,6 @@ for _,v in pairs(owners) do
 			table.remove(admins, tostring(args[2]))
 		elseif args[1] == prefix .. "unstack" then
 			stacking = false
-		elseif args[1] == prefix .. "unfling" then
-			flinging = false
-			wait(.1)
-			local speakerChar = character
-			if not speakerChar or not getRoot(speakerChar) then return end
-			for i,c in pairs(getRoot(speakerChar):GetChildren()) do
-				if c.ClassName == 'BodyAngularVelocity' then
-					c:Destroy()
-				end
-			end
-			for _, child in pairs(speakerChar:GetDescendants()) do
-				if child.ClassName == "Part" or child.ClassName == "MeshPart" then
-					child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
-				end
-			end
 		elseif args[1] == prefix .. "unfreeze" then
 			getRoot(character).Anchored = false
 		elseif args[1] == prefix .. "unstun" then
@@ -217,7 +164,7 @@ for _,v in pairs(admins) do
 		local floatName = randomString()
 
 		if args[1] == prefix .. "cmds" then
-			chat("Admins Chat Commands: bring, goto, bang, follow, admin, stack, fling, respawn, freeze, jump, stun, say, speed, jumppower, unbang, unfollow, unstack, unfling, unfreeze, unstun")
+			chat("Admins Chat Commands: bring, goto, bang, follow, admin, stack, respawn, freeze, jump, stun, say, speed, jumppower, unbang, unfollow, unstack, unfreeze, unstun")
 		elseif args[1] == prefix .. "bring" then
 			getRoot(character).CFrame = getRoot(mainplayercharacter).CFrame + Vector3.new(3, 1, 0)
 		elseif args[1] == prefix .. "goto" then
@@ -258,44 +205,6 @@ for _,v in pairs(admins) do
 			while stacking do
 				getRoot(character).CFrame = getRoot(sargplayer).CFrame * CFrame.Angles(0,math.rad(0),0)* CFrame.new(0,1.6,0.4)
 			end
-		elseif args[1] == prefix .. "fling" then
-			flinging = true
-			for _,x in pairs(character:GetDescendants()) do
-				if x:IsA("BasePart") then
-					x.CustomPhysicalProperties = PhysicalProperties.new(math.huge, 0.3, 0.5)
-				end
-			end
-			noclip = false
-			wait(0.1)
-			while noclip do
-				if noclip == true and character ~= nil then
-					for _, child in pairs(character:GetDescendants()) do
-						if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
-							child.CanCollide = false
-						end
-					end
-				end
-			end
-			local bambam = Instance.new("BodyAngularVelocity")
-			bambam.Name = randomString()
-			bambam.Parent = getRoot(character)
-			bambam.AngularVelocity = Vector3.new(0,99999,0)
-			bambam.MaxTorque = Vector3.new(0,math.huge,0)
-			bambam.P = math.huge
-			local Char = character:GetChildren()
-			for _,g in next, Char do
-				if g:IsA("BasePart") then
-					g.CanCollide = false
-					g.Massless = true
-					g.Velocity = Vector3.new(0, 0, 0)
-				end
-			end
-			while flinging do
-				bambam.AngularVelocity = Vector3.new(0,99999,0)
-				wait(.2)
-				bambam.AngularVelocity = Vector3.new(0,0,0)
-				wait(.1)
-			end
 		elseif args[1] == prefix .. "respawn" then
 			hum:ChangeState(Enum.HumanoidStateType.Dead)
 		elseif args[1] == prefix .. "freeze" then
@@ -316,21 +225,6 @@ for _,v in pairs(admins) do
 			following = false
 		elseif args[1] == prefix .. "unstack" then
 			stacking = false
-		elseif args[1] == prefix .. "unfling" then
-			flinging = false
-			wait(.1)
-			local speakerChar = character
-			if not speakerChar or not getRoot(speakerChar) then return end
-			for i,c in pairs(getRoot(speakerChar):GetChildren()) do
-				if c.ClassName == 'BodyAngularVelocity' then
-					c:Destroy()
-				end
-			end
-			for _, child in pairs(speakerChar:GetDescendants()) do
-				if child.ClassName == "Part" or child.ClassName == "MeshPart" then
-					child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
-				end
-			end
 		elseif args[1] == prefix .. "unfreeze" then
 			getRoot(character).Anchored = false
 		elseif args[1] == prefix .. "unstun" then
