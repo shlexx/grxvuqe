@@ -1,3 +1,7 @@
+repeat task.wait() until game:IsLoaded()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AnthonyIsntHere/anthonysrepository/main/scripts/AntiChatLogger.lua", true))()
+wait()
+
 local CB = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local ButtonHolder = Instance.new("Frame")
