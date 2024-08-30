@@ -1,6 +1,3 @@
-if game.CoreGui.SelectorGUI then
-    game.CoreGui.SelectorGUI:Destroy()
-end
 local Players = game:GetService("Players")
 local mouse = Players.LocalPlayer:GetMouse()
 local selectionbox = Instance.new("SelectionBox", workspace)
