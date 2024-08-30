@@ -43,7 +43,6 @@ TextButton.MouseButton1Click:Connect(function()
 	repeat wait() until player.Character.Humanoid
 	local humanoid = player.Character.Humanoid
 	local character = player.Character or player.CharacterAdded:Wait()
-	local UserInputService = game:GetService("UserInputService")
 	
 	local anim = Instance.new("Animation")
 	anim.AnimationId = "rbxassetid://" .. t
