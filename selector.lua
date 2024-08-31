@@ -3,6 +3,8 @@ local mouse = Players.LocalPlayer:GetMouse()
 local selectionbox = Instance.new("SelectionBox", workspace)
 local equipped = false
 local selectortool = Instance.new("Tool", Players.LocalPlayer:FindFirstChildOfClass("Backpack"))
+local isblack = true
+local iswhite = false
 local SelectorGUI = Instance.new("ScreenGui")
 local SelectorText = Instance.new("TextLabel")
 SelectorGUI.Name = "SelectorGUI"
@@ -39,5 +41,14 @@ selectortool.Unequipped:Connect(function()
 	equipped = false
 	selectionbox.Adornee = nil
 	SelectorText.Visible = false
+end)
+selectortool.Activated:Connect(function()
+	if isblack then
+		SelectorText.TextColor3 = Color3.fromRGB(255, 255, 255)
+		iswhite = true
+	else
+		SelectorText.TextColor3 = Color3.fromRGB(0, 0, 0)
+		isblack = true
+	end
 end)
 game:GetService("StarterGui"):SetCoreGuiEnabled('Backpack', true)
