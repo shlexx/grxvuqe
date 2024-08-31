@@ -56,9 +56,9 @@ for _,v in pairs(owners) do
 		local noclip = false
 		local floatName = randomString()
 		
-		if args[1] == prefix .. "cmds" then
+		if msg == prefix .. "cmds" then
 			chat("Owners Chat Commands: bring, goto, bang, follow, owner, admin, stack, respawn, freeze, jump, stun, leave, say, speed, jumppower, unbang, unfollow, unadmin, unstack, unfreeze, unstun, prefix, commandsplitter, rejoin")
-		elseif args[1] == prefix .. "bring" then
+		elseif msg == prefix .. "bring" then
 			getRoot(character).CFrame = getRoot(mainplayercharacter).CFrame + Vector3.new(3, 1, 0)
 		elseif args[1] == prefix .. "goto" then
 			getRoot(character).CFrame = getRoot(sargcharacter).CFrame + Vector3.new(3, 1, 0)
@@ -100,15 +100,15 @@ for _,v in pairs(owners) do
 			while stacking do
 				getRoot(character).CFrame = getRoot(sargplayer).CFrame * CFrame.Angles(0,math.rad(0),0)* CFrame.new(0,1.6,0.4)
 			end
-		elseif args[1] == prefix .. "respawn" then
+		elseif msg == prefix .. "respawn" then
 			hum:ChangeState(Enum.HumanoidStateType.Dead)
-		elseif args[1] == prefix .. "freeze" then
+		elseif msg == prefix .. "freeze" then
 			getRoot(character).Anchored = true
-		elseif args[1] == prefix .. "jump" then
+		elseif msg == prefix .. "jump" then
 			hum.Jump = true
-		elseif args[1] == prefix .. "stun" then
+		elseif msg == prefix .. "stun" then
 			hum.PlatformStand = true
-		elseif args[1] == prefix .. "leave" then
+		elseif msg == prefix .. "leave" then
 			game:Shutdown()
 		elseif args[1] == prefix .. "say" then
 			chat(tostring(args[2]))
@@ -116,23 +116,23 @@ for _,v in pairs(owners) do
 			hum.WalkSpeed = tonumber(args[2])
 		elseif args[1] == prefix .. "jumppower" then
 			hum.JumpPower = tonumber(args[2])
-		elseif args[1] == prefix .. "unbang" then
+		elseif msg == prefix .. "unbang" then
 			banging = false
-		elseif args[1] == prefix .. "unfollow" then
+		elseif msg == prefix .. "unfollow" then
 			following = false
 		elseif args[1] == prefix .. "unadmin" then
 			table.remove(admins, tostring(args[2]))
-		elseif args[1] == prefix .. "unstack" then
+		elseif msg == prefix .. "unstack" then
 			stacking = false
-		elseif args[1] == prefix .. "unfreeze" then
+		elseif msg == prefix .. "unfreeze" then
 			getRoot(character).Anchored = false
-		elseif args[1] == prefix .. "unstun" then
+		elseif msg == prefix .. "unstun" then
 			hum.PlatformStand = false
 		elseif args[1] == prefix .. "prefix" then
 			prefix = tostring(args[2])
 		elseif args[1] == prefix .. "commandsplitter" then
 			commandsplitter = tostring(args[2])
-		elseif args[1] == prefix .. "rejoin" then
+		elseif msg == prefix .. "rejoin" then
 			if #Players:GetPlayers() <= 1 then
 				Players.LocalPlayer:Kick("\nRejoining...")
 				wait()
@@ -163,9 +163,9 @@ for _,v in pairs(admins) do
 		local noclip = false
 		local floatName = randomString()
 
-		if args[1] == prefix .. "cmds" then
+		if msg == prefix .. "cmds" then
 			chat("Admins Chat Commands: bring, goto, bang, follow, admin, stack, respawn, freeze, jump, stun, say, speed, jumppower, unbang, unfollow, unstack, unfreeze, unstun")
-		elseif args[1] == prefix .. "bring" then
+		elseif msg == prefix .. "bring" then
 			getRoot(character).CFrame = getRoot(mainplayercharacter).CFrame + Vector3.new(3, 1, 0)
 		elseif args[1] == prefix .. "goto" then
 			getRoot(character).CFrame = getRoot(sargcharacter).CFrame + Vector3.new(3, 1, 0)
@@ -205,13 +205,13 @@ for _,v in pairs(admins) do
 			while stacking do
 				getRoot(character).CFrame = getRoot(sargplayer).CFrame * CFrame.Angles(0,math.rad(0),0)* CFrame.new(0,1.6,0.4)
 			end
-		elseif args[1] == prefix .. "respawn" then
+		elseif msg == prefix .. "respawn" then
 			hum:ChangeState(Enum.HumanoidStateType.Dead)
-		elseif args[1] == prefix .. "freeze" then
+		elseif msg == prefix .. "freeze" then
 			getRoot(character).Anchored = true
-		elseif args[1] == prefix .. "jump" then
+		elseif msg == prefix .. "jump" then
 			hum.Jump = true
-		elseif args[1] == prefix .. "stun" then
+		elseif msg == prefix .. "stun" then
 			hum.PlatformStand = true
 		elseif args[1] == prefix .. "say" then
 			chat(tostring(args[2]))
@@ -219,15 +219,15 @@ for _,v in pairs(admins) do
 			hum.WalkSpeed = tonumber(args[2])
 		elseif args[1] == prefix .. "jumppower" then
 			hum.JumpPower = tonumber(args[2])
-		elseif args[1] == prefix .. "unbang" then
+		elseif msg == prefix .. "unbang" then
 			banging = false
-		elseif args[1] == prefix .. "unfollow" then
+		elseif msg == prefix .. "unfollow" then
 			following = false
-		elseif args[1] == prefix .. "unstack" then
+		elseif msg == prefix .. "unstack" then
 			stacking = false
-		elseif args[1] == prefix .. "unfreeze" then
+		elseif msg == prefix .. "unfreeze" then
 			getRoot(character).Anchored = false
-		elseif args[1] == prefix .. "unstun" then
+		elseif msg == prefix .. "unstun" then
 			hum.PlatformStand = false
 		end
 	end)
