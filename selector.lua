@@ -46,9 +46,11 @@ selectortool.Activated:Connect(function()
 	if isblack then
 		SelectorText.TextColor3 = Color3.fromRGB(255, 255, 255)
 		iswhite = true
+		isblack = false
 	else
 		SelectorText.TextColor3 = Color3.fromRGB(0, 0, 0)
 		isblack = true
+		iswhite = false
 	end
 end)
 game:GetService("StarterGui"):SetCoreGuiEnabled('Backpack', true)
