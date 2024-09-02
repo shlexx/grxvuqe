@@ -2,6 +2,32 @@ local gun = Instance.new("Tool",game.Players.LocalPlayer.Backpack)
 local handle = Instance.new("Part",gun)
 local mouse = game.Players.LocalPlayer:GetMouse()
 local equipped = false
+local HB = Instance.new("ScreenGui")
+local Holder = Instance.new("Frame")
+local HBBox = Instance.new("TextBox")
+HB.Name = "HB"
+HB.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+Holder.Name = "Holder"
+Holder.Parent = HB
+Holder.AnchorPoint = Vector2.new(1, 1)
+Holder.BackgroundColor3 = Color3.fromRGB(0, 131, 212)
+Holder.BackgroundTransparency = 0.250
+Holder.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Holder.BorderSizePixel = 0
+Holder.Position = UDim2.new(0.708999991, 0, 0.967999995, 0)
+Holder.Size = UDim2.new(0, 60, 0, 60)
+HBBox.Name = "HBBox"
+HBBox.Parent = Holder
+HBBox.BackgroundColor3 = Color3.fromRGB(9, 25, 36)
+HBBox.BackgroundTransparency = 0.750
+HBBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+HBBox.BorderSizePixel = 0
+HBBox.Position = UDim2.new(0.0833333358, 0, 0.0833333358, 0)
+HBBox.Size = UDim2.new(0, 50, 0, 50)
+HBBox.Font = Enum.Font.SourceSansBold
+HBBox.Text = ""
+HBBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+HBBox.TextSize = 28.000
 gun.CanBeDropped = false
 gun.Name = "criminal exterminator"
 gun.ToolTip = "kill"
@@ -61,6 +87,22 @@ gun.Activated:Connect(function()
 				if mouse.Target.Parent.Humanoid then
 					game.ReplicatedStorage.Events.Arrest:InvokeServer(game.Players:FindFirstChild(mouse.Target.Parent.Name))
 				end
+			end
+		end
+	end
+end)
+
+HBBox.FocusLost:Connect(function(enter)
+	if enter then
+		for _,v in pairs(game.Players:GetPlayers()) do
+			local head = v.Character.Head
+			if head then
+				repeat wait() until head
+				head.Size = Vector3.new(tonumber(HBBox.Text),tonumber(HBBox.Text),tonumber(HBBox.Text))
+				v.Character:WaitForChild("Humanoid").Died:Connect(function()
+					repeat wait() until head
+					head.Size = Vector3.new(tonumber(HBBox.Text),tonumber(HBBox.Text),tonumber(HBBox.Text))
+				end)
 			end
 		end
 	end
