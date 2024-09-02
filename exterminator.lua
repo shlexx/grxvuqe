@@ -16,6 +16,7 @@ Holder.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Holder.BorderSizePixel = 0
 Holder.Position = UDim2.new(0.708999991, 0, 0.967999995, 0)
 Holder.Size = UDim2.new(0, 60, 0, 60)
+Holder.Visible = false
 HBBox.Name = "HBBox"
 HBBox.Parent = Holder
 HBBox.BackgroundColor3 = Color3.fromRGB(9, 25, 36)
@@ -49,12 +50,14 @@ gun.Equipped:Connect(function()
 	gunframe.Visible = true
 	gunframe.Label.Text = "criminal exterminator"
 	gunframe.Magazine.Text = "inf/inf"
+	Holder.Visible = true
 end)
 
 gun.Unequipped:Connect(function()
 	equipped = false
 	playAnim:Stop()
 	gunframe.Visible = false
+	Holder.Visible = false
 end)
 
 gun.Activated:Connect(function()
