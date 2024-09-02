@@ -16,19 +16,19 @@ gun.Equipped:Connect(function()
 	local humanoid = player.Character.Humanoid
 	local character = player.Character or player.CharacterAdded:Wait()
 	local anim = Instance.new("Animation")
-    gunframe = player.PlayerGui.Home.HUD.GunFrame
+	gunframe = player.PlayerGui.Home.HUD.GunFrame
 	anim.AnimationId = "rbxassetid://18137826278"
 	playAnim = humanoid:LoadAnimation(anim)
 	playAnim:Play()
-    gunframe.Visible = true
-    gunframe.Label.Text = "criminal exterminator"
-    gunframe.Magazine.Text = "inf/inf"
+	gunframe.Visible = true
+	gunframe.Label.Text = "criminal exterminator"
+	gunframe.Magazine.Text = "inf/inf"
 end)
 
 gun.Unequipped:Connect(function()
 	equipped = false
 	playAnim:Stop()
-    gunframe.Visible = false
+	gunframe.Visible = false
 end)
 
 gun.Activated:Connect(function()
