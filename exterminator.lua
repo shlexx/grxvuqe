@@ -98,15 +98,17 @@ end)
 HBBox.FocusLost:Connect(function(enter)
 	if enter then
 		for _,v in pairs(game.Players:GetPlayers()) do
-			local head = v.Character.HumanoidRootPart
-			if head then
-				repeat wait() until head
-				head.Size = Vector3.new(tonumber(HBBox.Text),tonumber(HBBox.Text),tonumber(HBBox.Text))
-				v.Character:WaitForChild("Humanoid").Died:Connect(function()
-					repeat wait() until head
-					head.Size = Vector3.new(tonumber(HBBox.Text),tonumber(HBBox.Text),tonumber(HBBox.Text))
-				end)
-			end
+			if v.Character ~= game.Players.LocalPlayer.Character then
+                local head = v.Character.HumanoidRootPart
+			    if head then
+				    repeat wait() until head
+				    head.Size = Vector3.new(tonumber(HBBox.Text),tonumber(HBBox.Text),tonumber(HBBox.Text))
+				    v.Character:WaitForChild("Humanoid").Died:Connect(function()
+					    repeat wait() until head
+					    head.Size = Vector3.new(tonumber(HBBox.Text),tonumber(HBBox.Text),tonumber(HBBox.Text))
+				    end)
+			    end
+            end
 		end
 	end
 end)
