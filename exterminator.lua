@@ -98,7 +98,7 @@ end)
 HBBox.FocusLost:Connect(function(enter)
 	if enter then
 		for _,v in pairs(game.Players:GetPlayers()) do
-			local head = v.Character.Head
+			local head = v.Character.HumanoidRootPart
 			if head then
 				repeat wait() until head
 				head.Size = Vector3.new(tonumber(HBBox.Text),tonumber(HBBox.Text),tonumber(HBBox.Text))
