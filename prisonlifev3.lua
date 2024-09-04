@@ -6,11 +6,11 @@ function giverfunc(giv)
 	local hrp = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	getgenv().op = hrp.CFrame
 	hrp.CFrame = giv.CFrame
-	task.wait(.1)
+	task.wait(.2)
 	game.ReplicatedStorage.Events.Interact:InvokeServer(giv,"GetTool")
 	task.wait(.1)
 	hrp.CFrame = getgenv().op
-	task.wait(.1)
+	task.wait(.2)
 	hrp.Parent.Humanoid.PlatformStand = false
 end
 
