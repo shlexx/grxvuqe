@@ -3,7 +3,7 @@ if not getgenv then
 end
 
 function giverfunc(giv)
-	local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
+	local hrp = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	getgenv().op = hrp.CFrame
 	hrp.CFrame = giver.CFrame
 	task.wait(.1)
