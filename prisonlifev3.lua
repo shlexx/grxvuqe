@@ -732,7 +732,7 @@ Execute.MouseButton1Click:Connect(function()
 	elseif args[1] == prefix .. "arrest" then
 		game.ReplicatedStorage.Events.Arrest:InvokeServer(game.Players:FindFirstChild(tostring(args[2])))
 	elseif command == prefix .. "escape" then
-		hrp.CFrame = workspace["NEUTRAL SPAWNLOCATIONS"].SpawnLocation
+		hrp.CFrame = workspace["NEUTRAL SPAWNLOCATIONS"].SpawnLocation.CFrame
 		wait(.25)
 		game.Players.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead)
 	elseif command == prefix .. "ak47" then
