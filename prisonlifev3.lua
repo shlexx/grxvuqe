@@ -2,6 +2,16 @@ if not getgenv then
 	print("The script doesn't work on your executor.")
 end
 
+function giverfunc(giv)
+	local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
+	getgenv().op = hrp.CFrame
+	hrp.CFrame = giver.CFrame
+	task.wait(.1)
+	game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
+	task.wait(.1)
+	hrp.CFrame = getgenv().op
+end
+
 local prefix = "."
 local speedlooped = false
 local jumppowerlooped = false
@@ -737,88 +747,40 @@ Execute.MouseButton1Click:Connect(function()
 		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead)
 	elseif command == prefix .. "ak47" then
 		local giver = workspace.Prison_ITEMS.giver["AK-47"].ITEMPICKUP
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "db" then
 		local giver = workspace.Prison_ITEMS.giver.DB.Part
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "glock17" then
 		local giver = workspace.Prison_ITEMS.giver["Glock-17"].ITEMPICKUP
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "m82" then
 		local giver = workspace.Prison_ITEMS.giver.M82.ITEMPICKUP
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "m9" then
 		local giver = workspace.Prison_ITEMS.giver.M9.ITEMPICKUP
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "medkit" then
 		local giver = workspace.Prison_ITEMS.giver.Medkit.ITEMPICKUP
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "remington870" then
 		local giver = workspace.Prison_ITEMS.giver["Remington 870"].Part
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "hk416" then
 		local giver = workspace.Prison_ITEMS.giver.HK416.Part
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "remington700" then
 		local giver = workspace.Prison_ITEMS.giver["Remington 700"].Part
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "scar" then
 		local giver = workspace.Prison_ITEMS.giver.SCAR.ITEMPICKUP
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "spas12" then
 		local giver = workspace.Prison_ITEMS.giver["SPAS-12"].ITEMPICKUP
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "uzi" then
 		local giver = workspace.Prison_ITEMS.giver.UZI.Part
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "hammer" then
 		-- UNFINISHED
 	elseif command == prefix .. "redguitar" then
@@ -921,11 +883,7 @@ Execute.MouseButton1Click:Connect(function()
 		CommandsFrame.Visible = false
 	elseif command == prefix .. "aug" then
 		local giver = workspace.Prison_ITEMS.giver.AUG.Part
-		getgenv().op = hrp.CFrame
-		hrp.CFrame = giver.CFrame
-		game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
-		task.wait(.1)
-		hrp.CFrame = getgenv().op
+		giverfunc(giver)
 	elseif command == prefix .. "teamesp" then
 		teamesp = true
 		while teamesp do
