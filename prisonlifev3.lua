@@ -10,6 +10,8 @@ function giverfunc(giv)
 	game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"GetTool")
 	task.wait(.1)
 	hrp.CFrame = getgenv().op
+	task.wait(.1)
+	hrp.Parent.Humanoid.PlatformStand = false
 end
 
 local prefix = "."
