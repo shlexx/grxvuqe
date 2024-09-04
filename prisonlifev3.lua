@@ -814,7 +814,7 @@ Execute.MouseButton1Click:Connect(function()
 		local special = "Bedsheets"
 		for _,v in nospace do
 			if tostring(args[2]) == v then
-				local giver = workspace.Prison_ITEMS.crafting:FindFirstChild(v).craftingitem
+				local giver = workspace.Prison_ITEMS.crafting:FindFirstChild(v).craftingItem
 				getgenv().op = hrp.CFrame
 				hrp.CFrame = giver.CFrame
 				game.ReplicatedStorage.Events.Interact:InvokeServer(giver,"CraftingItem")
