@@ -734,7 +734,7 @@ Execute.MouseButton1Click:Connect(function()
 	elseif command == prefix .. "escape" then
 		hrp.CFrame = workspace["NEUTRAL SPAWNLOCATIONS"].SpawnLocation.CFrame
 		wait(.25)
-		game.Players.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead)
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead)
 	elseif command == prefix .. "ak47" then
 		local giver = workspace.Prison_ITEMS.giver["AK-47"].ITEMPICKUP
 		getgenv().op = hrp.CFrame
