@@ -613,7 +613,7 @@ CMD_38.BorderColor3 = Color3.fromRGB(0, 0, 0)
 CMD_38.BorderSizePixel = 0
 CMD_38.Size = UDim2.new(0, 200, 0, 20)
 CMD_38.Font = Enum.Font.FredokaOne
-CMD_38.Text = "  unview <player>"
+CMD_38.Text = "  unview"
 CMD_38.TextColor3 = Color3.fromRGB(255, 255, 255)
 CMD_38.TextSize = 14.000
 CMD_38.TextXAlignment = Enum.TextXAlignment.Left
@@ -943,7 +943,7 @@ Execute.MouseButton1Click:Connect(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 	elseif args[1] == prefix .. "view" then
 		workspace.CurrentCamera.CameraSubject = game.Players:FindFirstChild(tostring(args[2])).Character
-	elseif args[1] == prefix .. "unview" then
+	elseif command == prefix .. "unview" then
 		workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character
 	elseif command == prefix .. "noclip" then
 		noclipping = true
