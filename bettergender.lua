@@ -101,6 +101,32 @@ Section6:AddButton({
       		game:GetService("TextChatService").ChatWindowConfiguration.Enabled = true
   	end    
 })
+local Section7 = Tab:AddSection({
+	Name = "Teddy"
+})
+Section7:AddToggle({
+	Name = "ESP",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+            local obj = workspace.FindMap.Teddy
+		    local hl = Instance.new("BoxHandleAdornment",obj)
+		    hl.Adornee = obj
+		    hl.AlwaysOnTop = true
+		    hl.ZIndex = 1
+		    hl.Size = Vector3.new(4,4,4)
+		    hl.Color3 = Color3.new(255,255,255)
+        else
+            workspace.FindMap.Teddy.BoxHandleAdornment:Destroy()
+        end
+	end    
+})
+Section7:AddButton({
+	Name = "Find Teddy",
+	Callback = function()
+      		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.FindMap.Teddy
+  	end    
+})
 local Tab2 = Window:MakeTab({
 	Name = "Misc",
 	Icon = "rbxassetid://4483345998",
