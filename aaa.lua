@@ -38,6 +38,14 @@ local ignoretable = {
 }
 for _,v in pairs(game:GetDescendants()) do
   if v:IsA("Animation") then
-    print("@ game." .. v:GetFullName() .. " / " .. v.AnimationId)
+    if ignore then
+      for i = 1,#ignoretable do
+        if v.AnimationId ~= i then
+          print("@ game." .. v:GetFullName() .. " / " .. v.AnimationId)
+        end
+      end
+    else
+      print("@ game." .. v:GetFullName() .. " / " .. v.AnimationId)
+    end
   end
 end
