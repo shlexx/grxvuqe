@@ -41,7 +41,7 @@ for _,v in pairs(game:GetDescendants()) do
     if ignore then
       local nono = false
       for i = 1,#ignoretable do
-        if v.AnimationId == ignoretable[i] then
+        if (v.AnimationId == ignoretable[i]) or (v.Parent.Parent.Name == "Animate") then
           nono = true
         end
       end
