@@ -95,34 +95,34 @@ end
 dragify(Frame)
 
 TextButton.MouseButton1Click:Connect(function()
-    local t = TextBox.Text
+	local t = TextBox.Text
 	if t == "all" then
-        for _,v in pairs(game.Players:GetPlayers()) do
-            if v.Name ~= game.Players.LocalPlayer.Name then
-                local args = {
-		            [1] = "Revolver",
-		            [2] = v.Name,
-		            [3] = {
-		            	[1] = "GunDefault",
-		            	[2] = "Torso",
-		            	[3] = Vector3.new(0,0,0),
-		            	[4] = "Default"
-		            }
-	            }
-	            workspace.GameMain.Triggers.ServerRequest.Damage:FireServer(unpack(args))
-            end
+		for _,v in pairs(game.Players:GetPlayers()) do
+			if v.Name ~= game.Players.LocalPlayer.Name then
+				local args = {
+					[1] = "Revolver",
+					[2] = v.Name,
+					[3] = {
+						[1] = "GunDefault",
+						[2] = "Torso",
+						[3] = Vector3.new(0,0,0),
+						[4] = "Default"
+					}
+				}
+				workspace.GameMain.Triggers.ServerRequest.Damage:FireServer(unpack(args))
+			end
 	else
 		local args = {
-		            [1] = "Revolver",
-		            [2] = t,
-		            [3] = {
-		            	[1] = "GunDefault",
-		            	[2] = "Torso",
-		            	[3] = Vector3.new(0,0,0),
-		            	[4] = "Default"
-		            }
-	            }
-	            workspace.GameMain.Triggers.ServerRequest.Damage:FireServer(unpack(args))
+					[1] = "Revolver",
+					[2] = t,
+					[3] = {
+						[1] = "GunDefault",
+						[2] = "Torso",
+						[3] = Vector3.new(0,0,0),
+						[4] = "Default"
+					}
+				}
+				workspace.GameMain.Triggers.ServerRequest.Damage:FireServer(unpack(args))
 		end
-    end
+	end
 end)
