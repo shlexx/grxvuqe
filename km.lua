@@ -111,18 +111,18 @@ TextButton.MouseButton1Click:Connect(function()
 				}
 				workspace.GameMain.Triggers.ServerRequest.Damage:FireServer(unpack(args))
 			end
+		end
 	else
 		local args = {
-					[1] = "Revolver",
-					[2] = t,
-					[3] = {
-						[1] = "GunDefault",
-						[2] = "Torso",
-						[3] = Vector3.new(0,0,0),
-						[4] = "Default"
-					}
-				}
-				workspace.GameMain.Triggers.ServerRequest.Damage:FireServer(unpack(args))
-		end
+			[1] = "Revolver",
+			[2] = t,
+			[3] = {
+				[1] = "GunDefault",
+				[2] = "Torso",
+				[3] = Vector3.new(0,0,0),
+				[4] = "Default"
+			}
+		}
+		workspace.GameMain.Triggers.ServerRequest.Damage:FireServer(unpack(args))
 	end
 end)
