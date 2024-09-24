@@ -41,7 +41,7 @@ TextBox.BorderSizePixel = 0
 TextBox.Position = UDim2.new(0.135036498, 0, 0.318452388, 0)
 TextBox.Size = UDim2.new(0, 200, 0, 50)
 TextBox.Font = Enum.Font.SourceSans
-TextBox.PlaceholderText = "enter cmd"
+TextBox.PlaceholderText = "enter name"
 TextBox.Text = ""
 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextBox.TextScaled = true
@@ -54,7 +54,7 @@ TextButton.BorderSizePixel = 0
 TextButton.Position = UDim2.new(0.135036498, 0, 0.589285731, 0)
 TextButton.Size = UDim2.new(0, 200, 0, 50)
 TextButton.Font = Enum.Font.SourceSans
-TextButton.Text = "real exec!1!"
+TextButton.Text = "kil skid lmao"
 TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextButton.TextScaled = true
 TextButton.TextSize = 14.000
@@ -63,7 +63,7 @@ TextButton.TextWrapped = true
 function kill(txt)
 	local args = {
 		[1] = "Revolver",
-		[2] = v.Name,
+		[2] = txt,
 		[3] = {
 			[1] = "GunDefault",
 			[2] = "Torso",
@@ -110,70 +110,11 @@ dragify(Frame)
 
 TextButton.MouseButton1Click:Connect(function()
 	local t = TextBox.Text
-	local r = t:split(" ")
-	if t == "kill all" then
-		for _,v in pairs(game.Players:GetPlayers()) do
+	if t == "all" then
+		for _,v in pairs(game:GetService("Players"):GetPlayers()) do
 			kill(v.Name)
 		end
-		game.Players.LocalPlayer.Character.Humanoid.Health = 0
-	elseif t == "sk all" then
-		ska = true
-		while ska do
-			for _,v in pairs(game:GetPlayers() do
-				kill(v)
-			end
-			game.Players.LocalPlayer.Character.Humanoid.Health = 0
-			task.wait()
-		end
-	elseif t = "ssk all" then
-		ska = false
-	elseif t == "kill others" then
-		for _,v in pairs(game.Players:GetPlayers()) do
-			if v.Name ~= game.Players.LocalPlayer.Name then
-				kill(v.Name)
-			end
-		end
-	elseif t == "sk others" then
-		sko = true
-		while sko do
-			for _,v in pairs(game:GetPlayers() do
-				if v.Name ~= game.Players.LocalPlayer.Name then
-					kill(v)
-					task.wait()
-				end
-			end
-		end
-	elseif t == "ssk others" then
-		sko = false
-	elseif (r[1] == "sk") and (r[2] ~= ("all" or "others")) then
-		skp = true
-		while skp do
-			kill(r[2])
-			task.wait()
-		end
-	elseif (r[1] == "ssk") and (r[2] ~= ("all" or "others")) then
-		skp = false
-	elseif (r[1] == "kill") and (r[2] ~= ("all" or "others")) then
-		kill(r[2])
-	elseif r[1] == "putnuke" then
-		game.Players:FindFirstChild(r[2]).Character.Humanoid.Died:Connect(function()
-			for _,v in pairs(game:GetPlayers()) do
-				kill(v)
-			end
-		end
-	elseif r[1] == "permnospin" then
-		local target = game.Players:FindFirstChild(r[2])
-		local forcefield = target.Character:FindFirstChildOfClass("Forcefield")
-		target.Chatted:Connect(function(msg)
-			msg = msg:lower()
-			if string.match(msg,"spin") then
-				if forcefield then
-					repeat wait() until forcefield == nil
-					wait(0.1)
-					kill(target)
-				end
-				kill(target)
-			end
-		end)
+	else
+		kill(t)
 	end
 end)
