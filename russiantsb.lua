@@ -780,6 +780,10 @@ _1hpdummy.MouseButton1Click:Connect(function()
 	action("Spawn Dummy Frame","Spawn 1 HP")
 end)
 
+counteringdummy.MouseButton1Click:Connect(function()
+	action("Spawn Dummy Frame","Spawn Counter Hunter")
+end)
+
 walkingdummy.MouseButton1Click:Connect(function()
 	action("Spawn Dummy Frame","Spawn Walk Dummy")
 end)
