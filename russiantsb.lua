@@ -868,11 +868,11 @@ end)
 removeult.MouseButton1Click:Connect(function()
 	local plr = game.Players:FindFirstChild(ultremoveplr.Text)
 	if plr.ChecingYourCharacter.Value == 1 then
-		plr.Character["Death = Remove Ult"]["SAITAMA REMOTE ULT EVENT"]:FireServer()
+		plr.Character["Death = Remove Ult"]["SAITAMA REMOVE ULT EVENT"]:FireServer()
 	elseif plr.ChecingYourCharacter.Value == 2 then
-		plr.Character["Death = Remove Ult"]["GAROU REMOTE ULT EVENT"]:FireServer()
+		plr.Character["Death = Remove Ult"]["GAROU REMOVE ULT EVENT"]:FireServer()
 	elseif plr.ChecingYourCharacter.Value == 3 then
-		plr.Character["Death = Remove Ult"]["KJ REMOTE ULT EVENT"]:FireServer()
+		plr.Character["Death = Remove Ult"]["KJ REMOVE ULT EVENT"]:FireServer()
 	else
 		print("failed, player may be an admin or a p2w :(")
 	end
