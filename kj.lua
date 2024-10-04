@@ -29,6 +29,7 @@ Commands.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Commands.BorderSizePixel = 0
 Commands.Position = UDim2.new(0, 0, 0.0833333358, 0)
 Commands.Size = UDim2.new(0, 200, 0, 200)
+Commands.CanvasSize = UDim2.new(0,0,6.05,0)
 
 UIListLayout.Parent = Commands
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -59,6 +60,7 @@ CommandBar.TextColor3 = Color3.fromRGB(0, 0, 0)
 CommandBar.TextSize = 14.000
 CommandBar.TextXAlignment = Enum.TextXAlignment.Left
 CommandBar.ClearTextOnFocus = false
+CommandBar.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 local function dragify(Frame,boool)
 	local frametomove = Frame
@@ -104,7 +106,7 @@ function addcmd(cmd)
 	COMMAND.Size = UDim2.new(0, 200, 0, 25)
 	COMMAND.Font = Enum.Font.Code
 	COMMAND.Text = " " .. cmd
-	COMMAND.TextColor3 = Color3.fromRGB(0, 0, 0)
+	COMMAND.TextColor3 = Color3.fromRGB(255, 255, 255)
 	COMMAND.TextSize = 12.000
 	COMMAND.TextXAlignment = Enum.TextXAlignment.Left
 end
@@ -132,7 +134,6 @@ end
 
 addcmd(":speed <player> <num>")
 addcmd(":force <player> <x,y,z>")
-addcmd(":yeet <player>")
 addcmd(":rocket <player>")
 addcmd(":rocks <player> <distance>")
 addcmd(":slashfx")
@@ -191,215 +192,211 @@ addcmd(":blob")
 
 UIS.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.Return then
-		if UIS:GetFocusedTextBox() == CommandBar then
-			local t = CommandBar.Text
-			local args = t:split(" ")
-			if args[1] == ":speed" then
-				apply(function(v)
-					mainremote:FireServer("ChangeAtribbe",v.Character,"SpeedChanger",tonumber(args[3]))
-				end)
-			elseif args[1] == ":force" then
-				apply(function(v)
-					mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(tonumber(args[3]),tonumber(args[4]),tonumber(args[5])))
-				end)
-			elseif args[1] == ":yeet" then
-				
-			elseif args[1] == ":rocket" then
-				apply(function(v)
-					mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,1000,0))
-				end)
-			elseif args[1] == ":rocks" then
-				apply(function(v)
-					mainremote:FireServer("Rockkkk","RockPathV1",v.Character.HumanoidRootPart,{["Delay"] = 0,["Distance"] = tonumber(args[3])})
-				end)
-			elseif t == ":slashfx" then
-				mainremote:FireServer("Chain of a thousand MilesGOOOO")
-			elseif args[1] == ":trail" then
-				apply(function(v)
-					mainremote:FireServer("EnableTrailOnPart",v.Character.HumanoidRootPart,true)
-				end)
-			elseif args[1] == ":nohit" then
-				apply(function(v)
-					mainremote:FireServer("ChangeAtribbe",v.Character,"CantHit",true)
-				end)
-			elseif args[1] == ":enablehit" then
-				apply(function(v)
-					mainremote:FireServer("ChangeAtribbe",v.Character,"CantHit",false)
-				end)
-			elseif args[1] == ":playsound" then
-				apply(function(v)
-					mainremote:FireServer("Play",v.Character.HumanoidRootPart.RootAttachment[args[3]],args[3])
-				end)
-			elseif t == ":listsounds" then
-				print("SOUNDS:\n")
-				for _,v in pairs(game.Players.LocalPlayer.Character.HumanoidRootPart.RootAttachment:GetChildren()) do
-					print(v.Name)
-				end
-			elseif args[1] == ":infpunish" then
-				apply(function(v)
-					mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,-1000,0))
-				end)
-			elseif args[1] == ":gameplaypaused" then
-				apply(function(v)
-					mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,-math.huge,0))
-				end)
-			elseif args[1] == ":ragdoll" then
-				apply(function(v)
-					mainremote:FireServer("ChangeValue",v.Character.IsRagdoll,true)
-				end)
-			elseif args[1] == ":unragdoll" then
-				apply(function(v)
-					mainremote:FireServer("ChangeValue",v.Character.IsRagdoll,false)
-				end)
-			elseif args[1] == ":stopforce" then
-				apply(function(v)
-					mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,0,0))
-				end)
-			elseif args[1] == ":untrail" then
-				apply(function(v)
-					mainremote:FireServer("EnableTrailOnPart",v.Character.HumanoidRootPart,false)
-				end)
-			elseif t == ":respawn" then
-				mainremote:FireServer("LoadChar")
-			elseif t == ":flash" then
-				mainremote:FireServer("CollateralRuin")
-			elseif t == ":smoke" then
-				mainremote:FireServer("DashSmokeStart",1)
-			elseif args[1] == ":dashback" then
-				apply(function(v)
-					mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,-1000,0))
-				end)
-			elseif t == ":nosmoke" then
-				mainremote:FireServer("DashSmokeEnd",1)
-			elseif args[1] == ":kickback" then
-				apply(function(v)
-					mainremote:FireServer("DropKick20MoveEndd",v.Character)
-				end)
-			elseif args[1] == ":superfling" then
-				apply(function(v)
-					mainremote:FireServer("ChangeValue",v.Character.IsRagdoll,true)
-					mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(1000,1000,1000))
-				end)
-			elseif args[1] == ":lag" then
-				apply(function(v)
-					for i = 1,10 do
-						mainremote:FireServer("DropKick20Move3",v.Character)
-					end
-				end)
-			elseif t == ":monster" then
-				mainremote:FireServer("Malevolent ShrineStart")
-			elseif args[1] == ":superexplode" then
-				apply(function(v)
-					for i = 1,11 do
-						mainremote:FireServer("Fury BarrageThrow",v.Character)
-					end
-				end)
-			elseif args[1] == ":explode" then
-				apply(function(v)
-					for i = 1,5 do
-						mainremote:FireServer("ThunderClapHitEnd",v.Character)
-					end
-				end)
-			elseif args[1] == ":kill" then
-				apply(function(v)
-					for i = 1,10 do
-						mainremote:FireServer("ThunderClapHitKnockback",v.Character)
-					end
-					mainremote:FireServer("ThunderClapHitEnd",v.Character)
-				end)
-			elseif args[1] == ":cut" then
-				apply(function(v)
-					mainremote:FireServer("SukunaSplitHit",v.Character)
-				end)
-			elseif t == ":worldshot" then
-				mainremote:FireServer("WorldCutHitt")
-			elseif t == ":funnyaura" then
-				mainremote:FireServer("FugaArrow")
-			elseif args[1] == ":bring" then
-				apply(function(v)
-					mainremote:FireServer("ShadowStab",v.Character,"ShadowStabEnemy")
-					task.wait()
-					mainremote:FireServer("ShadowStabThrow",v.Character)
-				end)
-			elseif args[1] == ":loopbring" then
-				apply(function(v)
-					mainremote:FireServer("ShadowStab",v.Character,"ShadowStabEnemy")
-				end)
-			elseif args[1] == ":stopbring" then
-				apply(function(v)
-					mainremote:FireServer("ShadowStabThrow",v.Character)
-				end)
-			elseif t == ":pistol" then
-				mainremote:FireServer("ChangeTojiWapeon","Pistol")
-			elseif args[1] == ":invis" then
-				apply(function(v)
-					mainremote:FireServer("SetTranspancyyyyyy",v.Character,true)
-				end)
-			elseif args[1] == ":vis" then
-				apply(function(v)
-					mainremote:FireServer("SetTranspancyyyyyy",v.Character,false)
-				end)
-			elseif t == ":gocrazy" then
-				mainremote:FireServer("flashSlashDash")
-			elseif t == ":flashaura" then
-				mainremote:FireServer("DomainBreakerStartCutting")
-			elseif args[1] == ":bring2" then
-				apply(function(v)
-					mainremote:FireServer("crossSlashHit",v.Character)
-					task.wait()
-					mainremote:FireServer("crossSlashHitSlashEnd",v.Character)
-				end)
-			elseif args[1] == ":loopbring2" then
-				apply(function(v)
-					mainremote:FireServer("crossSlashHit",v.Character)
-				end)
-			elseif args[1] == ":stopbring2" then
-				apply(function(v)
-					mainremote:FireServer("crossSlashHitSlashEnd",v.Character)
-				end)
-			elseif args[1] == ":wolf" then
-				apply(function(v)
-					mainremote:FireServer("Shadow Stlaker Start",v.Character)
-				end)
-			elseif t == ":dogs" then
-				mainremote:FireServer("SpawnDivineDogss")
-			elseif t == ":frog" then
-				mainremote:FireServer("SpawnGammaaaa")
-			elseif t == ":bird" then
-				mainremote:FireServer("SummonNueEEEEEE",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-			elseif t == ":elephant" then
-				mainremote:FireServer("Max Elephanttttt",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-			elseif args[1] == ":snake" then
-				apply(function(v)
-					mainremote:FireServer("TempestComboWELDDD",v.Character)
-				end)
-			elseif t == ":totalitydog" then
-				mainremote:FireServer("SpawnDivineDogTotality",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-			elseif t == ":darkness" then
-				mainremote:FireServer("ShadowGardenopennnnn",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-			elseif t == ":supercut" then
-				mainremote:FireServer("WorldSlashSUPERCUT",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
-			elseif args[1] == ":stun" then
-				apply(function(v)
-					mainremote:FireServer("ChangeAtribbe",v.Character,"Stun",true)
-				end)
-			elseif args[1] == ":unstun" then
-				apply(function(v)
-					mainremote:FireServer("ChangeAtribbe",v.Character,"Stun",false)
-				end)
-			elseif t == ":nocollision" then
-				for _,v in pairs(game.Players:GetPlayers()) do
-					mainremote:FireServer("CanColiideCharsssssssss",v.Character,false)
-				end
-			elseif t == ":collision" then
-				for _,v in pairs(game.Players:GetPlayers()) do
-					mainremote:FireServer("CanColiideCharsssssssss",v.Character,true)
-				end
-			elseif t == ":blob" then
-				mainremote:FireServer("HornCeroShoottt",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+		local t = CommandBar.Text
+		local args = t:split(" ")
+		if args[1] == ":speed" then
+			apply(function(v)
+				mainremote:FireServer("ChangeAtribbe",v.Character,"SpeedChanger",tonumber(args[3]))
+			end)
+		elseif args[1] == ":force" then
+			apply(function(v)
+				mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(tonumber(args[3]),tonumber(args[4]),tonumber(args[5])))
+			end)
+		elseif args[1] == ":rocket" then
+			apply(function(v)
+				mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,1000,0))
+			end)
+		elseif args[1] == ":rocks" then
+			apply(function(v)
+				mainremote:FireServer("Rockkkk","RockPathV1",v.Character.HumanoidRootPart,{["Delay"] = 0,["Distance"] = tonumber(args[3])})
+			end)
+		elseif t == ":slashfx" then
+			mainremote:FireServer("Chain of a thousand MilesGOOOO")
+		elseif args[1] == ":trail" then
+			apply(function(v)
+				mainremote:FireServer("EnableTrailOnPart",v.Character.HumanoidRootPart,true)
+			end)
+		elseif args[1] == ":nohit" then
+			apply(function(v)
+				mainremote:FireServer("ChangeAtribbe",v.Character,"CantHit",true)
+			end)
+		elseif args[1] == ":enablehit" then
+			apply(function(v)
+				mainremote:FireServer("ChangeAtribbe",v.Character,"CantHit",false)
+			end)
+		elseif args[1] == ":playsound" then
+			apply(function(v)
+				mainremote:FireServer("Play",v.Character.HumanoidRootPart.RootAttachment[args[3]],args[3])
+			end)
+		elseif t == ":listsounds" then
+			print("SOUNDS:\n")
+			for _,v in pairs(game.Players.LocalPlayer.Character.HumanoidRootPart.RootAttachment:GetChildren()) do
+				print(v.Name)
 			end
-			task.wait()
-			CommandBar:CaptureFocus()
+		elseif args[1] == ":infpunish" then
+			apply(function(v)
+				mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,-1000,0))
+			end)
+		elseif args[1] == ":gameplaypaused" then
+			apply(function(v)
+				mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,-math.huge,0))
+			end)
+		elseif args[1] == ":ragdoll" then
+			apply(function(v)
+				mainremote:FireServer("ChangeValue",v.Character.IsRagdoll,true)
+			end)
+		elseif args[1] == ":unragdoll" then
+			apply(function(v)
+				mainremote:FireServer("ChangeValue",v.Character.IsRagdoll,false)
+			end)
+		elseif args[1] == ":stopforce" then
+			apply(function(v)
+				mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,0,0))
+			end)
+		elseif args[1] == ":untrail" then
+			apply(function(v)
+				mainremote:FireServer("EnableTrailOnPart",v.Character.HumanoidRootPart,false)
+			end)
+		elseif t == ":respawn" then
+			mainremote:FireServer("LoadChar")
+		elseif t == ":flash" then
+			mainremote:FireServer("CollateralRuin")
+		elseif t == ":smoke" then
+			mainremote:FireServer("DashSmokeStart",1)
+		elseif args[1] == ":dashback" then
+			apply(function(v)
+				mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(0,-1000,0))
+			end)
+		elseif t == ":nosmoke" then
+			mainremote:FireServer("DashSmokeEnd",1)
+		elseif args[1] == ":kickback" then
+			apply(function(v)
+				mainremote:FireServer("DropKick20MoveEndd",v.Character)
+			end)
+		elseif args[1] == ":superfling" then
+			apply(function(v)
+				mainremote:FireServer("ChangeValue",v.Character.IsRagdoll,true)
+				mainremote:FireServer("Force",v.Character.HumanoidRootPart.HighQualtyPush,Vector3.new(1000,1000,1000))
+			end)
+		elseif args[1] == ":lag" then
+			apply(function(v)
+				for i = 1,10 do
+					mainremote:FireServer("DropKick20Move3",v.Character)
+				end
+			end)
+		elseif t == ":monster" then
+			mainremote:FireServer("Malevolent ShrineStart")
+		elseif args[1] == ":superexplode" then
+			apply(function(v)
+				for i = 1,11 do
+					mainremote:FireServer("Fury BarrageThrow",v.Character)
+				end
+			end)
+		elseif args[1] == ":explode" then
+			apply(function(v)
+				for i = 1,5 do
+					mainremote:FireServer("ThunderClapHitEnd",v.Character)
+				end
+			end)
+		elseif args[1] == ":kill" then
+			apply(function(v)
+				for i = 1,10 do
+					mainremote:FireServer("ThunderClapHitKnockback",v.Character)
+				end
+				mainremote:FireServer("ThunderClapHitEnd",v.Character)
+			end)
+		elseif args[1] == ":cut" then
+			apply(function(v)
+				mainremote:FireServer("SukunaSplitHit",v.Character)
+			end)
+		elseif t == ":worldshot" then
+			mainremote:FireServer("WorldCutHitt")
+		elseif t == ":funnyaura" then
+			mainremote:FireServer("FugaArrow")
+		elseif args[1] == ":bring" then
+			apply(function(v)
+				mainremote:FireServer("ShadowStab",v.Character,"ShadowStabEnemy")
+				task.wait()
+				mainremote:FireServer("ShadowStabThrow",v.Character)
+			end)
+		elseif args[1] == ":loopbring" then
+			apply(function(v)
+				mainremote:FireServer("ShadowStab",v.Character,"ShadowStabEnemy")
+			end)
+		elseif args[1] == ":stopbring" then
+			apply(function(v)
+				mainremote:FireServer("ShadowStabThrow",v.Character)
+			end)
+		elseif t == ":pistol" then
+			mainremote:FireServer("ChangeTojiWapeon","Pistol")
+		elseif args[1] == ":invis" then
+			apply(function(v)
+				mainremote:FireServer("SetTranspancyyyyyy",v.Character,true)
+			end)
+		elseif args[1] == ":vis" then
+			apply(function(v)
+				mainremote:FireServer("SetTranspancyyyyyy",v.Character,false)
+			end)
+		elseif t == ":gocrazy" then
+			mainremote:FireServer("flashSlashDash")
+		elseif t == ":flashaura" then
+			mainremote:FireServer("DomainBreakerStartCutting")
+		elseif args[1] == ":bring2" then
+			apply(function(v)
+				mainremote:FireServer("crossSlashHit",v.Character)
+				task.wait()
+				mainremote:FireServer("crossSlashHitSlashEnd",v.Character)
+			end)
+		elseif args[1] == ":loopbring2" then
+			apply(function(v)
+				mainremote:FireServer("crossSlashHit",v.Character)
+			end)
+		elseif args[1] == ":stopbring2" then
+			apply(function(v)
+				mainremote:FireServer("crossSlashHitSlashEnd",v.Character)
+			end)
+		elseif args[1] == ":wolf" then
+			apply(function(v)
+				mainremote:FireServer("Shadow Stlaker Start",v.Character)
+			end)
+		elseif t == ":dogs" then
+			mainremote:FireServer("SpawnDivineDogss")
+		elseif t == ":frog" then
+			mainremote:FireServer("SpawnGammaaaa")
+		elseif t == ":bird" then
+			mainremote:FireServer("SummonNueEEEEEE",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+		elseif t == ":elephant" then
+			mainremote:FireServer("Max Elephanttttt",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+		elseif args[1] == ":snake" then
+			apply(function(v)
+				mainremote:FireServer("TempestComboWELDDD",v.Character)
+			end)
+		elseif t == ":totalitydog" then
+			mainremote:FireServer("SpawnDivineDogTotality",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+		elseif t == ":darkness" then
+			mainremote:FireServer("ShadowGardenopennnnn",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+		elseif t == ":supercut" then
+			mainremote:FireServer("WorldSlashSUPERCUT",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+		elseif args[1] == ":stun" then
+			apply(function(v)
+				mainremote:FireServer("ChangeAtribbe",v.Character,"Stun",true)
+			end)
+		elseif args[1] == ":unstun" then
+			apply(function(v)
+				mainremote:FireServer("ChangeAtribbe",v.Character,"Stun",false)
+			end)
+		elseif t == ":nocollision" then
+			for _,v in pairs(game.Players:GetPlayers()) do
+				mainremote:FireServer("CanColiideCharsssssssss",v.Character,false)
+			end
+		elseif t == ":collision" then
+			for _,v in pairs(game.Players:GetPlayers()) do
+				mainremote:FireServer("CanColiideCharsssssssss",v.Character,true)
+			end
+		elseif t == ":blob" then
+			mainremote:FireServer("HornCeroShoottt",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
 		end
+		task.wait()
+		CommandBar:CaptureFocus()
 	end
 end)
