@@ -190,8 +190,8 @@ addcmd(":nocollision")
 addcmd(":collision")
 addcmd(":blob")
 
-UIS.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.Return then
+CommandBar.FocusLost:Connect(function(e)
+	if e then
 		local t = CommandBar.Text
 		local args = t:split(" ")
 		if args[1] == ":speed" then
@@ -396,7 +396,5 @@ UIS.InputBegan:Connect(function(input)
 		elseif t == ":blob" then
 			mainremote:FireServer("HornCeroShoottt",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
 		end
-		task.wait()
-		CommandBar:CaptureFocus()
 	end
 end)
