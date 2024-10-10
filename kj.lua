@@ -29,7 +29,7 @@ Commands.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Commands.BorderSizePixel = 0
 Commands.Position = UDim2.new(0, 0, 0.0833333358, 0)
 Commands.Size = UDim2.new(0, 200, 0, 200)
-Commands.CanvasSize = UDim2.new(0,0,6.05,0)
+Commands.CanvasSize = UDim2.new(0,0,7,0)
 
 UIListLayout.Parent = Commands
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -189,6 +189,8 @@ addcmd(":unstun <player>")
 addcmd(":nocollision")
 addcmd(":collision")
 addcmd(":blob")
+addcmd(":invismap")
+addcmd(":restoremap")
 
 CommandBar.FocusLost:Connect(function(e)
 	if e then
@@ -364,19 +366,19 @@ CommandBar.FocusLost:Connect(function(e)
 		elseif t == ":frog" then
 			mainremote:FireServer("SpawnGammaaaa")
 		elseif t == ":bird" then
-			mainremote:FireServer("SummonNueEEEEEE",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+			mainremote:FireServer("SummonNueEEEEEE",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
 		elseif t == ":elephant" then
-			mainremote:FireServer("Max Elephanttttt",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+			mainremote:FireServer("Max Elephanttttt",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
 		elseif args[1] == ":snake" then
 			apply(function(v)
 				mainremote:FireServer("TempestComboWELDDD",v.Character)
 			end)
 		elseif t == ":totalitydog" then
-			mainremote:FireServer("SpawnDivineDogTotality",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+			mainremote:FireServer("SpawnDivineDogTotality",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
 		elseif t == ":darkness" then
-			mainremote:FireServer("ShadowGardenopennnnn",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+			mainremote:FireServer("ShadowGardenopennnnn",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
 		elseif t == ":supercut" then
-			mainremote:FireServer("WorldSlashSUPERCUT",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+			mainremote:FireServer("WorldSlashSUPERCUT",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
 		elseif args[1] == ":stun" then
 			apply(function(v)
 				mainremote:FireServer("ChangeAtribbe",v.Character,"Stun",true)
@@ -394,7 +396,15 @@ CommandBar.FocusLost:Connect(function(e)
 				mainremote:FireServer("CanColiideCharsssssssss",v.Character,true)
 			end
 		elseif t == ":blob" then
-			mainremote:FireServer("HornCeroShoottt",game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+			mainremote:FireServer("HornCeroShoottt",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+		elseif t == ":invismap" then
+			for _,v in pairs(workspace:GetDescendants()) do
+				mainremote:FireServer("SetTranspancyyyyyy",v,true)
+			end
+		elseif t == ":restoremap" then
+			for _,v in pairs(workspace:GetDescendants()) do
+				mainremote:FireServer("SetTranspancyyyyyy",v,false)
+			end
 		end
 	end
 end)
