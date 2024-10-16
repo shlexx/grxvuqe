@@ -1702,7 +1702,7 @@ NewGuiPart152.TextWrapped = true
 return NewGuiPart1
 end
 local D_E_X = CreateGui()
-D_E_X.Parent = game.Players.LocalPlayer.PlayerGui
+D_E_X.Parent = gethui() or game.CoreGui
 spawn(function()
 	local Gui = D_E_X
 	
