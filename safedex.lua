@@ -1702,7 +1702,7 @@ NewGuiPart152.TextWrapped = true
 return NewGuiPart1
 end
 local D_E_X = CreateGui()
-D_E_X.Parent = gethui() or game.CoreGui
+D_E_X.Parent = game.CoreGui.RobloxGui or gethui()
 spawn(function()
 	local Gui = D_E_X
 	
