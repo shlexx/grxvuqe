@@ -29,7 +29,7 @@ Commands.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Commands.BorderSizePixel = 0
 Commands.Position = UDim2.new(0, 0, 0.0833333358, 0)
 Commands.Size = UDim2.new(0, 200, 0, 200)
-Commands.CanvasSize = UDim2.new(0,0,8,0)
+Commands.CanvasSize = UDim2.new(0,0,89,0)
 
 UIListLayout.Parent = Commands
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -208,6 +208,10 @@ addcmd(":listaccessories")
 addcmd(":addaura <name>")
 addcmd(":removeaura <name>")
 addcmd(":listauras")
+addcmd(":hidekillstreak <player>")
+addcmd(":showkillstreak <player>")
+addcmd(":hidechathistory")
+addcmd(":showchathistory")
 
 CommandBar.FocusLost:Connect(function(e)
 	if e then
@@ -473,13 +477,23 @@ CommandBar.FocusLost:Connect(function(e)
 				print(v.Name)
 			end
 		elseif args[1] == ":addaura" then
-			mainremote:FireServer("addACCESSORIE",args[2],"AllAURAS")
+			mainremote:FireServer("addACCESSORIE",args[2] .. " " .. args[3]),"AllAURAS")
 		elseif args[1] == ":removeaura" then
-			mainremote:FireServer("RemoveACCESSORIE",args[2])
+			mainremote:FireServer("RemoveACCESSORIE",args[2] .. " " .. args[3])
 		elseif args[1] == ":listauras" then
 			for _,v in pairs(game.ReplicatedStorage.AllAURAS:GetChildren()) do
 				print(v.Name)
 			end
+		elseif args[1] == ":hidekillstreak" then
+			apply(function(v)
+				mainremote:FireServer("EnabledSomeThing",v.Character.Killstreak,false)
+				mainremote:FireServer("EnabledSomeThing",v.Character.THEGOLDENHIGHLIGHTTTT,false)
+			end)
+		elseif args[1] == ":showkillstreak" then
+			apply(function(v)
+				mainremote:FireServer("EnabledSomeThing",v.Character.Killstreak,true)
+				mainremote:FireServer("EnabledSomeThing",v.Character.THEGOLDENHIGHLIGHTTTT,true)
+			end)
 		end
 	end
 end)
