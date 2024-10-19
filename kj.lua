@@ -191,9 +191,28 @@ addcmd(":collision")
 addcmd(":blob")
 addcmd(":invismap")
 addcmd(":restoremap")
+addcmd(":smalltornado")
+addcmd(":guitar <player>")
+addcmd(":kill2 <player>")
+addcmd(":loopbring3 <player>")
+addcmd(":stopbring3 <player>")
+addcmd(":bring3 <player>")
+addcmd(":dragonsbreath")
+addcmd(":jumpscare <player>")
+addcmd(":eyesjumpscare <player>")
+addcmd(":damage <player> <number>")
+addcmd(":heal <player>")
+addcmd(":addaccessory <name>")
+addcmd(":removeaccessory <name>")
+addcmd(":listaccessories")
+addcmd(":addaura <name>")
+addcmd(":removeaura <name>")
+addcmd(":listauras")
+addcmd(":
 
 CommandBar.FocusLost:Connect(function(e)
 	if e then
+		local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
 		local t = CommandBar.Text
 		local args = t:split(" ")
 		if args[1] == ":speed" then
@@ -374,11 +393,11 @@ CommandBar.FocusLost:Connect(function(e)
 				mainremote:FireServer("TempestComboWELDDD",v.Character)
 			end)
 		elseif t == ":totalitydog" then
-			mainremote:FireServer("SpawnDivineDogTotality",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+			mainremote:FireServer("SpawnDivineDogTotality",hrp.CFrame)
 		elseif t == ":darkness" then
-			mainremote:FireServer("ShadowGardenopennnnn",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+			mainremote:FireServer("ShadowGardenopennnnn",hrp.CFrame)
 		elseif t == ":supercut" then
-			mainremote:FireServer("WorldSlashSUPERCUT",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+			mainremote:FireServer("WorldSlashSUPERCUT",hrp.CFrame)
 		elseif args[1] == ":stun" then
 			apply(function(v)
 				mainremote:FireServer("ChangeAtribbe",v.Character,"Stun",true)
@@ -396,7 +415,7 @@ CommandBar.FocusLost:Connect(function(e)
 				mainremote:FireServer("CanColiideCharsssssssss",v.Character,true)
 			end
 		elseif t == ":blob" then
-			mainremote:FireServer("HornCeroShoottt",game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+			mainremote:FireServer("HornCeroShoottt",hrp.CFrame)
 		elseif t == ":invismap" then
 			for _,v in pairs(workspace:GetDescendants()) do
 				mainremote:FireServer("SetTranspancyyyyyy",v,true)
@@ -405,6 +424,63 @@ CommandBar.FocusLost:Connect(function(e)
 			for _,v in pairs(workspace:GetDescendants()) do
 				mainremote:FireServer("SetTranspancyyyyyy",v,false)
 			end
+		elseif t == ":smalltornado" then
+			mainremote:FireServer("GunabiTwisterTORNADO",hrp.CFrame)
+		elseif args[1] == ":guitar" then
+			apply(function(v)
+				mainremote:FireServer("ChangeMadraFanWelds",v.Character.MadraFan,true)
+			end)
+		elseif args[1] == ":kill2" then
+			apply(function(v)
+				mainremote:FireServer("TOPIMPORTANT_CharHater",v.Character,100,0,nil,true,0)
+			end)
+		elseif args[1] == ":loopbring3" then
+			apply(function(v)
+				mainremote:FireServer("AirCascadeHITTT",v.Character)
+			end)
+		elseif args[1] == ":stopbring3" then
+			apply(function(v)
+				mainremote:FireServer("AirCascadeEnddddd",v.Character)
+			end)
+		elseif args[1] == ":bring3" then
+			apply(function(v)
+				mainremote:FireServer("AirCascadeHITTT",v.Character)
+				mainremote:FireServer("AirCascadeEnddddd",v.Character)
+			end)
+		elseif t == ":dragonsbreath" then
+			mainremote:FireServer("GreatestFireFIREE")
+		elseif args[1] == ":jumpscare" then
+			apply(function(v)
+				mainremote:FireServer("FIREOTHERCLIENTTTTT",v.Character,"PlayFunCtionsTableEFunction","SkullCrusherImpactFrames")
+			end)
+		elseif args[1] == ":eyesjumpscare" then
+			apply(function(v)
+				mainremote:FireServer("FIREOTHERCLIENTTTTT",v.Character,"PlayFunCtionsTableEFunction","SkullCrusherPullEyes")
+			end)
+		elseif args[1] == ":damage" then
+			apply(function(v)
+				mainremote:FireServer("DamgeHumanoidDDDDD",v.Character.Humanoid,tonumber(args[3]))
+			end)
+		elseif args[1] == ":heal" then
+			apply(function(v)
+				mainremote:FireServer("DamgeHumanoidDDDDD",v.Character.Humanoid,-100)
+			end)
+		elseif args[1] == ":addaccessory" then
+			mainremote:FireServer("addACCESSORIE",args[2])
+		elseif args[1] == ":removeaccessory" then
+			mainremote:FireServer("RemoveACCESSORIE",args[2])
+		elseif t == ":listaccessories" then
+			for _,v in pairs(game.ReplicatedStorage.AllACCESSORIES:GetChildren()) do
+				print(v.Name)
+			end
+		elseif args[1] == ":addaura" then
+			mainremote:FireServer("addACCESSORIE",args[2],"AllAURAS")
+		elseif args[1] == ":removeaura" then
+			mainremote:FireServer("RemoveACCESSORIE",args[2])
+		elseif args[1] == ":listauras" then
+			for _,v in pairs(game.ReplicatedStorage.AllAURAS:GetChildren()) do
+				print(v.Name)
+			end)
 		end
 	end
 end)
