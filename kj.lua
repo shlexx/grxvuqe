@@ -208,7 +208,6 @@ addcmd(":listaccessories")
 addcmd(":addaura <name>")
 addcmd(":removeaura <name>")
 addcmd(":listauras")
-addcmd(":
 
 CommandBar.FocusLost:Connect(function(e)
 	if e then
@@ -463,7 +462,7 @@ CommandBar.FocusLost:Connect(function(e)
 			end)
 		elseif args[1] == ":heal" then
 			apply(function(v)
-				mainremote:FireServer("DamgeHumanoidDDDDD",v.Character.Humanoid,-100)
+				mainremote:FireServer("DamgeHumanoidDDDDD",v.Character.Humanoid,-math.huge)
 			end)
 		elseif args[1] == ":addaccessory" then
 			mainremote:FireServer("addACCESSORIE",args[2])
@@ -480,7 +479,7 @@ CommandBar.FocusLost:Connect(function(e)
 		elseif args[1] == ":listauras" then
 			for _,v in pairs(game.ReplicatedStorage.AllAURAS:GetChildren()) do
 				print(v.Name)
-			end)
+			end
 		end
 	end
 end)
