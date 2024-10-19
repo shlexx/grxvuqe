@@ -29,7 +29,7 @@ Commands.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Commands.BorderSizePixel = 0
 Commands.Position = UDim2.new(0, 0, 0.0833333358, 0)
 Commands.Size = UDim2.new(0, 200, 0, 200)
-Commands.CanvasSize = UDim2.new(0,0,7,0)
+Commands.CanvasSize = UDim2.new(0,0,8,0)
 
 UIListLayout.Parent = Commands
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
