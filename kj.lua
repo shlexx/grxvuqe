@@ -17,7 +17,7 @@ AdminFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 AdminFrame.BackgroundTransparency = 0.500
 AdminFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 AdminFrame.BorderSizePixel = 0
-AdminFrame.Position = UDim2.new(0.36601308, 0, 0.26758793, 0)
+AdminFrame.Position = UDim2.new(0, 0, 0, 0)
 AdminFrame.Size = UDim2.new(0, 200, 0, 240)
 
 Commands.Name = "Commands"
