@@ -477,7 +477,7 @@ CommandBar.FocusLost:Connect(function(e)
 				print(v.Name)
 			end
 		elseif args[1] == ":addaura" then
-			mainremote:FireServer("addACCESSORIE",args[2] .. " " .. args[3]),"AllAURAS")
+			mainremote:FireServer("addACCESSORIE",args[2] .. " " .. args[3],"AllAURAS")
 		elseif args[1] == ":removeaura" then
 			mainremote:FireServer("RemoveACCESSORIE",args[2] .. " " .. args[3])
 		elseif args[1] == ":listauras" then
