@@ -210,8 +210,6 @@ addcmd(":removeaura <name>")
 addcmd(":listauras")
 addcmd(":hidekillstreak <player>")
 addcmd(":showkillstreak <player>")
-addcmd(":hidechathistory")
-addcmd(":showchathistory")
 
 CommandBar.FocusLost:Connect(function(e)
 	if e then
