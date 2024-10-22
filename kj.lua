@@ -210,6 +210,21 @@ addcmd(":removeaura <name>")
 addcmd(":listauras")
 addcmd(":hidekillstreak <player>")
 addcmd(":showkillstreak <player>")
+addcmd(":hidechat")
+addcmd(":showchat")
+addcmd(":dummy <player>")
+addcmd(":part <player>")
+addcmd(":health <player> <number>")
+addcmd(":kills <player> <number>")
+addcmd(":inverted")
+addcmd(":stopinverted")
+addcmd(":noface <player>")
+addcmd(":hideleaderboard")
+addcmd(":showleaderboard")
+addcmd(":setting <player> <name> <off/on>")
+addcmd(":listsettings")
+addcmd(":wall <player>")
+addcmd(":covermap <time>")
 
 CommandBar.FocusLost:Connect(function(e)
 	if e then
@@ -492,6 +507,74 @@ CommandBar.FocusLost:Connect(function(e)
 				mainremote:FireServer("EnabledSomeThing",v.Character.Killstreak,true)
 				mainremote:FireServer("EnabledSomeThing",v.Character.THEGOLDENHIGHLIGHTTTT,true)
 			end)
+		elseif t == ":hidechat" then
+			mainremote:FireServer("EnabledSomeThing",game.TextChatService.ChatWindowConfiguration,false)
+			mainremote:FireServer("EnabledSomeThing",game.TextChatService.ChatInputBarConfiguration,false)
+		elseif t == ":showchat" then
+			mainremote:FireServer("EnabledSomeThing",game.TextChatService.ChatWindowConfiguration,true)
+			mainremote:FireServer("EnabledSomeThing",game.TextChatService.ChatInputBarConfiguration,true)
+		elseif args[1] == ":dummy" then
+			apply(function(v)
+				mainremote:FireServer("TOPIMPORTANT_VFXEMITEER",game.ReplicatedStorage.TheBestRig,v.Character.HumanoidRootPart.Position,nil,nil,nil,math.huge)
+			end)
+		elseif args[1] == ":part" then
+			apply(function(v)
+				mainremote:FireServer("TOPIMPORTANT_VFXEMITEER",game.ReplicatedStorage.VFX.SomeGoodAir,v.Character.HumanoidRootPart.Position,nil,nil,nil,math.huge)
+				repeat wait() until workspace.Fx.SomeGoodAir
+				for _,v in pairs(workspace.Fx.SomeGoodAir.Beams:GetChildren()) do
+					mainremote:FireServer("EnabledSomeThing",v,false)
+				end
+			end)
+		elseif args[1] == ":health" then
+			apply(function(v)
+				if tonumber(args[3]) < v.Character.Humanoid.Health then
+					mainremote:FireServer("DamgeHumanoidDDDDD",v.Character.Humanoid,tonumber(args[3]))
+				else
+					mainremote:FireServer("DamgeHumanoidDDDDD",v.Character.Humanoid,-tonumber(args[3]))
+				end
+			end)
+		elseif args[1] == ":kills" then
+			apply(function(v)
+				mainremote:FireServer("ChangeValue",v.leaderstats.Kills.Value,tonumber(args[3]))
+			end)
+		elseif t == ":inverted" then
+			mainremote:FireServer("EnabledSomeThing",game.Lighting.Contrast,true)
+		elseif t == ":stopinverted" then
+			mainremote:FireServer("EnabledSomeThing",game.Lighting.Contrast,false)
+		elseif args[1] == ":noface" then
+			apply(function(v)
+				mainremote:FireServer("EnabledSomeThing",v.Character.Head.face,false)
+			end)
+		elseif t == ":hideleaderboard" then
+			mainremote:FireServer("EnabledSomeThing",workspace.World.Essentials.LeaderboardTotal.Surface,false)
+		elseif t == ":showleaderboard" then
+			mainremote:FireServer("EnabledSomeThing",workspace.World.Essentials.LeaderboardTotal.Surface,true)
+		elseif args[1] == ":setting" then
+			if args[4] == "on" then
+				mainremote:FireServer("ChangeValue",v.PlayerData.Settings[args[3]],true)
+			else
+				mainremote:FireServer("ChangeValue",v.PlayerData.Settings[args[3]],false)
+			end
+		elseif t == ":listsettings" then
+			print("SETTINGS:\n")
+			for _,v in pairs(game.Players.LocalPlayer.PlayerData.Settings:GetChildren()) do
+				print(v.Name)
+			end
+		elseif args[1] == ":wall" then
+			apply(function(v)
+				mainremote:FireServer("TOPIMPORTANT_VFXEMITEER",game.ReplicatedStorage.VFX.TheEmperor.MobWall,v.Character.HumanoidRootPart.Position,nil,nil,nil,math.huge)
+				repeat wait() until game.ReplicatedStorage.VFX.TheEmperor.MobWall
+				for _,v in pairs(game.ReplicatedStorage.VFX.TheEmperor.MobWall:GetDescendants()) do
+					if v:IsA("ParticleEmitter") or v:IsA("Beam") then
+						mainremote:FireServer("EnabledSomeThing",v,false)
+					end
+				end
+			end)
+		elseif args[1] == ":covermap" then
+			mainremote:FireServer("TOPIMPORTANT_VFXEMITEER",game.ReplicatedStorage.VFX["Malevolent Shrine"].DomainExpansionFX,game.Players.LocalPlayer.Character.HumanoidRootPart.Position,nil,nil,nil,tonumber(args[2]))	
+			repeat wait() until workspace.Fx.DomainExpansionFX
+			mainremote:FireServer("CanColiideCharsssssssss",workspace.Fx.DomainExpansionFX,true)
+			mainremote:FireServer("SetTranspancyyyyyy",workspace.Fx.DomainExpansionFX,false)
 		end
 	end
 end)
