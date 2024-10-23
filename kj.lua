@@ -520,7 +520,7 @@ CommandBar.FocusLost:Connect(function(e)
 		elseif args[1] == ":part" then
 			apply(function(v)
 				mainremote:FireServer("TOPIMPORTANT_VFXEMITEER",game.ReplicatedStorage.VFX.SomeGoodAir,v.Character.HumanoidRootPart.Position,nil,nil,nil,math.huge)
-				repeat wait() until workspace.Fx.SomeGoodAir
+				task.wait()
 				for _,v in pairs(workspace.Fx.SomeGoodAir.Beams:GetChildren()) do
 					mainremote:FireServer("EnabledSomeThing",v,false)
 				end
@@ -563,7 +563,7 @@ CommandBar.FocusLost:Connect(function(e)
 		elseif args[1] == ":wall" then
 			apply(function(v)
 				mainremote:FireServer("TOPIMPORTANT_VFXEMITEER",game.ReplicatedStorage.VFX.TheEmperor.MobWall,v.Character.HumanoidRootPart.Position,nil,nil,nil,math.huge)
-				repeat wait() until game.ReplicatedStorage.VFX.TheEmperor.MobWall
+				task.wait()
 				for _,v in pairs(game.ReplicatedStorage.VFX.TheEmperor.MobWall:GetDescendants()) do
 					if v:IsA("ParticleEmitter") or v:IsA("Beam") then
 						mainremote:FireServer("EnabledSomeThing",v,false)
@@ -572,7 +572,7 @@ CommandBar.FocusLost:Connect(function(e)
 			end)
 		elseif args[1] == ":covermap" then
 			mainremote:FireServer("TOPIMPORTANT_VFXEMITEER",game.ReplicatedStorage.VFX["Malevolent Shrine"].DomainExpansionFX,game.Players.LocalPlayer.Character.HumanoidRootPart.Position,nil,nil,nil,tonumber(args[2]))	
-			repeat wait() until workspace.Fx.DomainExpansionFX
+			task.wait()
 			mainremote:FireServer("CanColiideCharsssssssss",workspace.Fx.DomainExpansionFX,true)
 			mainremote:FireServer("SetTranspancyyyyyy",workspace.Fx.DomainExpansionFX,false)
 		end
