@@ -155,8 +155,10 @@ local Button5 = Tab:CreateButton({
    Name = "Enlarge All",
    Callback = function()
    for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="EnlargePlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
    end
    end,
 })
@@ -164,8 +166,10 @@ local Button6 = Tab:CreateButton({
    Name = "Shrink All",
    Callback = function()
    for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="ShrinkPlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
    end
    end,
 })
@@ -173,8 +177,10 @@ local Button7 = Tab:CreateButton({
    Name = "Slap All",
    Callback = function()
    for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="SlapPlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
    end
    end,
 })
@@ -182,8 +188,10 @@ local Button8 = Tab:CreateButton({
    Name = "Explode All",
    Callback = function()
    for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="ExplodePlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
    end
    end,
 })
@@ -191,8 +199,10 @@ local Button9 = Tab:CreateButton({
    Name = "Clown All",
    Callback = function()
    for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="ClownPlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
    end
    end,
 })
