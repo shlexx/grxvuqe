@@ -1,8 +1,8 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
    Name = "Like Or Pass",
-   LoadingTitle = "Rayfield Interface Suite",
-   LoadingSubtitle = "by Sirius",
+   LoadingTitle = "Hub",
+   LoadingSubtitle = "by LOUDAUDlOS",
    ConfigurationSaving = {
       Enabled = true,
       FolderName = nil, -- Create a custom folder for your hub/game
@@ -122,7 +122,7 @@ local Button3 = Tab:CreateButton({
    end,
 })
 local Button4 = Tab:CreateButton({
-   Name = "Lag/Crash Server",
+   Name = "Lag Server",
    Callback = function()
    for i = 1,100 do
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="GiveMoney",Key="x5",Cash=0})
