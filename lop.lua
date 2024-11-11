@@ -181,7 +181,7 @@ local Button14 = Tab:CreateButton({
    Callback = function()
    for _,v in pairs(game.Players:GetPlayers()) do
    if v ~= game.Players.LocalPlayer then
-   game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="BaconHairs",Key="x5",Cash=0})
+   game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="BaconHead",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
    end
    end
