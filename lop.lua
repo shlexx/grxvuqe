@@ -1,3 +1,5 @@
+local isheadless = false
+local iskorblox = false
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
    Name = "Like Or Pass",
@@ -206,8 +208,8 @@ local Button9 = Tab:CreateButton({
    end
    end,
 })
-local Button9 = Tab:CreateButton({
-   Name = "Kill All",
+local Button10 = Tab:CreateButton({
+   Name = "Kill All (~4 secs)",
    Callback = function()
    for _,v in pairs(game.Players:GetPlayers()) do
    if v ~= game.Players.LocalPlayer then
@@ -216,6 +218,7 @@ local Button9 = Tab:CreateButton({
    task.wait(.1)
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="SlapPlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   task.wait(.1)
    end
    end
    end,
@@ -230,6 +233,110 @@ local Input4 = Tab:CreateInput({
    task.wait(.1)
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="SlapPlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(Text)
+   end,
+})
+local Button11 = Tab:CreateButton({
+   Name = "Atom",
+   Callback = function()
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({BodyScale={BodyTypeScale=0,HeadScale=0.10000000149011612,HeightScale=0.10000000149011612,WidthScale=0.10000000149011612,ProportionScale=0}})
+   game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="ShrinkPlayer",Key="x5",Cash=0})
+   game.ReplicatedStorage.Events.TrollPlayer:FireServer(game.Players.LocalPlayer.Name)
+   end,
+})
+local ColorPicker = Tab:CreateColorPicker({
+    Name = "Body Color3",
+    Color = Color3.fromRGB(255,255,255),
+    Flag = "ColorPicker1",
+    Callback = function(Value)
+    game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({BodyColor=Value})
+    end
+})
+local Button12 = Tab:CreateButton({
+   Name = "Headless On/Off",
+   Callback = function()
+   if isheadless then
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=0,Property="Head"})
+   isheadless = false
+   else
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=15093053680,Property="Head"})
+   isheadless = true
+   end
+   end,
+})
+local Button12 = Tab:CreateButton({
+   Name = "Korblox On/Off",
+   Callback = function()
+   if iskorblox then
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=0,Property="RightLeg"})
+   iskorblox = false
+   else
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=139607718,Property="RightLeg"})
+   iskorblox = true
+   end
+   end,
+})
+local Input5 = Tab:CreateInput({
+   Name = "Apply Accessory",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AccessoryData={Order=1,AccessoryType=Enum.AccessoryType.Unknown,AssetId=Text}})
+   end,
+})
+local Input6 = Tab:CreateInput({
+   Name = "Apply Shirt",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=Text,Property="Shirt"})
+   end,
+})
+local Input7 = Tab:CreateInput({
+   Name = "Apply T-Shirt",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=Text,Property="GraphicTShirt"})
+   end,
+})
+local Input8 = Tab:CreateInput({
+   Name = "Apply Pants",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=Text,Property="Pants"})
+   end,
+})
+local Input9 = Tab:CreateInput({
+   Name = "Remove Accessory",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=Text})
+   end,
+})
+local Input6 = Tab:CreateInput({
+   Name = "Remove Shirt",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=0,Property="Shirt"})
+   end,
+})
+local Input7 = Tab:CreateInput({
+   Name = "Remove T-Shirt",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=0,Property="GraphicTShirt"})
+   end,
+})
+local Input8 = Tab:CreateInput({
+   Name = "Remove Pants",
+   PlaceholderText = "ID",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+   game.ReplicatedStorage.BloxbizRemotes.CatalogOnApplyToRealHumanoid:FireServer({AssetId=0,Property="Pants"})
    end,
 })
 Rayfield:LoadConfiguration()
