@@ -1,5 +1,8 @@
 local isheadless = false
 local iskorblox = false
+local emotes = {}
+local tags = {}
+local booths = {}
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
    Name = "Like Or Pass",
@@ -54,64 +57,18 @@ local Button = Tab:CreateButton({
 local Button2 = Tab:CreateButton({
    Name = "Get Everything",
    Callback = function()
-   local args = {
-    [1] = "Blow a Kiss",
-    [2] = "Emote",
-    [3] = {
-        [1] = "Salute",
-        [2] = "Sleepy",
-        [3] = "Facepalm",
-        [4] = "Clapping",
-        [5] = "Sobbing",
-        [6] = "Shhh",
-        [7] = "Hairflip",
-        [8] = "Skibidi Toilet",
-        [9] = "Pushup",
-        [10] = "Hairflip 2",
-        [11] = "Muscle Flex",
-        [12] = "Handstand",
-        [13] = "Cheerleading",
-        [14] = "Sparring",
-        [15] = "Blow a Kiss"
-    },
-    [4] = {
-        [1] = "Broke Boy",
-        [2] = "Homeless",
-        [3] = "L Rizz",
-        [4] = "Unspoken Rizz",
-        [5] = "Sigma Rizzler",
-        [6] = "Ohio Gyatt",
-        [7] = "Smooth Operator",
-        [8] = "Angel \240\159\152\135",
-        [9] = "Certified Rizzler",
-        [10] = "Queen",
-        [11] = "Dread Shaker",
-        [12] = "The Baddest",
-        [13] = "Bands Generator"
-    },
-    [5] = {
-        [1] = "My Fast Food",
-        [2] = "Lego",
-        [3] = "Early Halloween",
-        [4] = "Infinite Luck",
-        [5] = "Bandz Generator",
-        [6] = "Mr Richest",
-        [7] = "The Queen",
-        [8] = "Candy Booth",
-        [9] = "Galactico",
-        [10] = "Hearts",
-        [11] = "Cute Flower",
-        [12] = "Mr Aura",
-        [13] = "Web Booth",
-        [14] = "Black Hole",
-        [15] = "Shoot for the stars",
-        [16] = "Halloween Booth",
-        [17] = "Freaky booth",
-        [18] = "Cute Unicorn"
-    }
-}
-
-game:GetService("ReplicatedStorage").Events.Buy:FireServer(unpack(args))
+   for _,v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Shop.Tabs.Tags.Holder:GetChildren()) do
+   if v.Name ~= "UIGridLayout" then
+   table.insert(tags,v.Name)
+   end
+   end
+   for _,v in pairs(workspace.newemotes.AnimSaves:GetChildren()) do
+   table.insert(emotes,v.Name)
+   end
+   for _,v in pairs(workspace.Booths:GetChildren()) do
+   table.insert(booths,v.Name)
+   end
+   game:GetService("ReplicatedStorage").Events.Buy:FireServer("Blow A Kiss","Emote",emotes,tags,booths)
    end,
 })
 local Button3 = Tab:CreateButton({
@@ -208,6 +165,28 @@ local Button9 = Tab:CreateButton({
    end
    end,
 })
+local Button13 = Tab:CreateButton({
+   Name = "Big Head All",
+   Callback = function()
+   for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
+   game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="BigHead",Key="x5",Cash=0})
+   game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
+   end
+   end,
+})
+local Button14 = Tab:CreateButton({
+   Name = "Bacon Hair All",
+   Callback = function()
+   for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
+   game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="BaconHairs",Key="x5",Cash=0})
+   game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
+   end
+   end,
+})
 local Button10 = Tab:CreateButton({
    Name = "Kill All (~4 secs)",
    Callback = function()
@@ -233,6 +212,18 @@ local Input4 = Tab:CreateInput({
    task.wait(.1)
    game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="SlapPlayer",Key="x5",Cash=0})
    game.ReplicatedStorage.Events.TrollPlayer:FireServer(Text)
+   end,
+})
+local Button15 = Tab:CreateButton({
+   Name = "TP to VC servers",
+   Callback = function()
+   game:GetService("TeleportService"):Teleport(89586208269430)
+   end,
+})
+local Button16 = Tab:CreateButton({
+   Name = "TP to Normal servers",
+   Callback = function()
+   game:GetService("TeleportService"):Teleport(107640846225330)
    end,
 })
 local Button11 = Tab:CreateButton({
