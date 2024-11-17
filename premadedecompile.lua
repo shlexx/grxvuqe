@@ -9740,7 +9740,7 @@ end))]]
 		source = [[--Do not delete this script. This is what makes the board work.
 require(389325813).Parent = script.Parent
 ]]
-	elseif v.Name == "Main" and v.Parent:FindFirstChild("Keys") then
+	elseif v.Name == "Main" and v.Parent.Name == "Piano" then
 		source = [[Settings = require(script.Parent.Settings)
 Piano = script.Parent
 Box = Piano.Keys.KeyBox
@@ -9897,6 +9897,7520 @@ function RestorePianoKey(note1)
 	end
 end
 ]]
+	elseif v.Name == "ChatServiceRunner" then
+		source = [[--!nonstrict
+--	// FileName: ChatServiceRunner.lua
+--	// Written by: Xsitsu
+--	// Description: Main script to initialize ChatService and run ChatModules.
+
+local EventFolderName = "DefaultChatSystemChatEvents"
+local EventFolderParent = game:GetService("ReplicatedStorage")
+local modulesFolder = script
+
+local PlayersService = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Chat = game:GetService("Chat")
+
+local ChatService = require(modulesFolder:WaitForChild("ChatService"))
+
+local ReplicatedModules = Chat:WaitForChild("ClientChatModules")
+local ChatSettings = require(ReplicatedModules:WaitForChild("ChatSettings"))
+
+local ChatLocalization = nil
+pcall(function() ChatLocalization = require(Chat.ClientChatModules.ChatLocalization :: any) end)
+ChatLocalization = ChatLocalization or {}
+
+local MAX_CHANNEL_NAME_LENGTH = ChatSettings.MaxChannelNameCheckLength or 50
+local MAX_MESSAGE_LENGTH = ChatSettings.MaximumMessageLength
+local MAX_BYTES_PER_CODEPOINT = 6
+
+if not ChatLocalization.FormatMessageToSend or not ChatLocalization.LocalizeFormattedMessage then
+	function ChatLocalization:FormatMessageToSend(key,default) return default end
+end
+
+local MAX_BLOCKED_SPEAKERS_PER_REQ = 50
+
+local useEvents = {}
+
+local EventFolder = EventFolderParent:FindFirstChild(EventFolderName)
+if (not EventFolder) then
+	EventFolder = Instance.new("Folder")
+	EventFolder.Name = EventFolderName
+	EventFolder.Archivable = false
+	EventFolder.Parent = EventFolderParent
+end
+
+local function validateMessageLength(msg)
+    if msg:len() > MAX_MESSAGE_LENGTH*MAX_BYTES_PER_CODEPOINT then
+        return false
+    end
+
+    if utf8.len(msg) == nil then
+        return false
+    end
+
+    if utf8.len(utf8.nfcnormalize(msg)) > MAX_MESSAGE_LENGTH then
+        return false
+    end
+
+    return true
+end
+
+local function validateChannelNameLength(channelName)
+    if channelName:len() > MAX_CHANNEL_NAME_LENGTH*MAX_BYTES_PER_CODEPOINT then
+        return false
+    end
+
+    if utf8.len(channelName) == nil then
+        return false
+    end
+
+    if utf8.len(utf8.nfcnormalize(channelName)) > MAX_CHANNEL_NAME_LENGTH then
+        return false
+    end
+
+    return true
+end
+
+--// No-opt connect Server>Client RemoteEvents to ensure they cannot be called
+--// to fill the remote event queue.
+local function emptyFunction()
+	--intentially empty
+end
+
+local function GetObjectWithNameAndType(parentObject, objectName, objectType)
+	for _, child in pairs(parentObject:GetChildren()) do
+		if (child:IsA(objectType) and child.Name == objectName) then
+			return child
+		end
+	end
+
+	return nil
+end
+
+local function CreateIfDoesntExist(parentObject, objectName, objectType)
+	local obj = GetObjectWithNameAndType(parentObject, objectName, objectType)
+	if (not obj) then
+		obj = Instance.new(objectType)
+		obj.Name = objectName
+		obj.Parent = parentObject
+	end
+	useEvents[objectName] = obj
+
+	return obj
+end
+
+--// All remote events will have a no-opt OnServerEvent connecdted on construction
+local function CreateEventIfItDoesntExist(parentObject, objectName)
+	local obj = CreateIfDoesntExist(parentObject, objectName, "RemoteEvent")
+	obj.OnServerEvent:Connect(emptyFunction)
+	return obj
+end
+
+CreateEventIfItDoesntExist(EventFolder, "OnNewMessage")
+CreateEventIfItDoesntExist(EventFolder, "OnMessageDoneFiltering")
+CreateEventIfItDoesntExist(EventFolder, "OnNewSystemMessage")
+CreateEventIfItDoesntExist(EventFolder, "OnChannelJoined")
+CreateEventIfItDoesntExist(EventFolder, "OnChannelLeft")
+CreateEventIfItDoesntExist(EventFolder, "OnMuted")
+CreateEventIfItDoesntExist(EventFolder, "OnUnmuted")
+CreateEventIfItDoesntExist(EventFolder, "OnMainChannelSet")
+CreateEventIfItDoesntExist(EventFolder, "ChannelNameColorUpdated")
+
+CreateEventIfItDoesntExist(EventFolder, "SayMessageRequest")
+CreateEventIfItDoesntExist(EventFolder, "SetBlockedUserIdsRequest")
+CreateIfDoesntExist(EventFolder, "GetInitDataRequest", "RemoteFunction")
+CreateIfDoesntExist(EventFolder, "MutePlayerRequest", "RemoteFunction")
+CreateIfDoesntExist(EventFolder, "UnMutePlayerRequest", "RemoteFunction")
+
+EventFolder = useEvents
+
+local function CreatePlayerSpeakerObject(playerObj)
+	--// If a developer already created a speaker object with the
+	--// name of a player and then a player joins and tries to
+	--// take that name, we first need to remove the old speaker object
+	local speaker = ChatService:GetSpeaker(playerObj.Name)
+	if (speaker) then
+		ChatService:RemoveSpeaker(playerObj.Name)
+	end
+
+	speaker = ChatService:InternalAddSpeakerWithPlayerObject(playerObj.Name, playerObj, false)
+
+	for _, channel in pairs(ChatService:GetAutoJoinChannelList()) do
+		speaker:JoinChannel(channel.Name)
+	end
+
+	speaker:InternalAssignEventFolder(EventFolder)
+
+	speaker.ChannelJoined:connect(function(channel, welcomeMessage)
+		local log = nil
+		local channelNameColor = nil
+
+		local channelObject = ChatService:GetChannel(channel)
+		if (channelObject) then
+			log = channelObject:GetHistoryLogForSpeaker(speaker)
+			channelNameColor = channelObject.ChannelNameColor
+		end
+		EventFolder.OnChannelJoined:FireClient(playerObj, channel, welcomeMessage, log, channelNameColor)
+	end)
+
+	speaker.Muted:connect(function(channel, reason, length)
+		EventFolder.OnMuted:FireClient(playerObj, channel, reason, length)
+	end)
+
+	speaker.Unmuted:connect(function(channel)
+		EventFolder.OnUnmuted:FireClient(playerObj, channel)
+	end)
+
+	ChatService:InternalFireSpeakerAdded(speaker.Name)
+end
+
+EventFolder.SayMessageRequest.OnServerEvent:connect(function(playerObj, message, channel)
+	if type(message) ~= "string" then
+		return
+	elseif not validateMessageLength(message) then
+		return
+	end
+
+	if type(channel) ~= "string" then
+		return
+	elseif not validateChannelNameLength(channel) then
+		return
+	end
+
+	local speaker = ChatService:GetSpeaker(playerObj.Name)
+	if (speaker) then
+		return speaker:SayMessage(message, channel)
+	end
+
+	return nil
+end)
+
+EventFolder.MutePlayerRequest.OnServerInvoke = function(playerObj, muteSpeakerName)
+	if type(muteSpeakerName) ~= "string" then
+		return
+	end
+
+	local speaker = ChatService:GetSpeaker(playerObj.Name)
+	if speaker then
+		local muteSpeaker = ChatService:GetSpeaker(muteSpeakerName)
+		if muteSpeaker then
+			speaker:AddMutedSpeaker(muteSpeaker.Name)
+			return true
+		end
+	end
+	return false
+end
+
+EventFolder.UnMutePlayerRequest.OnServerInvoke = function(playerObj, unmuteSpeakerName)
+	if type(unmuteSpeakerName) ~= "string" then
+		return
+	end
+
+	local speaker = ChatService:GetSpeaker(playerObj.Name)
+	if speaker then
+		local unmuteSpeaker = ChatService:GetSpeaker(unmuteSpeakerName)
+		if unmuteSpeaker then
+			speaker:RemoveMutedSpeaker(unmuteSpeaker.Name)
+			return true
+		end
+	end
+	return false
+end
+
+-- Map storing Player -> Blocked user Ids.
+local BlockedUserIdsMap = {}
+
+PlayersService.PlayerAdded:connect(function(newPlayer)
+	for player, blockedUsers in pairs(BlockedUserIdsMap) do
+		local speaker = ChatService:GetSpeaker(player.Name)
+		if speaker then
+			for i = 1, #blockedUsers do
+				local blockedUserId = blockedUsers[i]
+				if blockedUserId == newPlayer.UserId then
+					speaker:AddMutedSpeaker(newPlayer.Name)
+				end
+			end
+		end
+	end
+end)
+
+PlayersService.PlayerRemoving:connect(function(removingPlayer)
+	BlockedUserIdsMap[removingPlayer] = nil
+end)
+
+EventFolder.SetBlockedUserIdsRequest.OnServerEvent:Connect(function(player, blockedUserIdsList)
+	if type(blockedUserIdsList) ~= "table" then
+		return
+	end
+
+	local prunedBlockedUserIdsList = {}
+	local speaker = ChatService:GetSpeaker(player.Name)
+	if speaker then
+		for i = 1, math.min(#blockedUserIdsList, MAX_BLOCKED_SPEAKERS_PER_REQ) do
+			if type(blockedUserIdsList[i]) == "number" then
+
+				table.insert(prunedBlockedUserIdsList, blockedUserIdsList[i])
+
+				local blockedPlayer = PlayersService:GetPlayerByUserId(blockedUserIdsList[i])
+				if blockedPlayer then
+					speaker:AddMutedSpeaker(blockedPlayer.Name)
+				end
+			end
+		end
+
+		-- We only want to store the first
+		-- MAX_BLOCKED_SPEAKERS_PER_REQ number of ids as needed
+		BlockedUserIdsMap[player] = prunedBlockedUserIdsList
+	end
+end)
+
+EventFolder.GetInitDataRequest.OnServerInvoke = (function(playerObj)
+	local speaker = ChatService:GetSpeaker(playerObj.Name)
+	if not (speaker and speaker:GetPlayer()) then
+		CreatePlayerSpeakerObject(playerObj)
+		speaker = ChatService:GetSpeaker(playerObj.Name)
+	end
+
+	local data = {}
+	data.Channels = {}
+	data.SpeakerExtraData = {}
+
+	for _, channelName in pairs(speaker:GetChannelList()) do
+		local channelObj = ChatService:GetChannel(channelName)
+		if (channelObj) then
+			local channelData =
+			{
+				channelName,
+				channelObj:GetWelcomeMessageForSpeaker(speaker),
+				channelObj:GetHistoryLogForSpeaker(speaker),
+				channelObj.ChannelNameColor,
+			}
+
+			table.insert(data.Channels, channelData)
+		end
+	end
+
+	for _, oSpeakerName in pairs(ChatService:GetSpeakerList()) do
+		local oSpeaker = ChatService:GetSpeaker(oSpeakerName)
+		data.SpeakerExtraData[oSpeakerName] = oSpeaker.ExtraData
+	end
+
+	return data
+end)
+
+local function DoJoinCommand(speakerName, channelName, fromChannelName)
+	local speaker = ChatService:GetSpeaker(speakerName)
+	local channel = ChatService:GetChannel(channelName)
+
+	if (speaker) then
+		if (channel) then
+			if (channel.Joinable) then
+				if (not speaker:IsInChannel(channel.Name)) then
+					speaker:JoinChannel(channel.Name)
+				else
+					speaker:SetMainChannel(channel.Name)
+					local msg = ChatLocalization:FormatMessageToSend(
+						"GameChat_SwitchChannel_NowInChannel",
+						string.format("You are now chatting in channel: '%s'", channel.Name),
+						"RBX_NAME",
+						channel.Name)
+					speaker:SendSystemMessage(msg, channel.Name)
+				end
+			else
+				local msg = ChatLocalization:FormatMessageToSend(
+					"GameChat_ChatServiceRunner_YouCannotJoinChannel",
+					"You cannot join channel '" .. channelName .. "'.",
+					"RBX_NAME",
+					channelName)
+				speaker:SendSystemMessage(msg, fromChannelName)
+			end
+		else
+			local msg = ChatLocalization:FormatMessageToSend(
+				"GameChat_ChatServiceRunner_ChannelDoesNotExist",
+				"Channel '" .. channelName .. "' does not exist.",
+				"RBX_NAME",
+				channelName)
+			speaker:SendSystemMessage(msg, fromChannelName)
+		end
+	end
+end
+
+local function DoLeaveCommand(speakerName, channelName, fromChannelName)
+	local speaker = ChatService:GetSpeaker(speakerName)
+	local channel = ChatService:GetChannel(channelName)
+
+	if (speaker) then
+		if (speaker:IsInChannel(channelName)) then
+			if (channel.Leavable) then
+				speaker:LeaveChannel(channel.Name)
+				local msg = ChatLocalization:FormatMessageToSend(
+					"GameChat_ChatService_YouHaveLeftChannel",
+					string.format("You have left channel '%s'", channelName),
+					"RBX_NAME",
+					channel.Name)
+				speaker:SendSystemMessage(msg, "System")
+			else
+				local msg = ChatLocalization:FormatMessageToSend(
+					"GameChat_ChatServiceRunner_YouCannotLeaveChannel",
+					("You cannot leave channel '" .. channelName .. "'."),
+					"RBX_NAME",
+					channelName)
+				speaker:SendSystemMessage(msg, fromChannelName)
+			end
+		else
+			local msg = ChatLocalization:FormatMessageToSend(
+				"GameChat_ChatServiceRunner_YouAreNotInChannel",
+				("You are not in channel '" .. channelName .. "'."),
+				"RBX_NAME",
+				channelName)
+			speaker:SendSystemMessage(msg, fromChannelName)
+		end
+	end
+end
+
+ChatService:RegisterProcessCommandsFunction("default_commands", function(fromSpeaker, message, channel)
+	if (string.sub(message, 1, 6):lower() == "/join ") then
+		DoJoinCommand(fromSpeaker, string.sub(message, 7), channel)
+		return true
+	elseif (string.sub(message, 1, 3):lower() == "/j ") then
+		DoJoinCommand(fromSpeaker, string.sub(message, 4), channel)
+		return true
+	elseif (string.sub(message, 1, 7):lower() == "/leave ") then
+		DoLeaveCommand(fromSpeaker, string.sub(message, 8), channel)
+		return true
+	elseif (string.sub(message, 1, 3):lower() == "/l ") then
+		DoLeaveCommand(fromSpeaker, string.sub(message, 4), channel)
+		return true
+	end
+
+	return false
+end)
+
+if ChatSettings.GeneralChannelName and ChatSettings.GeneralChannelName ~= "" then
+	local allChannel = ChatService:AddChannel(ChatSettings.GeneralChannelName)
+
+	allChannel.Leavable = false
+	allChannel.AutoJoin = true
+
+	allChannel:RegisterGetWelcomeMessageFunction(function(speaker)
+		if RunService:IsStudio() then
+			return nil
+		end
+		local player = speaker:GetPlayer()
+		if player then
+			local success, canChat = pcall(function()
+				return Chat:CanUserChatAsync(player.UserId)
+			end)
+			if success and not canChat then
+				return ""
+			end
+		end
+	end)
+end
+
+local systemChannel = ChatService:AddChannel("System")
+systemChannel.Leavable = false
+systemChannel.AutoJoin = true
+systemChannel.WelcomeMessage = ChatLocalization:FormatMessageToSend(
+	"GameChat_ChatServiceRunner_SystemChannelWelcomeMessage", "This channel is for system and game notifications."
+)
+
+systemChannel.SpeakerJoined:connect(function(speakerName)
+	systemChannel:MuteSpeaker(speakerName)
+end)
+
+
+local function TryRunModule(module)
+	if module:IsA("ModuleScript") then
+		local ret = require(module)
+		if (type(ret) == "function") then
+			ret(ChatService)
+		end
+	end
+end
+
+local modules = Chat:WaitForChild("ChatModules")
+modules.ChildAdded:connect(function(child)
+	local success, returnval = pcall(TryRunModule, child)
+	if not success and returnval then
+		print("Error running module " ..child.Name.. ": " ..returnval)
+	end
+end)
+
+for _, module in pairs(modules:GetChildren()) do
+	local success, returnval = pcall(TryRunModule, module)
+	if not success and returnval then
+		print("Error running module " ..module.Name.. ": " ..returnval)
+	end
+end
+
+PlayersService.PlayerRemoving:connect(function(playerObj)
+	if (ChatService:GetSpeaker(playerObj.Name)) then
+		ChatService:RemoveSpeaker(playerObj.Name)
+	end
+end)
+]]
+	elseif v.Name == "TimePlayedScript" then
+		source = [[local DATA_STORE 		= "TopTimePlayed" --< Name of the Data store values will be saved in
+local SCORE_UPDATE 		= 1 --< How often you want the score to be sent to datastore in minutes (no less than 1)
+local LEADERBOARD_UPDATE= 1 --< How often you want the leaderboard to update in minutes (no less than 1) 
+local NAME_OF_STAT 		= "TimePlayed" --< Stat name to save in the database
+local DO_DEBUG			= true --< Should it debug (print) messages to the console?
+
+local scoreBlock = script.Parent.Model.ScoreBlock
+
+-- gets the datastore, fails if could not find
+local Database = nil
+local suc, err = pcall(function ()
+	Database = game:GetService("DataStoreService"):GetOrderedDataStore(DATA_STORE)
+end)
+if not suc or Database == nil then warn(err) script.Parent:Destroy() end
+
+local function disp__time(_time)
+	_time = _time * 60
+	local days = math.floor(_time/86400)
+	local hours = math.floor(math.fmod(_time, 86400)/3600)
+	local minutes = math.floor(math.fmod(_time,3600)/60)
+	return string.format("%02dd : %02dh : %02dm",days,hours,minutes)
+end
+
+local UpdateBoard = function ()
+	if DO_DEBUG then print("Updating board") end
+	local results = Database:GetSortedAsync(false, 10, 1):GetCurrentPage()
+	for k, v in pairs(results) do
+		local userid = tonumber(string.split(v.key, NAME_OF_STAT)[2])
+		local name = game:GetService("Players"):GetNameFromUserIdAsync(userid)
+		local score = disp__time(v.value)
+		local sufgui = scoreBlock.SurfaceGui
+		sufgui.Names["Name"..k].Text = name
+		sufgui.Score["Score"..k].Text = score
+		sufgui.Photos["Photo"..k].Image = game:GetService("Players"):GetUserThumbnailAsync(userid, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+	end
+	if DO_DEBUG then print("Board updated sucessfully") end
+end
+
+local suc, err = pcall(UpdateBoard) -- update once
+if not suc then warn(err) end
+
+-- increments players time in the datastore
+spawn(function ()
+	while wait(SCORE_UPDATE*60) do
+		local suc, err = coroutine.resume(coroutine.create(function ()
+			local players = game:GetService("Players"):GetPlayers()
+			for _, player in pairs(players) do
+				local stat = NAME_OF_STAT .. player.UserId
+				local newval = Database:IncrementAsync(stat, SCORE_UPDATE)
+				if DO_DEBUG then print("Incremented time played stat of", player, stat, "to", newval) end
+			end
+		end))
+		if not suc then warn(err) end
+	end
+end)
+
+-- update leaderboard
+spawn(function ()
+	while wait(LEADERBOARD_UPDATE*60) do
+		UpdateBoard()
+	end
+end)
+
+
+-- Green_Bromine woz here]]
+	elseif v.Parent:FindFirstChild("ToolName") then
+		source = [[--Rescripted by Luckymaxer
+--Made by Stickmasterluke
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Sparkles = Handle:WaitForChild("Sparkles")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+WeaponHud = Tool:WaitForChild("WeaponHud")
+WeaponNameTag = WeaponHud:WaitForChild("WeaponName")
+GuiBar = WeaponHud:WaitForChild("Bar")
+GuiBarFill = GuiBar:WaitForChild("Fill")
+WeaponNameTag.Text = Tool:WaitForChild("ToolName").Value
+BasePart = Instance.new("Part")
+BasePart.Shape = Enum.PartType.Block
+BasePart.Material = Enum.Material.Plastic
+BasePart.TopSurface = Enum.SurfaceType.Smooth
+BasePart.BottomSurface = Enum.SurfaceType.Smooth
+BasePart.FormFactor = Enum.FormFactor.Custom
+BasePart.Size = Vector3.new(0.2, 0.2, 0.2)
+BasePart.CanCollide = true
+BasePart.Locked = true
+BasePart.Anchored = false
+Animations = {
+	Equip = {Animation = Tool:WaitForChild("Equip"), FadeTime = nil, Weight = nil, Speed = 1.5, Duration = nil},
+	Hold = {Animation = Tool:WaitForChild("Hold"), FadeTime = nil, Weight = nil, Speed = nil, Duration = nil},
+	LeftSlash = {Animation = Tool:WaitForChild("LeftSlash"), FadeTime = nil, Weight = nil, Speed = 1.2, Duration = nil},
+	RightSlash = {Animation = Tool:WaitForChild("RightSlash"), FadeTime = nil, Weight = nil, Speed = 1.2, Duration = nil},
+	Stab1 = {Animation = Tool:WaitForChild("Stab1"), FadeTime = nil, Weight = nil, Speed = 1.2, Duration = nil},
+	Stab2 = {Animation = Tool:WaitForChild("Stab2"), FadeTime = nil, Weight = nil, Speed = 1.2, Duration = nil},
+}
+Sounds = {
+	Swoosh1 = Handle:WaitForChild("Swoosh1"),
+	Swoosh2 = Handle:WaitForChild("Swoosh2"),
+	Hit1 = Handle:WaitForChild("Hit1"),
+	Hit2 = Handle:WaitForChild("Hit2"),
+	Hit3 = Handle:WaitForChild("Hit3"),
+	Clash1 = Handle:WaitForChild("Clash1"),
+	Clash2 = Handle:WaitForChild("Clash2"),
+	Clash3 = Handle:WaitForChild("Clash3"),
+	Clash4 = Handle:WaitForChild("Clash4"),
+	Clash5 = Handle:WaitForChild("Clash5"),
+}
+Damage = 22 -- +/- 10%
+DamageWindow = 1 --How long the player has to hit opponent to deal damage after click
+SwingRate = 0.75
+BloodEffects = false
+Ready = false
+ToolEquipped = false
+Rate = (1 / 30)
+LastSwing = 0
+MouseDown = false
+CurrentAnimation = nil
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Tool.Enabled = true
+ServerControl.OnServerInvoke = (function(player, Mode, Value)
+	if player == Player then
+		if Mode == "MouseClick" then
+			MouseDown = Value.Down
+			if MouseDown then
+				Activated()
+			end
+		elseif Mode == "KeyPress" then
+			local Key = Value.Key
+			local Down = Value.Down
+		end
+	end
+end)
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+function TagHumanoid(humanoid, player)
+	local Creator_Tag = Instance.new("ObjectValue")
+	Creator_Tag.Name = "creator"
+	Creator_Tag.Value = player
+	Debris:AddItem(Creator_Tag, 2)
+	Creator_Tag.Parent = humanoid
+end
+function UntagHumanoid(humanoid)
+	for i, v in pairs(humanoid:GetChildren()) do
+		if v:IsA("ObjectValue") and v.Name == "creator" then
+			v:Destroy()
+		end
+	end
+end
+function Billboard(Pos, Text, Time, Color)
+	local Pos = (Pos or Vector3.new(0, 0, 0))
+	local Text = (Text or "Hello World!")
+	local Time = (Time or 2)
+	local Color = (Color or Color3.new(1, 0, 0))
+	local Pos = (Pos + Vector3.new(0, 5, 0))
+	local EffectPart = BasePart:Clone()
+	EffectPart.Name = "Effect"
+	EffectPart.Size = Vector3.new(0, 0, 0)
+	EffectPart.CFrame=CFrame.new(Pos)
+	EffectPart.Anchored = true
+	EffectPart.CanCollide = false
+	EffectPart.Transparency = 1
+	local BillboardGui = Instance.new("BillboardGui")
+	BillboardGui.Size = UDim2.new(3, 0, 3, 0)
+	BillboardGui.Adornee = EffectPart
+	local TextLabel = Instance.new("TextLabel")
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.Size = UDim2.new(1, 0, 1, 0)
+	TextLabel.Text = Text
+	TextLabel.TextColor3 = Color
+	TextLabel.TextScaled = true
+	TextLabel.Font = Enum.Font.ArialBold
+	TextLabel.Parent = BillboardGui
+	BillboardGui.Parent = EffectPart
+	Debris:AddItem(EffectPart, (Time + 0.1))
+	EffectPart.Parent = game:GetService("Workspace")
+	Delay(0, function()
+		local Frames = (Time / Rate)
+		for Frame = 1, Frames do
+			wait(Rate)
+			local Percent = (Frame / Frames)
+			EffectPart.CFrame=CFrame.new(Pos) + Vector3.new(0, (5 * Percent), 0)
+			TextLabel.TextTransparency = Percent
+		end
+		if EffectPart and EffectPart.Parent then
+			EffectPart:Destroy()
+		end
+	end)
+end
+function MakeBlood(Part)
+	if not Part then
+		return
+	end
+	local Blood = BasePart:Clone()
+	Blood.BrickColor = BrickColor.new("Bright red")
+	Blood.Transparency = (math.random(0, 1) * 0.5)
+	Blood.CanCollide = ((math.random() < 0.5 and false) or true)
+	Blood.Size = Vector3.new((0.2 * math.random(1, 5)), (0.2 * math.random(1, 5)), (0.2 * math.random(1, 5)))
+	Blood.Velocity= Part.Velocity + (Vector3.new((math.random() - 0.5), (math.random() - 0.5), (math.random() - 0.5)) * 30)
+	Blood.RotVelocity = Part.RotVelocity + (Vector3.new((math.random() - 0.5), (math.random() - 0.5), (math.random() - 0.5)) * 20)
+	Blood.CFrame= Part.CFrame * CFrame.new(((math.random() - 0.5) * 3), ((math.random() - 0.5) * 3), ((math.random() - 0.5) * 3)) * CFrame.Angles((math.pi * 2 * math.random()), (math.pi * 2 * math.random()), (math.pi * 2 * math.random()))
+	Debris:AddItem(Blood, (math.random() * 4))
+	Blood.Parent = game:GetService("Workspace")
+end
+function Blow(Hit)
+	if not Hit or not Hit.Parent or not CheckIfAlive() or not Ready or not ToolEquipped or (tick() - LastSwing) > DamageWindow then
+		return
+	end
+	local character = Hit.Parent
+	if character == Character then
+		return
+	end
+	if Hit:FindFirstChild("CanBlock") and Handle:FindFirstChild("Blockable") then
+		local Ready = false
+		local PossibleSounds = {Sounds.Clash1, Sounds.Clash2, Sounds.Clash3, Sounds.Clash4, Sounds.Clash5}
+		local Sound = PossibleSounds[math.random(1, #PossibleSounds)]
+		Sound:Play()
+		Sparkles.Enabled = true
+		Delay(0.2, function()
+			Sparkles.Enabled = false
+		end)
+		Billboard(Handle.Position, "Block", 2, Color3.new(1, 1, 0))
+	end
+	local humanoid = character:FindFirstChild("Humanoid")
+	local player = Players:GetPlayerFromCharacter(character)
+	local RightArm = Character:FindFirstChild("Right Arm")
+	if humanoid and humanoid.Health > 0 and humanoid ~= Humanoid and RightArm then
+		local RightGrip = RightArm:FindFirstChild("RightGrip")
+		if RightGrip and (RightGrip.Part0 == Handle or RightGrip.Part1 == Handle) then
+			if player and player ~= Player and not Player.Neutral and not player.Neutral and Player.TeamColor == player.TeamColor then
+				return --No team killing
+			end
+			Ready = false
+			UntagHumanoid(humanoid)
+			TagHumanoid(humanoid)
+			local LocalDamage= math.floor(Damage * (0.9 + (math.random() * 0.2)) + 0.5)
+			humanoid:TakeDamage(LocalDamage)
+			Billboard(Hit.Position, ("-" .. tostring(LocalDamage)))
+			local PossibleSounds = {Sounds.Hit1, Sounds.Hit2, Sounds.Hit3}
+			local Sound = PossibleSounds[math.random(1, #PossibleSounds)]
+			Sound:Play()
+			if BloodEffects then
+				local NumBloodEffects = math.ceil(LocalDamage / 10)
+				for i = 1, math.random((NumBloodEffects - 1), (NumBloodEffects + 1)) do
+					MakeBlood(Hit)
+				end
+			end
+		end
+	end
+end
+function Activated()
+	if ToolEquipped and (tick() - LastSwing) >= SwingRate then
+		Tool.Enabled = false
+		Ready = true
+		
+		local PossibleSounds = {Sounds.Swoosh1, Sounds.Swoosh2}
+		local Sound = PossibleSounds[math.random(1, #PossibleSounds)]
+		Sound:Play()
+		
+		local AttackAnimations = {Animations.LeftSlash, Animations.RightSlash, Animations.Stab1, Animations.Stab2}
+		local NewAnimation = AttackAnimations[math.random(1, #AttackAnimations)]
+		while NewAnimation == CurrentAnimation do
+			NewAnimation = AttackAnimations[math.random(1, #AttackAnimations)]
+		end
+		
+		CurrentAnimation = NewAnimation
+		
+		InvokeClient("PlayAnimation", CurrentAnimation)
+		LastSwing = tick()
+		wait(SwingRate)
+		
+		if MouseDown then
+			Activated()
+		end
+		
+		Tool.Enabled = true
+	end
+end
+function UpdateGui()
+	local SwingPercent = math.min(((tick() - LastSwing) / SwingRate), 1)
+	if SwingPercent < 0.5 then	--fade from red to yellow then to green
+		GuiBarFill.BackgroundColor3 = Color3.new(1, (SwingPercent * 2), 0)
+	else
+		GuiBarFill.BackgroundColor3 = Color3.new((1 - ((SwingPercent - 0.5 ) / 0.5)), 1, 0)
+	end
+	GuiBarFill.Size = UDim2.new(SwingPercent, 0, 1, 0)
+end
+function CheckIfAlive()
+	return (Player and Player.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0)
+end
+function Equipped()
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	PlayerGui = Player:FindFirstChild("PlayerGui")
+	Humanoid = Character:FindFirstChild("Humanoid")
+	if not CheckIfAlive() then
+		return
+	end
+	if PlayerGui then
+		WeaponHud.Parent = PlayerGui
+	end
+	InvokeClient("PlayAnimation", Animations.Equip)
+	LastSwing = tick()
+	Ready = false
+	ToolEquipped = true
+	for i, v in pairs(Animations) do
+		if v and v.Animation then
+			InvokeClient("Preload", v.Animation.AnimationId)
+		end
+	end
+	ToolEquipped = true
+end
+function Unequipped()
+	for i, v in pairs(Animations) do
+		InvokeClient("StopAnimation", v)
+	end
+	WeaponHud.Parent = Tool
+	ToolEquipped = false
+	Ready = false
+end
+Handle.Touched:connect(Blow)
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)
+Spawn(function()
+	while true do
+		UpdateGui()
+		wait(Rate)
+	end
+end)]]
+	elseif v.Name == "TeddyScript" then
+		source = [[local Tool = script.Parent;
+enabled = true
+s1 = Instance.new("Sound")
+s1.SoundId = "http://www.roblox.com/asset/?id=12844799"
+s1.Parent = Tool.Handle
+s2 = Instance.new("Sound")
+s2.SoundId = "http://www.roblox.com/asset/?id=12844794"
+s2.Parent = Tool.Handle
+s3 = Instance.new("Sound")
+s3.SoundId = "http://www.roblox.com/asset/?id=12803520"
+s3.Parent = Tool.Handle
+s4 = Instance.new("Sound")
+s4.SoundId = "http://www.roblox.com/asset/?id=12803507"
+s4.Parent = Tool.Handle
+s5 = Instance.new("Sound")
+s5.SoundId = "http://www.roblox.com/asset/?id=12803498"
+s5.Parent = Tool.Handle
+local sayings = {s1,s2,s3,s4,s5}
+function onActivated()
+	if not enabled  then
+		return
+	end
+	enabled = false
+	
+	Tool.GripForward = Vector3.new(1,0,0)
+	Tool.GripPos = Vector3.new(.5,-1.5,-1.56)
+	Tool.GripRight = Vector3.new(0,-.707,-.707)
+	Tool.GripUp = Vector3.new(0,-.707,.707)
+	sayings[math.random(1,#sayings)]:Play()
+	wait(2)
+	Tool.GripForward = Vector3.new(-1,0,0)
+	Tool.GripPos = Vector3.new(0,0,-.4)
+	Tool.GripRight = Vector3.new(0,1,0)
+	Tool.GripUp = Vector3.new(0,0,1)
+	
+	enabled = true
+end
+function onEquipped()
+	for i=1,#sayings do
+		sayings[i].Volume = 1
+	end
+end
+function onUnequipped()
+	for i=1,#sayings do
+		sayings[i].Volume = 0
+	end
+end
+script.Parent.Activated:connect(onActivated)
+script.Parent.Equipped:connect(onEquipped)
+script.Parent.Unequipped:connect(onUnequipped)]]
+	elseif v.Name == "HealingPotionScript" then
+		source = [[--Updated for R15 avatar by StarWars
+local Tool = script.Parent;
+local GlassBreak = Instance.new("Sound")
+GlassBreak.Name = "GlassBreak"
+GlassBreak.SoundId = "http://www.roblox.com/asset/?id=11415738"
+GlassBreak.Volume = 1
+GlassBreak.Parent = Tool.Handle
+local DrinkSound = Instance.new("Sound")
+DrinkSound.Name = "Drink"
+DrinkSound.SoundId = "http://www.roblox.com/asset/?id=10722059"
+DrinkSound.Volume = .5
+DrinkSound.Parent = Tool.Handle
+function onActivated()
+	if not Tool.Enabled  then
+		return
+	end
+	Tool.Enabled = false
+	Tool.GripForward = Vector3.new(0,-.759,-.651)
+	Tool.GripPos = Vector3.new(1.5,-.35,.1)
+	Tool.GripRight = Vector3.new(1,0,0)
+	Tool.GripUp = Vector3.new(0,.651,-.759)
+	DrinkSound:Play()
+	DrinkSound:Destroy()
+	wait(3)
+	
+	local h = Tool.Parent:FindFirstChild("Humanoid")
+	if (h ~= nil) then
+		h.Health = h.MaxHealth
+	else
+		return
+	end
+	Tool.GripForward = Vector3.new(-.976,0,-0.217)
+	Tool.GripPos = Vector3.new(0.1,0,.1)
+	Tool.GripRight = Vector3.new(.217,0,-.976)
+	Tool.GripUp = Vector3.new(0,1,0)
+	wait(1)
+	local p = Tool.Handle:Clone()
+	GlassBreak.Parent = p
+	p.Transparency = 0
+	local Torso = Tool.Parent:FindFirstChild("Torso") or Tool.Parent:FindFirstChild("RightUpperArm")
+	
+	if Torso then
+		local RightArm = Torso:FindFirstChild("Right Shoulder") or Torso:FindFirstChild("RightShoulder")
+		if RightArm then
+			RightArm.MaxVelocity = 0.7
+			RightArm.DesiredAngle = 3.6
+			wait(.1)
+			RightArm.MaxVelocity = 1
+		end
+	end
+	local dir = h.Parent.Head.CFrame.lookVector
+	p.Velocity = (dir * 60) + Vector3.new(0,30,0)
+	p.CanCollide = true
+	Tool.Glass.Parent = p
+	p.Glass.Disabled = false
+	p.Parent = game.Workspace
+	script.Parent:Destroy()
+end
+function onEquipped()
+	--Tool.Handle.OpenSound:play()
+end
+script.Parent.Activated:connect(onActivated)
+script.Parent.Equipped:connect(onEquipped)]]
+	elseif v.Name == "Glass" and v.Parent:FindFirstChild("HealingPotionScript") then
+		source = [[function Touched(part)
+	script.Parent.GlassBreak:Play()
+	con:disconnect()
+end
+con = script.Parent.Touched:connect(Touched)
+wait(30)
+script.Parent:Destroy()]]
+	elseif v:FindFirstChild("RemovalMonitor") then
+		source = [[--Made by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+RemovalMonitor = script:WaitForChild("RemovalMonitor")
+CarpetPieces = {
+	{MeshId = 223079795, Angle = 160},
+	{MeshId = 223079835, Angle = 100},
+	{MeshId = 223079888, Angle = 100},
+	{MeshId = 223079981, Angle = 160},
+}
+CarpetSize = Vector3.new(3, 0.5, 6.5)
+BaseUrl = "http://www.roblox.com/asset/?id="
+Rate = (1 / 10)
+BasePart = Instance.new("Part")
+BasePart.Material = Enum.Material.Plastic
+BasePart.Shape = Enum.PartType.Block
+BasePart.TopSurface = Enum.SurfaceType.Smooth
+BasePart.BottomSurface = Enum.SurfaceType.Smooth
+BasePart.FormFactor = Enum.FormFactor.Custom
+BasePart.Size = Vector3.new(0.2, 0.2, 0.2)
+BasePart.CanCollide = false
+BasePart.Locked = true
+ColorPart = BasePart:Clone()
+ColorPart.Name = "ColorPart"
+ColorPart.Reflectance = 0.25
+ColorPart.Transparency = 0.1
+ColorPart.Material = Enum.Material.SmoothPlastic
+ColorPart.FrontSurface = Enum.SurfaceType.SmoothNoOutlines
+ColorPart.BackSurface = Enum.SurfaceType.SmoothNoOutlines
+ColorPart.TopSurface = Enum.SurfaceType.SmoothNoOutlines
+ColorPart.BottomSurface = Enum.SurfaceType.SmoothNoOutlines
+ColorPart.LeftSurface = Enum.SurfaceType.SmoothNoOutlines
+ColorPart.RightSurface = Enum.SurfaceType.SmoothNoOutlines
+ColorPart.Size = Vector3.new(1, 1, 1)
+ColorPart.Anchored = true
+ColorPart.CanCollide = false
+ColorMesh = Instance.new("SpecialMesh")
+ColorMesh.Name = "Mesh"
+ColorMesh.MeshType = Enum.MeshType.FileMesh
+ColorMesh.MeshId = (BaseUrl .. "9856898")
+ColorMesh.TextureId = (BaseUrl .. "1361097")
+ColorMesh.Scale = (ColorPart.Size * 2) --Default mesh scale is 1/2 the size of a 1x1x1 brick.
+ColorMesh.Offset = Vector3.new(0, 0, 0)
+ColorMesh.VertexColor = Vector3.new(1, 1, 1)
+ColorMesh.Parent = ColorPart
+ColorLight = Instance.new("PointLight")
+ColorLight.Name = "Light"
+ColorLight.Brightness = 50
+ColorLight.Range = 8
+ColorLight.Shadows = false
+ColorLight.Enabled = true
+ColorLight.Parent = ColorPart
+RainbowColors = {
+	Vector3.new(1, 0, 0),
+	Vector3.new(1, 0.5, 0),
+	Vector3.new(1, 1, 0),
+	Vector3.new(0, 1, 0),
+	Vector3.new(0, 1, 1),
+	Vector3.new(0, 0, 1),
+	Vector3.new(0.5, 0, 1)
+}
+Animations = {
+	Sit = {Animation = Tool:WaitForChild("Sit"), FadeTime = nil, Weight = nil, Speed = nil, Duration = nil},
+}
+Grips = {
+	Normal = CFrame.new(-1.5, 0, 0, 0, 0, -1, -1, 8.90154915e-005, 0, 8.90154915e-005, 1, 0),
+	Flying = CFrame.new(-1.5, 0.5, -0.75, -1, 0, -8.99756625e-009, -8.99756625e-009, 8.10000031e-008, 1, 7.28802977e-016, 0.99999994, -8.10000103e-008)
+}
+Flying = false
+ToolEquipped = false
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Handle.Transparency = 0
+Tool.Grip = Grips.Normal
+Tool.Enabled = true
+function Clamp(Number, Min, Max)
+	return math.max(math.min(Max, Number), Min)
+end
+function TransformModel(Objects, Center, NewCFrame, Recurse)
+	local Objects = ((type(Objects) ~= "table" and {Objects}) or Objects)
+	for i, v in pairs(Objects) do
+		if v:IsA("BasePart") then
+			v.CFrame = NewCFrame:toWorldSpace(Center:toObjectSpace(v.CFrame))
+		end
+		if Recurse then
+			TransformModel(v:GetChildren(), Center, NewCFrame, true)
+		end
+	end
+end
+function Weld(Parent, PrimaryPart)
+	local Parts = {}
+	local Welds = {}
+	local function WeldModel(Parent, PrimaryPart)
+		for i, v in pairs(Parent:GetChildren()) do
+			if v:IsA("BasePart") then
+				if v ~= PrimaryPart then
+					local Weld = Instance.new("Weld")
+					Weld.Name = "Weld"
+					Weld.Part0 = PrimaryPart
+					Weld.Part1 = v
+					Weld.C0 = PrimaryPart.CFrame:inverse()
+					Weld.C1 = v.CFrame:inverse()
+					Weld.Parent = PrimaryPart
+					table.insert(Welds, Weld)
+				end
+				table.insert(Parts, v)
+			end
+			WeldModel(v, PrimaryPart)
+		end
+	end
+	WeldModel(Parent, PrimaryPart)
+	return Parts, Welds
+end
+function CleanUp()
+	for i, v in pairs(Tool:GetChildren()) do
+		if v:IsA("BasePart") and v ~= Handle then
+			v:Destroy()
+		end
+	end
+end
+function CreateRainbow(Length)
+	local RainbowModel = Instance.new("Model")
+	RainbowModel.Name = "RainbowPart"
+	for i, v in pairs(RainbowColors) do
+		local Part = ColorPart:Clone()
+		Part.Name = "Part"
+		Part.Size = Vector3.new(0.5, 0.5, Length)
+		Part.CFrame = Part.CFrame * CFrame.new((Part.Size.X * (i - 1)), 0, 0)
+		Part.Mesh.Scale = (Part.Size * 2)
+		Part.Mesh.VertexColor = v
+		Part.Light.Color = Color3.new(v.X, v.Y, v.Z)
+		Part.Parent = RainbowModel
+	end
+	local RainbowBoundingBox = BasePart:Clone()
+	RainbowBoundingBox.Name = "BoundingBox"
+	RainbowBoundingBox.Transparency = 1
+	RainbowBoundingBox.Size = RainbowModel:GetModelSize()
+	RainbowBoundingBox.Anchored = true
+	RainbowBoundingBox.CanCollide = false
+	RainbowBoundingBox.CFrame = RainbowModel:GetModelCFrame()
+	RainbowBoundingBox.Parent = RainbowModel
+	return RainbowModel
+end
+function GetRainbowModel()
+	local ModelName = (Player.Name .. "'s Rainbow")
+	local Model = game:GetService("Workspace"):FindFirstChild(ModelName)
+	if not Model then
+		Model = Instance.new("Model")
+		Model.Name = ModelName
+		local RemovalMonitorClone = RemovalMonitor:Clone()
+		RemovalMonitorClone.Disabled = false
+		RemovalMonitorClone.Parent = Model
+	end
+	return Model
+end
+function CheckIfAlive()
+	return (((Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent and Player and Player.Parent) and true) or false)
+end
+function Activated()
+	if not Tool.Enabled then
+		return
+	end
+	Tool.Enabled = false
+	Flying = not Flying
+	if Flying then
+		Handle.Transparency = 1
+		CleanUp()
+		local CarpetParts = {}
+		for i, v in pairs(CarpetPieces) do
+			local CarpetPart = BasePart:Clone()
+			CarpetPart.CanCollide = false
+			CarpetPart.Size = Vector3.new(CarpetSize.X, CarpetSize.Y, (CarpetSize.Z / #CarpetPieces))
+			local Mesh = Instance.new("SpecialMesh")
+			Mesh.MeshType = Enum.MeshType.FileMesh
+			Mesh.MeshId = (BaseUrl .. v.MeshId)
+			Mesh.TextureId = (BaseUrl .. "223080038")
+			Mesh.Scale = Vector3.new(1.125, 1.125, 1.125)
+			Mesh.VertexColor = Vector3.new(1, 1, 1)
+			Mesh.Offset = Vector3.new(0, 0, 0)
+			Mesh.Parent = CarpetPart
+			local Weld = Instance.new("Weld")
+			Weld.Part0 = Handle
+			Weld.Part1 = CarpetPart
+			local XOffset = (((i == 1 or i == #CarpetPieces) and -0.005) or 0)
+			local YOffset = ((-((Handle.Size.Z / 2) - (CarpetPart.Size.Z / 2))) + ((CarpetPart.Size.Z * (i - 1))) + ((i == 2 and 0.245) or (i == 3 and 0.04) or (i == #CarpetPieces and 0.28) or 0))
+			Weld.C1 = CFrame.new(0, XOffset, YOffset)
+			Weld.Parent = CarpetPart
+			table.insert(CarpetParts, {Part = CarpetPart, Weld = Weld, InitialCFrame = Weld.C0, Angle = v.Angle})
+			CarpetPart.Parent = Tool
+		end	
+		
+		spawn(function()
+			InvokeClient("PlayAnimation", Animations.Sit)
+			Tool.Grip = Grips.Flying
+		end)
+		Torso.Anchored = true
+		delay(.2,function()
+			Torso.Anchored = false
+			Torso.Velocity = Vector3.new(0,0,0)
+			Torso.RotVelocity = Vector3.new(0,0,0)
+		end)
+		
+		FlightSpin = Instance.new("BodyGyro")
+		FlightSpin.Name = "FlightSpin"
+		FlightSpin.P = 10000
+		FlightSpin.maxTorque = Vector3.new(FlightSpin.P, FlightSpin.P, FlightSpin.P)*100
+		FlightSpin.cframe = Torso.CFrame
+		
+		FlightPower = Instance.new("BodyVelocity")
+		FlightPower.Name = "FlightPower"
+		FlightPower.velocity = Vector3.new(0, 0, 0)
+		FlightPower.maxForce = Vector3.new(0, 0, 0)	--Vector3.new(1,1,1)*1000000
+		FlightPower.P = 1000
+		
+		FlightHold = Instance.new("BodyPosition")
+		FlightHold.Name = "FlightHold"
+		FlightHold.P = 100000
+		FlightHold.maxForce = Vector3.new(0, 0, 0)
+		FlightHold.position = Torso.Position
+		
+		FlightSpin.Parent = Torso
+		FlightPower.Parent = Torso
+		FlightHold.Parent = Torso
+		
+		spawn(function()
+			local LastPlace = nil
+			while Flying and ToolEquipped and CheckIfAlive() do
+				
+				local CurrentPlace = Handle.Position
+				local Velocity = Torso.Velocity
+				Velocity = Vector3.new(Velocity.X, 0, Velocity.Z).magnitude
+				
+				if LastPlace and Velocity > 10 then
+					
+					spawn(function()
+						local Model = GetRainbowModel()
+						local Distance = (LastPlace - CurrentPlace).magnitude
+						local Length = Distance + 3.5
+						
+						local RainbowModel = CreateRainbow(Length)
+						
+						--Thanks so much to ArceusInator for helping solve this part!
+						local RainbowCFrame = CFrame.new((LastPlace + (CurrentPlace - LastPlace).unit * (Distance / 2)), CurrentPlace)
+						
+						TransformModel(RainbowModel, RainbowModel:GetModelCFrame(), RainbowCFrame, true)
+						Debris:AddItem(RainbowModel, 1)
+						RainbowModel.Parent = Model
+						
+						if Model and not Model.Parent then
+							Model.Parent = game:GetService("Workspace")
+						end
+						
+						LastPlace = CurrentPlace
+					end)
+				elseif not LastPlace then
+					LastPlace = CurrentPlace
+				end
+				
+				wait(Rate)
+			end
+		end)
+	elseif not Flying then
+		Torso.Velocity = Vector3.new(0, 0, 0)
+		Torso.RotVelocity = Vector3.new(0, 0, 0)
+		
+		for i, v in pairs({FlightSpin, FlightPower, FlightHold}) do
+			if v and v.Parent then
+				v:Destroy()
+			end
+		end
+		spawn(function()
+			Tool.Grip = Grips.Normal
+			InvokeClient("StopAnimation", Animations.Sit)
+		end)
+	end
+	
+	wait(2)
+	
+	Tool.Enabled = true
+end
+function Equipped(Mouse)
+	Character = Tool.Parent
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("HumanoidRootPart")
+	Player = Players:GetPlayerFromCharacter(Character)
+	if not CheckIfAlive() then
+		return
+	end
+	if Humanoid then
+		if Humanoid.RigType == Enum.HumanoidRigType.R15 then
+			Animations = {
+				Sit = {Animation = Tool:WaitForChild("SitR15"), FadeTime = nil, Weight = nil, Speed = nil, Duration = nil},
+			}
+		else
+			Animations = {
+				Sit = {Animation = Tool:WaitForChild("Sit"), FadeTime = nil, Weight = nil, Speed = nil, Duration = nil},
+			}
+		end
+	end
+	Tool.Grip = Grips.Normal
+	ToolEquipped = true
+end
+function Unequipped()
+	Flying = false
+	for i, v in pairs({FlightSpin, FlightPower, FlightHold}) do
+		if v and v.Parent then
+			v:Destroy()
+		end
+	end
+	CleanUp()
+	Handle.Transparency = 0
+	ToolEquipped = false
+end
+function OnServerInvoke(player, mode, value)
+	if player ~= Player or not ToolEquipped or not value or not CheckIfAlive() then
+		return
+	end
+end
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+CleanUp()
+ServerControl.OnServerInvoke = OnServerInvoke
+Tool.Activated:connect(Activated)
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "RemovalMonitor" then
+		source = [[--Made by Luckymaxer
+Model = script.Parent
+Debris = game:GetService("Debris")
+Removing = false
+function RemoveModel()
+	if Removing then
+		return
+	end
+	local Parts = {}
+	for i, v in pairs(Model:GetChildren()) do
+		if v:IsA("Model") then
+			table.insert(Parts, v)
+		end
+	end
+	if #Parts == 0 then
+		Removing = true
+		Model.Name = ""
+		Debris:AddItem(Model, 1)
+	end
+end
+Model.ChildRemoved:connect(function(Child)
+	RemoveModel()
+end)
+RemoveModel()]]
+	elseif v.Name == "Script" and v:FindFirstChild("Handle"):FindFirstChild("CoilSound") then
+		source = [[--Rescripted by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Sounds = {
+	CoilSound = Handle:WaitForChild("CoilSound"),
+}
+Gravity = 196.20
+JumpHeightPercentage = 0.25
+ToolEquipped = false
+function GetAllConnectedParts(Object)
+	local Parts = {}
+	local function GetConnectedParts(Object)
+		for i, v in pairs(Object:GetConnectedParts()) do
+			local Ignore = false
+			for ii, vv in pairs(Parts) do
+				if v == vv then
+					Ignore = true
+				end
+			end
+			if not Ignore then
+				table.insert(Parts, v)
+				GetConnectedParts(v)
+			end
+		end
+	end
+	GetConnectedParts(Object)
+	return Parts
+end
+function SetGravityEffect()
+	if not GravityEffect or not GravityEffect.Parent then
+		GravityEffect = Instance.new("BodyForce")
+		GravityEffect.Name = "GravityCoilEffect"
+		GravityEffect.Parent = Torso
+	end
+	local TotalMass = 0
+	local ConnectedParts = GetAllConnectedParts(Torso)
+	for i, v in pairs(ConnectedParts) do
+		if v:IsA("BasePart") then
+			TotalMass = (TotalMass + v:GetMass())
+		end
+	end
+	local TotalMass = (TotalMass * 196.20 * (1 - JumpHeightPercentage))
+	GravityEffect.force = Vector3.new(0, TotalMass, 0)
+end
+function HandleGravityEffect(Enabled)
+	if not CheckIfAlive() then
+		return
+	end
+	for i, v in pairs(Torso:GetChildren()) do
+		if v:IsA("BodyForce") then
+			v:Destroy()
+		end
+	end
+	for i, v in pairs({ToolUnequipped, DescendantAdded, DescendantRemoving}) do
+		if v then
+			v:disconnect()
+		end
+	end
+	if Enabled then
+		CurrentlyEquipped = true
+		ToolUnequipped = Tool.Unequipped:connect(function()
+			CurrentlyEquipped = false
+		end)
+		SetGravityEffect()
+		DescendantAdded = Character.DescendantAdded:connect(function()
+			wait()
+			if not CurrentlyEquipped or not CheckIfAlive() then
+				return
+			end
+			SetGravityEffect()
+		end)
+		DescendantRemoving = Character.DescendantRemoving:connect(function()
+			wait()
+			if not CurrentlyEquipped or not CheckIfAlive() then
+				return
+			end
+			SetGravityEffect()
+		end)
+	end
+end
+function CheckIfAlive()
+	return (((Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent and Player and Player.Parent) and true) or false)
+end
+function Equipped(Mouse)
+	Character = Tool.Parent
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("UpperTorso")
+	Player = Players:GetPlayerFromCharacter(Character)
+	if not CheckIfAlive() then
+		return
+	end
+	if HumanoidDied then
+		HumanoidDied:disconnect()
+	end
+	HumanoidDied = Humanoid.Died:connect(function()
+		if GravityEffect and GravityEffect.Parent then
+			GravityEffect:Destroy()
+		end
+	end)
+	Sounds.CoilSound:Play()
+	HandleGravityEffect(true)
+	ToolEquipped = true
+end
+function Unequipped()
+	if HumanoidDied then
+		HumanoidDied:disconnect()
+	end
+	HandleGravityEffect(false)
+	ToolEquipped = false
+end
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Parent:FindFirstChild("SwapWith") then
+		source = [[local Tool = script.Parent
+Tool.Enabled = true
+local Players = game:GetService'Players'
+function BuildCharacterRig(Character, AppearanceModel, IsR15)
+	local Humanoid,FF = Character:FindFirstChildOfClass("Humanoid"),Character:FindFirstChildOfClass("ForceField")
+	if not Humanoid and Humanoid.Health > 0 or FF then return end 	
+	local AnimateScript = Character:FindFirstChild("Animate")
+	if not AnimateScript then return end 
+	
+	for _, Object in next, Character:GetChildren() do
+		if Object:IsA("Accessory") then
+			Object:Destroy()
+		elseif Object.Name == "Head" then
+			local Face = Object:FindFirstChild("face")
+			if Face then
+				Face.Texture = "rbxasset://textures/face.png"
+			end
+		elseif Object:IsA("Shirt") or Object:IsA("Pants") or Object:IsA("ShirtGraphic") or Object:IsA("BodyColors") then
+			Object:Destroy()
+		end
+	end
+	
+	if IsR15 then		
+		for _, Object in next, AppearanceModel:GetChildren() do
+			if Object.Name == "R15" and Object:IsA("Folder") then
+				for _, Part in next, Object:GetChildren() do
+					if Part:IsA("BasePart") then
+						local HasLimb = Character:FindFirstChild(Part.Name)
+						if HasLimb then
+							HasLimb:Destroy()
+						end
+						Part.Parent = Character
+						Humanoid:BuildRigFromAttachments()
+					end
+				end
+			elseif Object.Name == "R15Anim" and Object:IsA("Folder") then
+				for _, AnimationObject in next, Object:GetChildren() do
+					local HasAnimObject = AnimateScript:FindFirstChild(AnimationObject.Name)
+					if HasAnimObject then
+						HasAnimObject:Destroy()
+					end
+					
+					AnimationObject.Parent = AnimateScript
+				end
+			elseif Object:IsA("Accessory") then
+				Humanoid:AddAccessory(Object)
+			elseif Object:IsA("Pants") or Object:IsA("Shirt") or Object:IsA("ShirtGraphic") or Object:IsA("BodyColors") then
+				Object.Parent = Character
+			elseif Object.Name == "face" then
+				local Head = Character:FindFirstChild("Head")
+				if Head then
+					local Face = Head:FindFirstChild("face")
+					if Face then
+						Face.Texture = Object.Texture
+					else
+						Object.Parent = Head
+					end
+				end
+			elseif Object.Name == "BodyDepthScale" or Object.Name == "BodyHeightScale" or Object.Name == "BodyWidthScale" or Object.Name == "HeadScale" then
+				local ValueObject = Humanoid:FindFirstChild(Object.Name)
+				if ValueObject then
+					ValueObject.Value = Object.Value
+				else
+					Object.Parent = Humanoid
+				end
+			end
+		end				
+	else
+		for _, Object in next, AppearanceModel:GetChildren() do
+			if Object:IsA("Accessory") then
+				Humanoid:AddAccessory(Object)
+			elseif Object:IsA("Pants") or Object:IsA("Shirt") or Object:IsA("ShirtGraphic") or Object:IsA("BodyColors") then
+				Object.Parent = Character
+			elseif Object.Name == "face" then
+				Object.Parent = Character:FindFirstChild("Head")				
+			end
+		end
+	end
+end
+Tool.SwapWith.OnServerEvent:Connect(function(client, character)
+	if client == Players:GetPlayerFromCharacter(Tool.Parent) and client.Character and Tool.Enabled then
+		local otherPlayer = Players:GetPlayerFromCharacter(character)
+		if not otherPlayer then return end -- Remove to make it work with NPCs
+		
+		local clienttorso,targettorso = client.Character:FindFirstChild("Torso") or client.Character:FindFirstChild("UpperTorso"),character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+		if not clienttorso or not targettorso or (targettorso.Position-clienttorso.Position).Magnitude > 50 then return end
+		
+		local ClientCharacterAppearance = Players:GetCharacterAppearanceAsync(client.UserId)		
+		local OtherCharacterAppearance = Players:GetCharacterAppearanceAsync(otherPlayer.UserId)
+		
+		
+		local ClientHumanoid = client.Character:FindFirstChildOfClass("Humanoid")
+		local OtherHumanoid = character:FindFirstChildOfClass("Humanoid")
+		if ClientHumanoid and OtherHumanoid then
+			BuildCharacterRig(client.Character, OtherCharacterAppearance, ClientHumanoid.RigType == Enum.HumanoidRigType.R15)
+			BuildCharacterRig(character, ClientCharacterAppearance, OtherHumanoid.RigType == Enum.HumanoidRigType.R15)
+		end
+		
+		ClientCharacterAppearance:Destroy()
+		OtherCharacterAppearance:Destroy()
+		if otherPlayer and client.Character:FindFirstChild'HumanoidRootPart' and character:FindFirstChild'HumanoidRootPart' and client.Character.HumanoidRootPart.Anchored == false and character.HumanoidRootPart.Anchored == false then
+			local posA, posB = client.Character.HumanoidRootPart.CFrame, character.HumanoidRootPart.CFrame
+			client.Character.HumanoidRootPart.CFrame = posB
+			character.HumanoidRootPart.CFrame = posA
+		end
+		Tool.Enabled = false
+		delay(5,function()
+			Tool.Enabled = true
+		end)
+	end 
+end)]]
+	elseif v.Parent:FindFirstChild("HitFade") then
+		source = [[--Rescripted by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+Speed = 100
+Duration = 1
+NozzleOffset = Vector3.new(0, 0.4, -1.1)
+Sounds = {
+	Fire = Handle:WaitForChild("Fire"),
+	Reload = Handle:WaitForChild("Reload"),
+	HitFade = Handle:WaitForChild("HitFade")
+}
+PointLight = Handle:WaitForChild("PointLight")
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+ServerControl.OnServerInvoke = (function(player, Mode, Value, arg)
+	if player ~= Player or Humanoid.Health == 0 or not Tool.Enabled then
+		return
+	end
+	if Mode == "Click" and Value then
+		Activated(arg)
+	end
+end)
+function InvokeClient(Mode, Value)
+	pcall(function()
+		ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+end
+function TagHumanoid(humanoid, player)
+	local Creator_Tag = Instance.new("ObjectValue")
+	Creator_Tag.Name = "creator"
+	Creator_Tag.Value = player
+	Debris:AddItem(Creator_Tag, 2)
+	Creator_Tag.Parent = humanoid
+end
+function UntagHumanoid(humanoid)
+	for i, v in pairs(humanoid:GetChildren()) do
+		if v:IsA("ObjectValue") and v.Name == "creator" then
+			v:Destroy()
+		end
+	end
+end
+function FindCharacterAncestor(Parent)
+	if Parent and Parent ~= game:GetService("Workspace") then
+		local humanoid = Parent:FindFirstChild("Humanoid")
+		if humanoid then
+			return Parent, humanoid
+		else
+			return FindCharacterAncestor(Parent.Parent)
+		end
+	end
+	return nil
+end
+function GetTransparentsRecursive(Parent, PartsTable)
+	local PartsTable = (PartsTable or {})
+	for i, v in pairs(Parent:GetChildren()) do
+		local TransparencyExists = false
+		pcall(function()
+			local Transparency = v["Transparency"]
+			if Transparency then
+				TransparencyExists = true
+			end
+		end)
+		if TransparencyExists then
+			table.insert(PartsTable, v)
+		end
+		GetTransparentsRecursive(v, PartsTable)
+	end
+	return PartsTable
+end
+function SelectionBoxify(Object)
+	local SelectionBox = Instance.new("SelectionBox")
+	SelectionBox.Adornee = Object
+	SelectionBox.Color = BrickColor.new("Really red")
+	SelectionBox.Parent = Object
+	return SelectionBox
+end
+local function Light(Object)
+	local Light = PointLight:Clone()
+	Light.Range = (Light.Range + 2)
+	Light.Parent = Object
+end
+function FadeOutObjects(Objects, FadeIncrement)
+	repeat
+		local LastObject = nil
+		for i, v in pairs(Objects) do
+			v.Transparency = (v.Transparency + FadeIncrement)
+			LastObject = v
+		end
+		wait()
+	until LastObject.Transparency >= 1 or not LastObject
+end
+function Dematerialize(character, humanoid, FirstPart)
+	if not character or not humanoid then
+		return
+	end
+	
+	humanoid.WalkSpeed = 0
+	local Parts = {}
+	
+	for i, v in pairs(character:GetChildren()) do
+		if v:IsA("BasePart") then
+			v.Anchored = true
+			table.insert(Parts, v)
+		elseif v:IsA("LocalScript") or v:IsA("Script") then
+			v:Destroy()
+		end
+	end
+	local SelectionBoxes = {}
+	local FirstSelectionBox = SelectionBoxify(FirstPart)
+	Light(FirstPart)
+	wait(0.05)
+	for i, v in pairs(Parts) do
+		if v ~= FirstPart then
+			table.insert(SelectionBoxes, SelectionBoxify(v))
+			Light(v)
+		end
+	end
+	local ObjectsWithTransparency = GetTransparentsRecursive(character)
+	FadeOutObjects(ObjectsWithTransparency, 0.1)
+	wait(0.5)
+	character:BreakJoints()
+	humanoid.Health = 0
+	
+	Debris:AddItem(character, 2)
+	local FadeIncrement = 0.05
+	Delay(0.2, function()
+		FadeOutObjects({FirstSelectionBox}, FadeIncrement)
+		if character and character.Parent then
+			character:Destroy()
+		end
+	end)
+	FadeOutObjects(SelectionBoxes, FadeIncrement)
+end
+function Touched(Projectile, Hit)
+	if not Hit or not Hit.Parent then
+		return
+	end
+	local character, humanoid = FindCharacterAncestor(Hit)
+	if character and humanoid and character ~= Character then
+		local ForceFieldExists = false
+		for i, v in pairs(character:GetChildren()) do
+			if v:IsA("ForceField") then
+				ForceFieldExists = true
+			end
+		end
+		if not ForceFieldExists then
+			if Projectile then
+				local HitFadeSound = Projectile:FindFirstChild(Sounds.HitFade.Name)
+				local torso = humanoid.Torso
+				if HitFadeSound and torso then
+					HitFadeSound.Parent = torso
+					HitFadeSound:Play()
+				end
+			end
+			Dematerialize(character, humanoid, Hit)
+		end
+		if Projectile and Projectile.Parent then
+			Projectile:Destroy()
+		end
+	end
+end
+function Equipped()
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	if not Player or not Humanoid or Humanoid.Health == 0 then
+		return
+	end
+end
+function Activated(target)
+	if Tool.Enabled and Humanoid.Health > 0 then
+		Tool.Enabled = false
+		InvokeClient("PlaySound", Sounds.Fire)
+		local HandleCFrame = Handle.CFrame
+		local FiringPoint = HandleCFrame.p + HandleCFrame:vectorToWorldSpace(NozzleOffset)
+		local ShotCFrame = CFrame.new(FiringPoint, target)
+		local LaserShotClone = BaseShot:Clone()
+		LaserShotClone.CFrame = ShotCFrame + (ShotCFrame.lookVector * (BaseShot.Size.Z / 2))
+		local BodyVelocity = Instance.new("BodyVelocity")
+		BodyVelocity.velocity = ShotCFrame.lookVector * Speed
+		BodyVelocity.Parent = LaserShotClone
+		LaserShotClone.Touched:connect(function(Hit)
+			if not Hit or not Hit.Parent then
+				return
+			end
+			Touched(LaserShotClone, Hit)
+		end)
+		Debris:AddItem(LaserShotClone, Duration)
+		LaserShotClone.Parent = game:GetService("Workspace")
+		wait(0.6) -- FireSound length
+		InvokeClient("PlaySound", Sounds.Reload)
+		
+		wait(0.75) -- ReloadSound length
+		Tool.Enabled = true
+	end
+end
+function Unequipped()
+	
+end
+BaseShot = Instance.new("Part")
+BaseShot.Name = "Effect"
+BaseShot.BrickColor = BrickColor.new("Really red")
+BaseShot.Material = Enum.Material.Plastic
+BaseShot.Shape = Enum.PartType.Block
+BaseShot.TopSurface = Enum.SurfaceType.Smooth
+BaseShot.BottomSurface = Enum.SurfaceType.Smooth
+BaseShot.FormFactor = Enum.FormFactor.Custom
+BaseShot.Size = Vector3.new(0.2, 0.2, 3)
+BaseShot.CanCollide = false
+BaseShot.Locked = true
+SelectionBoxify(BaseShot)
+Light(BaseShot)
+BaseShotSound = Sounds.HitFade:Clone()
+BaseShotSound.Parent = BaseShot
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v:FindFirstChild("AIScript") then
+		source = [[--Made by Luckymaxer
+--Updated for R15 avatar by StarWars
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+InsertService = game:GetService("InsertService")
+AIScript = script:WaitForChild("AIScript")
+Remover = script:WaitForChild("Remover")
+NPCModel = InsertService:LoadAsset(257489726)
+NPC = NPCModel:GetChildren()[1]:Clone()
+if NPCModel and NPCModel.Parent then
+	NPCModel:Destroy()
+end
+ReloadTime = 5
+NPCSpawned = false
+ToolEquipped = false
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Handle.Transparency = 0
+Tool.Enabled = true
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+function MakeNPC()
+	if PlayerNPC and PlayerNPC.Parent then
+		PlayerNPC:Destroy()
+	end
+	PlayerNPC = NPC:Clone()
+	NPCHumanoid = PlayerNPC:FindFirstChild("Humanoid")
+	NPCTorso = PlayerNPC:FindFirstChild("Torso")
+	if not NPCHumanoid or not NPCTorso then
+		return
+	end
+	NPCHumanoid.WalkSpeed = 18
+	NPCHumanoid.MaxHealth = 200
+	NPCHumanoid.Health = NPCHumanoid.MaxHealth
+	local Values = {
+		{Name = "Creator", Class = "ObjectValue", Value = Player},
+		{Name = "Tool", Class = "ObjectValue", Value = Tool},
+		{Name = "Mode", Class = "StringValue", Value = "Follow"},
+		{Name = "MaxDistance", Class = "NumberValue", Value = 50},
+		{Name = "Follow", Class = "ObjectValue", Value = Player},
+		{Name = "Offset", Class = "Vector3Value", Value = Vector3.new(-3, 0, -0.5)},
+		{Name = "Target", Class = "ObjectValue", Value = nil},
+		{Name = "TargetPos", Class = "Vector3Value", Value = Vector3.new(0, 0, 0)},
+		{Name = "Damage", Class = "NumberValue", Value = 0},
+	}
+	for i, v in pairs(Values) do
+		local Value = Instance.new(v.Class)
+		Value.Name = v.Name
+		Value.Value = v.Value
+		Value.Parent = PlayerNPC
+	end
+	for i, v in pairs({AIScript, Remover}) do
+		local ScriptClone = v:Clone()
+		ScriptClone.Disabled = false
+		ScriptClone.Parent = PlayerNPC
+	end
+	NPCHumanoid.Died:connect(function()
+		Debris:AddItem(PlayerNPC, 3)
+	end)
+	PlayerNPC.Changed:connect(function(Property)
+		if Property == "Parent" and not PlayerNPC.Parent and NPCSpawned then
+			Tool.Enabled = false
+			NPCSpawned = false
+			wait(ReloadTime)
+			Tool.Enabled = true
+		end
+	end)
+	NPCTorso.CFrame = (Torso.CFrame * CFrame.new(PlayerNPC.Offset.Value))
+	PlayerNPC.Parent = game:GetService("Workspace")
+	NPCHumanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+	NPCSpawned = true
+end
+function SetTarget(Data)
+	if not PlayerNPC or not PlayerNPC.Parent then
+		return
+	end
+	local MousePosition = Data.MousePosition
+	local Target = Data.Target
+	local TargetValue = PlayerNPC:FindFirstChild("Target")
+	local TargetPosValue = PlayerNPC:FindFirstChild("TargetPos")
+	local ModeValue = PlayerNPC:FindFirstChild("Mode")
+	local OffsetValue = PlayerNPC:FindFirstChild("Offset")
+	if not TargetValue or not TargetPosValue or not ModeValue then
+		return
+	end
+	if Target and Target.Parent then
+		local character = Target.Parent
+		if character:IsA("Hat") then
+			character = character.Parent
+		end
+		local player = Players:GetPlayerFromCharacter(character)
+		if player and IsTeamMate(player, Player) then
+			return
+		end
+		local creator = character:FindFirstChild("Creator")
+		local humanoid = character:FindFirstChild("Humanoid")
+		if creator and (creator.Value == Player or IsTeamMate(Player, creator.Value)) then
+			return
+		end
+		if humanoid and humanoid.Health > 0 then
+			if TargetValue then
+				TargetValue.Value = character
+				ModeValue.Value = "Attack"
+				return
+			end
+		else
+			TargetPosValue.Value = MousePosition
+			TargetValue.Value = nil
+			ModeValue.Value = "MoveTo"
+		end
+	else
+		ModeValue.Value = "Follow"
+	end
+end
+function Activated()
+	if not ToolEquipped or not CheckIfAlive() then
+		return
+	end
+	if Tool.Enabled and (not PlayerNPC or not PlayerNPC.Parent) then
+		Handle.Transparency = 1
+		--MakeNPC()
+	else
+		local MouseData = InvokeClient("MousePosition")
+		if not MouseData then
+			return
+		end
+		local MousePosition = MouseData.Position
+		local Target = MouseData.Target
+		SetTarget({MousePosition = MousePosition, Target = Target})
+	end
+end
+function CheckIfAlive()
+	return (((Player and Player.Parent and Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent) and true) or false)
+end
+function Equipped()
+	Handle.Transparency = 1
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("UpperTorso")
+	if not CheckIfAlive() then
+		return
+	end
+	ToolEquipped = true
+end
+function Unequipped()
+	--[[NPCSpawned = false
+	if PlayerNPC then
+		for i, v in pairs({PlayerNPC}) do
+			if v and v.Parent then
+				v:Destroy()
+			end
+		end
+		PlayerNPC = nil
+	end]
+		ToolEquipped = false
+	end
+	function InvokeClient(Mode, Value)
+		local ClientReturn = nil
+		pcall(function()
+			ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+		end)
+		return ClientReturn
+	end
+	ServerControl.OnServerInvoke = (function(player, Mode, Value)
+		if player ~= Player or not ToolEquipped or not CheckIfAlive() or not Mode or not Value then
+			return
+		end
+	end)
+	Tool.Changed:connect(function(Property)
+		if not Tool.Parent then
+			return
+		end
+		if Tool.Enabled and not NPCSpawned and ToolEquipped and CheckIfAlive() then
+			MakeNPC()
+		end
+		Handle.Transparency = (((Tool.Parent:IsA("Backpack") or Players:GetPlayerFromCharacter(Tool.Parent) and (((not NPCSpawned and Tool.Enabled) and 0) or 1)) or 0))
+	end)
+	Tool.Activated:connect(Activated)
+	Tool.Equipped:connect(Equipped)
+	Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "AIScript" and v.Parent:FindFirstChild("Remover") then
+		source = [[--Made by Luckymaxer
+--Updated for R15 avatar by StarWars
+Figure = script.Parent
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+RunService = game:GetService("RunService")
+Functions = require(script:WaitForChild("Functions"))
+DogeModule = require(191816425)
+LastMove = 0
+Rate = (1 / 60)
+local function Create_PrivImpl(objectType)
+	if type(objectType) ~= 'string' then
+		error("Argument of Create must be a string", 2)
+	end
+	--return the proxy function that gives us the nice Create'string'{data} syntax
+	--The first function call is a function call using Lua's single-string-argument syntax
+	--The second function call is using Lua's single-table-argument syntax
+	--Both can be chained together for the nice effect.
+	return function(dat)
+		--default to nothing, to handle the no argument given case
+		dat = dat or {}
+		--make the object to mutate
+		local obj = Instance.new(objectType)
+		local parent = nil
+		--stored constructor function to be called after other initialization
+		local ctor = nil
+		for k, v in pairs(dat) do
+			--add property
+			if type(k) == 'string' then
+				if k == 'Parent' then
+					-- Parent should always be set last, setting the Parent of a new object
+					-- immediately makes performance worse for all subsequent property updates.
+					parent = v
+				else
+					obj[k] = v
+				end
+			--add child
+			elseif type(k) == 'number' then
+				if type(v) ~= 'userdata' then
+					error("Bad entry in Create body: Numeric keys must be paired with children, got a: "..type(v), 2)
+				end
+				v.Parent = obj
+			--event connect
+			elseif type(k) == 'table' and k.__eventname then
+				if type(v) ~= 'function' then
+					error("Bad entry in Create body: Key `[Create.E\'"..k.__eventname.."\']` must have a function value\
+							got: "..tostring(v), 2)
+				end
+				obj[k.__eventname]:connect(v)
+			--define constructor function
+			elseif k == t.Create then
+				if type(v) ~= 'function' then
+					error("Bad entry in Create body: Key `[Create]` should be paired with a constructor function, \
+							got: "..tostring(v), 2)
+				elseif ctor then
+					--ctor already exists, only one allowed
+					error("Bad entry in Create body: Only one constructor function is allowed", 2)
+				end
+				ctor = v
+			else
+				error("Bad entry ("..tostring(k).." => "..tostring(v)..") in Create body", 2)
+			end
+		end
+		--apply constructor function if it exists
+		if ctor then
+			ctor(obj)
+		end
+		if parent then
+			obj.Parent = parent
+		end
+		--return the completed object
+		return obj
+	end
+end
+--now, create the functor:
+Create = setmetatable({}, {__call = function(tb, ...) return Create_PrivImpl(...) end})
+--and create the "Event.E" syntax stub. Really it's just a stub to construct a table which our Create
+--function can recognize as special.
+Create.E = function(eventName)
+	return {__eventname = eventName}
+end
+BasePart = Create("Part"){
+	Shape = Enum.PartType.Block,
+	Material = Enum.Material.Plastic,
+	TopSurface = Enum.SurfaceType.Smooth,
+	BottomSurface = Enum.SurfaceType.Smooth,
+	FormFactor = Enum.FormFactor.Custom,
+	Size = Vector3.new(0.2, 0.2, 0.2),
+	CanCollide = true,
+	Locked = true,
+	Anchored = false,
+}
+Figures = {}
+function IncludeFigure(Child)
+	if not Child or not Child.Parent then
+		return
+	end
+	local Player = Players:GetPlayerFromCharacter(Child)
+	if Player then
+		return
+	end
+	for i, v in pairs(Figures) do
+		if v.Figure == Child then
+			return
+		end
+	end
+	local Figure = {Figure = Child, TouchDebounce = false, Connections = {}}
+	local Humanoid = Child:FindFirstChild("Humanoid")
+	local Head = Child:FindFirstChild("Head")
+	local Torso = Child:FindFirstChild("Torso")
+	if not Humanoid or not Humanoid:IsA("Humanoid") or Humanoid.Health == 0 or not Head or not Torso then
+		return
+	end
+	local Neck = Torso:FindFirstChild("Neck")
+	if not Neck then
+		return
+	end
+	for i, v in pairs({Humanoid, Head, Torso, Neck}) do
+		Figure[v.Name] = v
+	end
+	local Values = {"Creator", "Mode", "Follow", "Target", "TargetPos", "Offset", "Damage", "MaxDistance"}
+	for i, v in pairs(Values) do
+		local Value = Child:FindFirstChild(v)
+		if not Value then
+			return
+		end
+		Figure[v] = Value
+	end
+	local Sounds = {}
+	for i, v in pairs(Head:GetChildren()) do
+		if v:IsA("Sound") then
+			Sounds[v.Name] = v
+		end
+	end
+	local ModuleData = DogeModule.GetTable({Key = "Doge", Player = ((Figure.Creator and Figure.Creator.Value) or nil)})
+	local DogeData = ModuleData.GetData({Character = Child})
+	Spawn(function()
+		DogeData.StartText()
+	end)
+	local Variables = {
+		Bark = {LastBark = 0, Paused = false, TimeOut = 0.75},
+		DogeData = DogeData,
+	}
+	for i, v in pairs(Variables) do
+		Figure[i] = v
+	end
+	Figure.Sounds = Sounds
+	local HumanoidChanged = Humanoid.Changed:connect(function(Property)
+		if Property == "Sit" and Humanoid.Sit then
+			Humanoid.Sit = false
+			Humanoid.Jump = true
+		end
+	end)
+	local FigureRemoved = Child.Changed:connect(function(Property)
+		if Property == "Parent" and not Child.Parent then
+			for i, v in pairs(Figures) do
+				if v == Figure then
+					for ii, vv in pairs(v.Connections) do
+						if vv then
+							vv:disconnect()
+						end
+					end
+					table.remove(Figures, i)
+				end
+			end
+		end
+	end)
+	for i ,v in pairs({HumanoidChanged, FigureRemoved}) do
+		table.insert(Figure.Connections, v)
+	end
+	for i, v in pairs(Child:GetChildren()) do
+		if v:IsA("BasePart") then
+			local TouchedConnection
+			TouchedConnection = v.Touched:connect(function(Hit)
+				if not Hit or not Hit.Parent or Figure.TouchDebounce then
+					return
+				end
+				local Connected = false
+				local ConnectedParts = v:GetConnectedParts()
+				if #ConnectedParts <= 1 then
+					return
+				end
+				for i, v in pairs(ConnectedParts) do
+					if v == Torso then
+						Connected = true
+					end
+				end
+				if not Connected then
+					return
+				end
+				local character = Hit.Parent
+				if character:IsA("Hat") then
+					character = character.Parent
+				end
+				if character ~= Figure.Target.Value then
+					return
+				end
+				local player = Players:GetPlayerFromCharacter(character)
+				local CreatorValue = Figure.Creator.Value
+				if not CreatorValue then
+					return
+				end
+				local CreatorPlayer = ((CreatorValue:IsA("Player") and CreatorValue) or Players:GetPlayerFromCharacter(CreatorValue))
+				if player then
+					if player == CreatorPlayer then
+						return
+					end
+					if player and CreatorPlayer and Functions.IsTeamMate(CreatorPlayer, player) then
+						return
+					end
+				end
+				local creator = character:FindFirstChild("Creator")
+				if creator and creator:IsA("ObjectValue") and creator.Value == CreatorValue then
+					return
+				end
+				local humanoid = character:FindFirstChild("Humanoid")
+				if not humanoid or not humanoid:IsA("Humanoid") or humanoid.Health == 0 then
+					return
+				end
+				Figure.TouchDebounce = true
+				Functions.UntagHumanoid(humanoid)
+				Functions.TagHumanoid(humanoid, CreatorPlayer)
+				humanoid:TakeDamage(Figure.Damage.Value)
+				wait(0.25)
+				Figure.TouchDebounce = false
+			end)
+			table.insert(Figure.Connections, TouchedConnection)
+		end
+	end
+	Figure.Sounds.Wow:Play()
+	table.insert(Figures, Figure)
+end
+function SecureJump(Table)
+	local Humanoid = Table.Humanoid
+	local Torso = Table.Torso
+	if not Humanoid or Humanoid.Jump or not Torso then
+		return
+	end
+	local TargetPoint = Torso.Velocity.Unit
+	local Blockage, BlockagePos = Functions.CastRay((Torso.CFrame + CFrame.new(Torso.Position, Vector3.new(TargetPoint.X, Torso.Position.Y, TargetPoint.Z)).lookVector * (Torso.Size.Z / 2)).p, Torso.CFrame.lookVector, (Torso.Size.Z * 2.5), {Figure, (((Creator and Creator.Value and Creator.Value:IsA("Player") and Creator.Value.Character) and Creator.Value.Character) or nil)}, false)
+	local Jumpable = false
+	if Blockage then
+		Jumpable = true
+		if Blockage:IsA("Terrain") then
+			local CellPos = Blockage:WorldToCellPreferSolid((BlockagePos - Vector3.new(0, 2, 0)))
+			local CellMaterial, CellShape, CellOrientation = Blockage:GetCell(CellPos.X, CellPos.Y, CellPos.Z)
+			if CellMaterial == Enum.CellMaterial.Water then
+				Jumpable = false
+			end
+		elseif Blockage.Parent:FindFirstChild("Humanoid") then
+			Jumpable = false
+		end
+	end
+	if Jumpable then
+		Humanoid.Jump = true
+	end
+end
+RunService.Stepped:connect(function()
+	_, Time = wait(0.05)
+	for i, v in pairs(Figures) do
+		Spawn(function()
+			pcall(function()
+				if v and v.Figure and v.Figure.Parent then
+					Spawn(function()
+						SecureJump(v)
+					end)
+					local Disabled = v.Figure:FindFirstChild("Disabled")
+					if not Disabled then
+						local CreatorValue = v.Creator.Value
+						if CreatorValue then
+							local CreatorPlayer = ((CreatorValue:IsA("Player") and CreatorValue) or Players:GetPlayerFromCharacter(v.Creator.Value))
+							if CreatorPlayer then
+								local CreatorCharacter = CreatorPlayer.Character
+								if CreatorCharacter and CreatorCharacter.Parent then
+									local CreatorTorso = CreatorCharacter:FindFirstChild("Torso") or CreatorCharacter:FindFirstChild("UpperTorso")
+									if CreatorTorso then
+										local DistanceApart = (CreatorTorso.Position - v.Torso.Position).magnitude
+										if DistanceApart > v.MaxDistance.Value then
+											v.Mode.Value = "Follow"
+										end
+									end
+								end
+							end
+						end
+						if v.Mode.Value == "Follow" then
+							local FollowValue = v.Follow.Value
+							if FollowValue then
+								if FollowValue:IsA("Player") and FollowValue.Character and FollowValue.Character.Parent then
+									FollowValue = FollowValue.Character
+								end
+								local FollowHumanoid = FollowValue:FindFirstChild("Humanoid")
+								local FollowTorso = FollowValue:FindFirstChild("Torso") or FollowValue:FindFirstChild("UpperTorso")
+								if FollowHumanoid and FollowHumanoid.Health > 0 and FollowTorso then
+									--if (v.Torso.Position - FollowTorso.Position).magnitude > 5 then
+										v.Humanoid:MoveTo((FollowTorso.CFrame * CFrame.new(v.Offset.Value)).p)
+									--end
+								end
+							end
+						elseif v.Mode.Value == "MoveTo" then
+							v.Humanoid:MoveTo(v.TargetPos.Value)
+							LastMove = Time
+							v.Mode.Value = "Nothing"
+						elseif v.Mode.Value == "Attack" then
+							local TargetCharacter = v.Target.Value
+							local TargetDisabled = v.Target:FindFirstChild("Disabled")
+							local NotFound = false
+							if not TargetDisabled or not TargetDisabled.Value then
+								if TargetCharacter and TargetCharacter.Parent then
+									local TargetHumanoid = TargetCharacter:FindFirstChild("Humanoid")
+									local TargetTorso = TargetCharacter:FindFirstChild("Torso") or TargetCharacter:FindFirstChild("UpperTorso")
+									local creator = TargetCharacter:FindFirstChild("Creator")
+									if TargetHumanoid and TargetHumanoid.Health > 0 and TargetTorso and (not creator or (creator and v.Creator.Value ~= creator.Value and not Functions.IsTeamMate(v.Creator.Value, creator.Value))) then
+										local Direction = CFrame.new(v.Torso.Position, Vector3.new(TargetTorso.Position.X, v.Torso.Position.Y, TargetTorso.Position.Z))
+										local ChaseOffset = 8
+										local ChasePosition = (CFrame.new(TargetTorso.Position) - Direction.lookVector * ChaseOffset).p
+										local Time = tick()
+										local Distance = (v.Torso.Position - TargetTorso.Position).Magnitude
+										if Distance <= (ChaseOffset + 1) and not v.Bark.Paused and (Time - v.Bark.LastBark) > v.Bark.TimeOut then
+											v.Bark.Paused = true
+											Spawn(function()
+												for i = 1, math.random(1, 3) do
+													local Sound = v.Sounds.Bark:Clone()
+													Sound.Pitch = (math.random(900, 1150) * 0.001)
+													Debris:AddItem(Sound, 1.5)
+													Sound.Parent = v.Head
+													v.Sounds.Bark:Play()
+													wait(0.15)
+												end
+												v.Bark.TimeOut = (math.random(250, 750) * 0.001)
+												v.Bark.LastBark = tick()
+												v.Bark.Paused = false
+											end)
+											local TargetPlayer = Players:GetPlayerFromCharacter(TargetCharacter)
+											if TargetPlayer then
+												v.DogeData.ObscureScreen(TargetPlayer)
+											end
+  										end
+										local BodyGyro = Create("BodyGyro"){
+											maxTorque = Vector3.new(math.huge, math.huge, math.huge),
+											cframe = Direction,
+										}
+										Debris:AddItem(BodyGyro, Rate)
+										BodyGyro.Parent = v.Torso
+										v.Humanoid:MoveTo(ChasePosition)
+									else
+										NotFound = true
+									end
+								else
+									NotFound = true
+								end
+							end
+							if NotFound then
+								v.Target.Value = nil
+								v.Mode.Value = "Follow"
+							end
+						elseif v.Mode.Value == "Nothing" then
+							if (Time - LastMove) >= 30 then
+								v.Mode.Value = "Follow"
+							end
+						end
+					end
+				end
+			end)
+		end)
+	end
+end)
+IncludeFigure(Figure)]]
+	elseif v.Name == "Remover" and v.Parent:FindFirstChild("AIScript") then
+		source = [[--Made by Luckymaxer
+Model = script.Parent
+Humanoid = Model:FindFirstChild("Humanoid")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+Creator = Model:FindFirstChild("Creator")
+Tool = Model:FindFirstChild("Tool")
+function DestroyModel()
+	Debris:AddItem(Model, 2)
+end
+if not Creator or not Creator.Value or not Creator.Value:IsA("Player") or not Creator.Value.Parent or not Tool or not Tool.Value or not Tool.Value.Parent then
+	DestroyModel()
+	return
+end
+Creator = Creator.Value
+Tool = Tool.Value
+Character = Creator.Character
+if not Character then
+	DestroyModel()
+	return
+end
+Creator.Changed:connect(function(Property)
+	if Property == "Parent" and not Creator.Parent then
+		DestroyModel()
+	end
+end)
+Character.Changed:connect(function(Property)
+	if Property == "Parent" and not Character.Parent then
+		DestroyModel()
+	end
+end)
+Tool.Changed:connect(function(Property)
+	if Property == "Parent" then
+		local Player = ((Tool.Parent and ((Tool.Parent:IsA("Backpack") and Tool.Parent.Parent) or Players:GetPlayerFromCharacter(Tool.Parent))) or nil)
+		if (not Player or (Player and Player ~= Creator)) then
+			DestroyModel()
+		end
+	end
+end)
+if Humanoid then
+	Humanoid.Died:connect(function()
+		DestroyModel()
+	end)
+end]]
+	elseif v.Name == "Server" and v:FindFirstChild("ShardContent") then
+		source = [[--Rescripted by TakeoHonorable
+--Revamped Periastrons: The Periastron of Rainbow Maelstrom
+--The leader of the bunch, you know it well (get the reference?)
+function Create(ty)
+	return function(data)
+		local obj = Instance.new(ty)
+		for k, v in pairs(data) do
+			if type(k) == 'number' then
+				v.Parent = obj
+			else
+				obj[k] = v
+			end
+		end
+		return obj
+	end
+end
+local Seed = Random.new(tick())
+local Tool = script.Parent
+Tool.Enabled = true
+local Handle = Tool:WaitForChild("Handle",10)
+local Region = require(script:WaitForChild("RegionModule",10))
+local PointLight = Handle:WaitForChild("PointLight",10)
+local Sparkles = Handle:FindFirstChildOfClass("Sparkles")
+local Animations = Tool:WaitForChild("Animations",10)
+local Deletables = {} --Send all deletables here
+local Sounds = {
+	LungeSound = Handle:WaitForChild("LungeSound",10),
+	SlashSound = Handle:WaitForChild("SlashSound",10),
+}
+local PeriastronNames = {
+	"Azure",
+	"Grimgold",
+	"Crimson",
+	"Chartreuse",
+	"Amethyst",
+	"Ivory",
+	"Noir",
+}
+local PeriastronNamesAlt = {
+	"Azure",
+	"Grimgold",
+	"Crimson",
+	"Chartreuse",
+	"Amethyst",
+	"Ivory",
+	"Noir",
+	"Hazel",
+	"Fuchsia"
+}
+local AttackAnims
+local Services = {
+	Players = (game:FindService("Players") or game:GetService("Players")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService")),
+	RunService = (game:FindService("RunService") or game:GetService("RunService")),
+	Debris = (game:FindService("Debris") or game:GetService("Debris")),
+	ServerScriptService = (game:FindService("ServerScriptService") or game:GetService("ServerScriptService"))
+}
+local Components = {
+	PeriSparkle = Handle:WaitForChild("Sparkles",10),
+	PeriTrail = Handle:WaitForChild("Trail",10),
+	MouseInput = Tool:WaitForChild("MouseInput",10)
+}
+Components.PeriSparkle.Enabled = true
+Components.PeriTrail.Enabled = false
+PointLight.Enabled = true
+local Player,Character,Humanoid,Root,Torso
+local Properties = {
+	BaseDamage = 40,
+	SpecialCooldown = 90,
+	GrimgoldRange = 40,
+}
+local Remote = (Tool:FindFirstChild("Remote") or Instance.new("RemoteEvent"));Remote.Name = "Remote";Remote.Parent = Tool
+local Grips = {
+	Normal = Tool:WaitForChild("NormalGrip").Value,
+	--BackR6 = Tool:WaitForChild("BackGrip").Value,
+	--BackR15 = Tool:WaitForChild("BackGrip").Value+Vector3.new(-.7,0,-.7)
+}
+Tool.Grip = Grips.Normal
+local function Wait(para) -- bypasses the latency
+	local Initial = tick()
+	repeat
+		Services.RunService.Heartbeat:Wait()
+	until tick()-Initial >= para
+end
+function RayCast(Pos, Dir, Max, IgnoreList)
+	return game:GetService("Workspace"):FindPartOnRayWithIgnoreList(Ray.new(Pos, Dir.unit * (Max or 999.999)), IgnoreList) 
+end
+function IsInTable(Table,Value)
+	for _,v in pairs(Table) do
+		if v == Value then
+			return true
+		end
+	end
+	return false
+end
+local function HasPeri(PeriName)
+	return (Player:FindFirstChild("Backpack") and Player:FindFirstChild("Backpack"):FindFirstChild(PeriName.."Periastron")) or false
+end
+local function HasFullSet()
+	for _,names in pairs(PeriastronNames) do
+		if not HasPeri(names) then
+			return false
+		end
+	end
+	return true
+end
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+function TagHumanoid(humanoid, player)
+	local Creator_Tag = Instance.new("ObjectValue")
+	Creator_Tag.Name = "creator"
+	Creator_Tag.Value = player
+	Services.Debris:AddItem(Creator_Tag, 2)
+	Creator_Tag.Parent = humanoid
+end
+local function VisualizeRay(ray,RayLength)
+	local RayCast = Create("Part"){
+		Material = Enum.Material.Neon,
+		Color = Color3.new(0,1,0),
+		Size = Vector3.new(0.3,0.3,(RayLength or 5)),
+		CFrame = CFrame.new(ray.Origin, ray.Origin+ray.Direction) * CFrame.new(0, 0, -(RayLength or 5) / 2),
+		Anchored = true,
+		CanCollide = false,
+		Parent = workspace
+	}
+	game:GetService("Debris"):AddItem(RayCast,5)
+end
+function UntagHumanoid(humanoid)
+	for i, v in pairs(humanoid:GetChildren()) do
+		if v:IsA("ObjectValue") and v.Name == "creator" then
+			v:Destroy()
+		end
+	end
+end
+function GetHumanoidsInRange(Range)
+	local RecordedHumanoids = {}
+	for _,parts in pairs(Region.new(Root.CFrame,Vector3.new(1,1,1)*Range):Cast(Character)) do
+		if parts and parts.Parent and string.find(string.lower(parts.Name),"torso") or string.find(string.lower(parts.Name),"root") and (parts.CFrame.p-Root.CFrame.p).magnitude <= Range then
+			local Hum = parts.Parent:FindFirstChildOfClass("Humanoid")
+			if Hum and Hum.Health ~= 0 and not IsInTable(RecordedHumanoids,Hum) then
+				RecordedHumanoids[#RecordedHumanoids+1] = Hum
+			end
+		end
+	end
+	return RecordedHumanoids
+end
+local function GetNearestTorso(MarkedPosition,TorsoPopulationTable)
+	local ClosestDistance = math.huge
+	local ClosestTorso
+	for i=1,#TorsoPopulationTable do
+		local distance = (TorsoPopulationTable[i].CFrame.p-MarkedPosition).magnitude
+		if TorsoPopulationTable[i] and  distance < ClosestDistance then
+			ClosestDistance = distance
+			ClosestTorso = TorsoPopulationTable[i]
+		end
+	end
+	--warn("The Closest Person is: "..ClosestTorso.Parent.Name)
+	return ClosestTorso
+end
+local RedPillar = Create("Part"){
+	Shape = Enum.PartType.Cylinder,
+	Material = Enum.Material.Neon,
+	Name = "CrimsonPillar",
+	BrickColor = BrickColor.new("Crimson"),
+	Size = Vector3.new(100,5,5),
+	CanCollide = false,
+	Anchored = true,
+	Transparency = 0.3,
+	Locked = true,
+	TopSurface = Enum.SurfaceType.Smooth,
+	BottomSurface = Enum.SurfaceType.Smooth
+}
+local Surfaces = {"Front","Back","Left","Right","Top","Bottom"}
+local PillarLighting = Create("SurfaceLight"){
+	Color = Color3.fromRGB(151, 0, 0),
+	Angle = 180,
+	Enabled = true,
+	Range = 10,
+	Shadows = true
+}
+for _,surfaces in pairs(Surfaces) do
+	local Lighting = PillarLighting:Clone()
+	Lighting.Face = Enum.NormalId[surfaces]
+	Lighting.Parent = RedPillar
+end
+local CurrentTime,LastTime = tick(),tick()
+function Activated()
+	if not Tool.Enabled then return end
+	Tool.Enabled = false
+	CurrentTime = tick()
+	if (CurrentTime-LastTime) <= 0.2 then
+		--print("Lunge")
+		Sounds.LungeSound:Play()
+		Components.PeriTrail.Enabled = true
+		local sucess,MousePosition = pcall(function() return Components.MouseInput:InvokeClient(Player) end)
+		MousePosition = (sucess and MousePosition) or Vector3.new(0,0,0)
+		
+		local Direction = CFrame.new(Root.Position, Vector3.new(MousePosition.X, Root.Position.Y, MousePosition.Z))
+		local BodyVelocity = Instance.new("BodyVelocity")
+		BodyVelocity.MaxForce = Vector3.new(math.huge, 0, math.huge)
+		BodyVelocity.Velocity = Direction.lookVector * ((HasPeri("Fuchsia") and 200) or 100)
+		Services.Debris:AddItem(BodyVelocity, 0.5)
+		BodyVelocity.Parent = Root
+		delay(.5,function()
+			Components.PeriTrail.Enabled = false
+		end)
+		Root.CFrame = CFrame.new(Root.CFrame.p,Root.CFrame.p+Direction.lookVector)
+		wait(1.5)
+	else
+		local SwingAnims = {AttackAnims.Slash,AttackAnims.SlashAnim,AttackAnims.RightSlash}
+		local AttackAnim = SwingAnims[Seed:NextInteger(1,#SwingAnims)]
+		spawn(function()
+			if AttackAnim ~= AttackAnims.SlashAnim then
+				Sounds.SlashSound:Play()
+				else
+				Sounds.SlashSound:Play()
+				wait(.5)
+				Sounds.SlashSound:Play()
+			end	
+		end)
+		AttackAnim:Play()
+	--wait(.4)
+	end
+	LastTime = CurrentTime
+	Tool.Enabled = true
+end
+local Touch
+local EquippedPassives = {}
+local IvoryDebounce,GrimgoldDebounce,CrimsonDebounce = false,false,false
+function Equipped(Mouse)
+	Character = Tool.Parent
+	Root = Character:FindFirstChild("HumanoidRootPart")
+	Player = Services.Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChildOfClass("Humanoid")
+	AttackAnims = {
+		Slash = Animations:WaitForChild(Humanoid.RigType.Name,10):WaitForChild("Slash",10),
+		RightSlash = Animations:WaitForChild(Humanoid.RigType.Name,10):WaitForChild("RightSlash",10),
+		SlashAnim = Animations:WaitForChild(Humanoid.RigType.Name,10):WaitForChild("SlashAnim",10),
+	}
+	for i,v in pairs(AttackAnims) do
+		AttackAnims[i] = Humanoid:LoadAnimation(v)
+	end
+	Touch = Handle.Touched:Connect(function(hit)
+		Damage(hit,Properties.BaseDamage,false)
+	end)
+	
+	
+	local IgnoreHealthChange = false
+		local CurrentHealth = Humanoid.Health
+		EquippedPassives[#EquippedPassives+1] = Humanoid.Changed:Connect(function(Property) -- Based on Azure Periastron
+			local NewHealth = Humanoid.Health
+			if not IgnoreHealthChange and NewHealth ~= Humanoid.MaxHealth then
+				if NewHealth < CurrentHealth then
+					local DamageDealt = (CurrentHealth - NewHealth)
+					IgnoreHealthChange = true
+					Humanoid.Health = Humanoid.Health + (DamageDealt * ((HasFullSet() and .5) or .33))
+					--print((HasPeri("Azure") and "Has Azure") or "Does not have Azure")
+					IgnoreHealthChange = false
+				end
+			end
+			CurrentHealth = NewHealth
+		end)
+		
+	if HasPeri("Grimgold") then
+		EquippedPassives[#EquippedPassives+1] = Services.RunService.Heartbeat:Connect(function()
+			if GrimgoldDebounce or not Tool:IsDescendantOf(Character) then return end
+			repeat
+				
+				GrimgoldDebounce = true
+				local TaggedHumanoids = {}
+					for _,Hum in pairs(GetHumanoidsInRange((HasFullSet() and Properties.GrimgoldRange*1.5) or Properties.GrimgoldRange)) do
+						if not IsInTable(TaggedHumanoids,Hum) and not IsTeamMate(Player,Services.Players:GetPlayerFromCharacter(Hum.Parent)) and not Hum.Parent:FindFirstChild("RevealRainbow")then
+							TaggedHumanoids[#TaggedHumanoids+1] = Hum
+							spawn(function()
+								local RevealScript = script:WaitForChild("RevealRainbow",10):Clone()
+								RevealScript:WaitForChild("Range").Value = (HasFullSet() and Properties.GrimgoldRange*1.5) or Properties.GrimgoldRange
+								RevealScript:WaitForChild("Creator").Value = Character
+								RevealScript:WaitForChild("Tool").Value = Tool
+								RevealScript.Parent = Hum.Parent
+								RevealScript.Disabled = false
+							end)
+							Hum.WalkSpeed = (HasFullSet() and 4) or 12
+						end
+					end
+				wait(1/10)
+				GrimgoldDebounce = false
+				--Services.RunService.Heartbeat:Wait()
+			until not Tool:IsDescendantOf(Character) or Humanoid.Health <= 0
+		end)
+	end
+	
+	if HasPeri("Crimson") then
+		EquippedPassives[#EquippedPassives+1] = Services.RunService.Heartbeat:Connect(function()
+			if CrimsonDebounce or not Tool:IsDescendantOf(Character) then return end
+			repeat
+				CrimsonDebounce = true
+				Wait((HasFullSet() and Seed:NextNumber(.2,1)) or Seed:NextNumber(1,3))
+				local NearbyPlayers = {}
+				for _,player in pairs(Services.Players:GetPlayers()) do
+					if player ~= Player and player.Character and player.Character.PrimaryPart then
+						local Hum = player.Character:FindFirstChildOfClass("Humanoid")
+						if Hum and Hum.Health <= 0 and Hum.Health ~= 0 and (player.Character.PrimaryPart.CFrame.p-Root.CFrame.p).Magnitude <=30 then
+							NearbyPlayers[#NearbyPlayers+1] = player.Character.PrimaryPart
+						end
+					end
+				end
+				if #NearbyPlayers == 0 then
+					local SpawnPos = (Root.CFrame*CFrame.new(Seed:NextInteger(-40,40),100,Seed:NextInteger(-40,40))).p
+					local hit,pos = RayCast(SpawnPos,(SpawnPos-Vector3.new(0,1,0))-SpawnPos,150,{Character})
+					if hit then
+						local PillarClone = RedPillar:Clone()
+						local PillarScript = script:WaitForChild("CrimsonPillar",5):Clone()
+						PillarScript:WaitForChild("Creator",5).Value = Player
+						PillarScript.Parent = PillarClone
+						PillarClone.CFrame = CFrame.new(pos+Vector3.new(0,PillarClone.Size.X/2,0))*CFrame.Angles(0,0,math.rad(90))
+						PillarClone.Parent = workspace
+						PillarScript.Disabled = false
+					end
+				else
+					local ChosenPlayer = NearbyPlayers[Seed:NextInteger(1,#NearbyPlayers)]
+					if ChosenPlayer then
+						local PillarClone = RedPillar:Clone()
+						local PillarScript = script:WaitForChild("CrimsonPillar",5):Clone()
+						PillarScript:WaitForChild("Creator",5).Value = Player
+						PillarScript.Parent = PillarClone
+						PillarClone.CFrame = CFrame.new(ChosenPlayer.CFrame.p+Vector3.new(0,(PillarClone.Size.X/2)-2.5,0))*CFrame.Angles(0,0,math.rad(90))
+						PillarClone.Parent = workspace
+						PillarScript.Disabled = false
+					end
+				end
+				
+				Services.RunService.Heartbeat:Wait()
+				CrimsonDebounce = false
+			until not Tool:IsDescendantOf(Character) or Humanoid.Health <= 0
+		end)
+	end
+	
+	if HasPeri("Ivory") then
+		
+		local ShardContent = script:WaitForChild("ShardContent",10):GetChildren()	
+		
+		local Shard = Create("Part"){
+						Material = Enum.Material.Neon,
+						Size = Vector3.new(1,1,1)*.5,
+						Anchored = false,
+						CanCollide = false,
+						Name = "StarShard",
+						Locked = true,
+						Transparency = 0,
+						Shape = Enum.PartType.Ball,
+						CFrame = Handle.CFrame,
+					}
+					local TopAttachment = Create("Attachment"){
+						Position = Vector3.new(0,Shard.Size.y/2,0),
+						Name = "TopAttachment",
+						Parent = Shard
+					}
+					local BottomAttachment = Create("Attachment"){
+						Position = Vector3.new(0,-Shard.Size.y/2,0),
+						Name = "BottomAttachment",
+						Parent = Shard
+					}
+					for _,stuff in pairs(ShardContent) do
+						if stuff:IsA("ParticleEmitter") then
+							local particle = stuff:Clone()
+							particle.Parent = Shard
+						elseif stuff:IsA("Trail") then
+							local trail = stuff:Clone()
+							trail.Attachment0 = TopAttachment;
+							trail.Attachment1 = BottomAttachment;
+							trail.Parent = Shard
+							trail.Enabled = true
+						end
+					end
+		EquippedPassives[#EquippedPassives+1] = Services.RunService.Heartbeat:Connect(function()
+	
+				if IvoryDebounce or not Tool:IsDescendantOf(Character) then return end
+				
+				
+				repeat
+					--wait(Seed:NextNumber(.1,.5))
+					IvoryDebounce = true
+					local Proj = Shard:Clone()
+					for _,v in pairs(Proj:GetChildren()) do
+						if v:IsA("ParticleEmitter") then
+							v.Enabled = true
+						end
+					end
+					local SparkleClone = script:WaitForChild("Sparkle",5):Clone()
+					SparkleClone.Parent = Proj
+					SparkleClone:Play()
+					local ShardScript = script:WaitForChild("StarShard",10):Clone()
+					ShardScript:WaitForChild("Creator").Value = Player
+					ShardScript.Parent = Proj
+					ShardScript.Disabled = false
+					--Services.Debris:AddItem(Proj,7)
+					Proj.CFrame = Handle.CFrame
+					Proj.Parent = workspace
+					Proj:SetNetworkOwner(nil)
+					Proj.Velocity = CFrame.new(Handle.CFrame.p,Handle.CFrame.p+Vector3.new(Seed:NextNumber(-1,1),Seed:NextNumber(-1,1),Seed:NextNumber(-1,1))).lookVector*Seed:NextNumber(50,70)
+					Wait((HasFullSet() and 1/3) or 1/2)
+					IvoryDebounce = false
+					--Services.RunService.Heartbeat:Wait()
+				until not Tool:IsDescendantOf(Character) or Humanoid.Health <= 0
+		end)
+	end
+	
+end
+function Unequipped()
+	if Touch then Touch:Disconnect();Touch = nil end
+	for i,v in pairs(AttackAnims) do
+		v:Stop()
+	end
+	for index,passive in pairs(EquippedPassives) do
+		if passive then 
+			passive:Disconnect();EquippedPassives[index] = nil
+		end 
+	end
+end
+local HitHumanoids = {}
+function Damage(hit,TotalDamage)
+	if not hit or not hit.Parent then return end
+	local Hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+	local ForceField = hit.Parent:FindFirstChildOfClass("ForceField")
+	if not Hum or Hum.Health <=0 or Hum == Humanoid or ForceField then return end
+	
+	if IsTeamMate(Player,Services.Players:GetPlayerFromCharacter(Hum.Parent)) then return end
+	
+	if IsInTable(HitHumanoids,Hum) then return end
+	
+	spawn(function()
+		UntagHumanoid(Hum)
+		TagHumanoid(Hum,Player)
+		HitHumanoids[#HitHumanoids+1]=Hum
+		Hum:TakeDamage(TotalDamage)
+		Humanoid.Health = math.clamp(Humanoid.Health + (TotalDamage * ((HasFullSet() and .3) or .2)),0,Humanoid.MaxHealth)--Noir life-steal
+		--wait(.5)
+		for i,v in pairs(HitHumanoids) do
+			if v == Hum then
+				HitHumanoids[i] = nil
+			end
+		end
+	end)
+end
+Tool.Activated:Connect(Activated)
+Tool.Equipped:Connect(Equipped)
+Tool.Unequipped:Connect(Unequipped)
+function SummonRainBeam()
+	if not Sparkles.Enabled then return end
+	Sparkles.Enabled = false
+	local RainBeamScript = script:WaitForChild("RainBeam",5):Clone()
+	RainBeamScript:WaitForChild("Creator",5).Value = Player
+	RainBeamScript:WaitForChild("Tool",5).Value = Tool
+	RainBeamScript.Parent = Services.ServerScriptService
+	local PeriFormation = RainBeamScript:WaitForChild("PeriFormation",5)
+	for _,name in pairs(PeriastronNamesAlt) do
+		local Peri = HasPeri(name)
+		if Peri then
+			local PeriHandle = Peri:FindFirstChild("Handle",true)
+			
+			if PeriHandle then
+				local PeriLight = PeriHandle:FindFirstChildOfClass("PointLight")
+				local PeriMesh = PeriHandle:FindFirstChildOfClass("SpecialMesh")
+				if PeriMesh and PeriLight then
+					local PeriTag = Create("Color3Value"){
+						Name = PeriMesh.TextureId,
+						Value = PeriLight.Color,
+						Parent = PeriFormation
+					}
+				end
+			end
+		
+		end
+	end
+	RainBeamScript.Disabled = false
+	
+	repeat
+		Services.RunService.Heartbeat:Wait()
+	until not RainBeamScript or not RainBeamScript:IsDescendantOf(Services.ServerScriptService)
+	
+	wait((HasFullSet() and Properties.SpecialCooldown/2) or Properties.SpecialCooldown)
+	Sparkles.Enabled = true
+end
+local ChartreuseReady,AmethystReady,HazelReady = true,true,true -- debounces for each one
+function ShieldPulse()
+	if not ChartreuseReady then return end
+	ChartreuseReady = false
+	--print("Shield Pulse")
+	local ShieldScript = script:WaitForChild("ShieldScript",5):Clone()
+	ShieldScript.Parent = Character
+	ShieldScript.Disabled = false
+	
+	repeat
+		Services.RunService.Heartbeat:Wait()
+	until not ShieldScript or not ShieldScript.Parent
+	
+	delay((HasFullSet() and 7) or 7*2,function()
+		ChartreuseReady = true
+	end)
+end
+function Singularity()
+	if not AmethystReady then return end
+	AmethystReady = false
+	--print("Singularity")
+	
+local Centre = Create("Part"){
+	Size = Vector3.new(1,1,1)*1,
+	CFrame = Root.CFrame,
+	Transparency = 1,
+	Anchored = true,
+	Locked = true,
+	CanCollide = false,
+	TopSurface = Enum.SurfaceType.Smooth,
+	BottomSurface = Enum.SurfaceType.Smooth	
+}
+Centre.Parent = workspace
+local BlackHoleScript = script:WaitForChild("BlackHole"):Clone()
+BlackHoleScript:WaitForChild("Creator",5).Value = Player
+BlackHoleScript.Parent = Centre
+BlackHoleScript.Disabled = false
+	delay((HasFullSet() and 12) or 12*2,function()
+		AmethystReady = true
+	end)
+end
+function RockLift()
+	if not HazelReady then return end
+	HazelReady = false
+	--print("Rock Lift")
+	local hit,pos,mat = RayCast(Root.CFrame.p,(Root.CFrame.p+Vector3.new(0,-1,0))-Root.CFrame.p,10,{Character})
+	
+	local Rock = Create("Part"){
+		Size = Vector3.new(1,1,1)*15,
+		Material = Enum.Material.Slate,
+		Anchored = true,
+		Name = "Rock",
+		Locked = true,
+		CanCollide = true,
+		Color = ((hit and hit.Color) or Color3.fromRGB(102, 51, 0)),
+		CFrame = CFrame.new(Root.CFrame.p-Vector3.new(0,2,0))*CFrame.Angles(math.rad(Seed:NextInteger(0,360)),math.rad(Seed:NextInteger(0,360)),math.rad(Seed:NextInteger(0,360))),
+		Parent = workspace
+	}
+	
+	local RockSummon = script:WaitForChild("RockSummon",5):Clone()
+	RockSummon:WaitForChild("Creator",5).Value = Player
+	RockSummon.Parent = Rock
+	RockSummon.Disabled = false
+	
+	local JumpForce = Create("BodyVelocity"){
+		MaxForce = Vector3.new(1,1,1) * math.huge,
+		Name = "JumpForce",
+		Velocity = ((Root.CFrame.p + Vector3.new(0,1,0))-Root.CFrame.p).Unit*150,
+		Parent = Root
+	}
+	Services.Debris:AddItem(JumpForce,.1)
+	
+	delay((HasFullSet() and 6) or 6*2,function()
+		HazelReady = true
+	end)
+end
+Remote.OnServerEvent:Connect(function(Client,Key)
+	if not Player or not Client or Client ~= Player or not Key or not Tool.Enabled or Humanoid.Health <= 0 then return end
+	if Key == Enum.KeyCode.Q then
+		SummonRainBeam()
+	elseif Key == Enum.KeyCode.E and HasPeri("Chartreuse") then
+		ShieldPulse()
+	elseif Key == Enum.KeyCode.X and HasPeri("Amethyst") then
+		Singularity()	
+	elseif Key == Enum.KeyCode.R and HasPeri("Hazel") then
+		RockLift()
+	end
+end)]]
+	elseif v.Name == "BlackHole" and v.Parent:FindFirstChild("ShardContent") then
+		source = [[function Create(ty)
+	return function(data)
+		local obj = Instance.new(ty)
+		for k, v in pairs(data) do
+			if type(k) == 'number' then
+				v.Parent = obj
+			else
+				obj[k] = v
+			end
+		end
+		return obj
+	end
+end
+function IsInTable(Table,Value)
+	for _,v in pairs(Table) do
+		if v == Value then
+			return true
+		end
+	end
+	return false
+end
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+local Black_Hole = script.Parent
+local Creator = script:WaitForChild("Creator",5)
+local ParticleFolder = script:WaitForChild("Particles",5)
+local CenterAttachment = Create("Attachment"){
+	Position = Vector3.new(0,0,0),
+	Parent = Black_Hole
+}
+local Radius = 50
+local Services = {
+	Players = (game:FindService("Players") or game:GetService("Players")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService")),
+	RunService = (game:FindService("RunService") or game:GetService("RunService")),
+	Debris = (game:FindService("Debris") or game:GetService("Debris")),
+	ServerScriptService = (game:FindService("ServerScriptService") or game:GetService("ServerScriptService"))
+}
+local function Wait(para) -- bypasses the latency
+	local Initial = tick()
+	repeat
+		Services.RunService.Heartbeat:Wait()
+	until tick()-Initial >= para
+end
+for _,particles in pairs(ParticleFolder:GetChildren()) do
+	if particles:IsA("ParticleEmitter") then
+		particles.Parent = CenterAttachment
+		particles.Enabled = true
+	end
+end
+local EffectSound = script:WaitForChild("Effect")
+EffectSound.Parent = Black_Hole
+EffectSound:Play()
+local VeloForces = {}
+local AffectedParts = {}
+local Pulling = true
+delay(5,function()
+	Pulling = false
+	for _,forces in pairs(VeloForces) do
+		if forces then
+			forces:Destroy()
+		end
+	end
+	Black_Hole:Destroy()
+end)
+while Black_Hole and Black_Hole:IsDescendantOf(workspace) and Pulling do
+	--spawn(function()
+		local NegativeRegion = (Black_Hole.Position - Vector3.new(Radius,Radius,Radius))
+		local PositiveRegion = (Black_Hole.Position + Vector3.new(Radius,Radius,Radius))
+		local Region = Region3.new(NegativeRegion, PositiveRegion)
+		local Parts = workspace:FindPartsInRegion3WithIgnoreList(Region,{Creator.Value.Character,Black_Hole},math.huge)
+		for _,hit in pairs(Parts) do
+			if hit and hit.Parent and not hit.Anchored and (hit.CFrame.p-Black_Hole.CFrame.p).Magnitude <= Radius and not IsInTable(AffectedParts,hit) and not hit:FindFirstAncestorWhichIsA("Tool") and not hit:FindFirstAncestorWhichIsA("Accoutrement") and not hit.Parent:FindFirstChildOfClass("ForceField") and not IsTeamMate(Creator.Value,Services.Players:GetPlayerFromCharacter(hit.Parent)) then
+				AffectedParts[#AffectedParts+1] = hit
+				local Pull = Create("BodyVelocity"){
+					MaxForce = Vector3.new(1,1,1)*math.huge,
+					Velocity = ((Black_Hole.CFrame.p-hit.CFrame.p).Unit*25),
+					Name = "Pull",
+					Parent = hit
+				}
+				VeloForces[#VeloForces+1] = Pull
+				delay(.5,function()
+				
+						for index,v in pairs(VeloForces) do
+							if v == Pull then
+								table.remove(AffectedParts,index)
+								if Pull then
+									Pull:Destroy()
+								end
+							end
+						end
+						for index,v in pairs(AffectedParts) do
+							if v == hit then
+								table.remove(AffectedParts,index)
+							end
+						end
+					
+				end)
+				--Services.Debris:AddItem(Pull,.5)
+			end
+		end
+	--end)
+	Wait(1/30)
+	--Services.RunService.Heartbeat:Wait()
+end]]
+	elseif v.Name == "CrimsonPillar" then
+		source = [[local Pillar = script.Parent
+local Creator = script:WaitForChild("Creator",5).Value
+local Services = {
+	Players = (game:FindService("Players") or game:GetService("Players")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService")),
+	RunService = (game:FindService("RunService") or game:GetService("RunService")),
+	Debris = (game:FindService("Debris") or game:GetService("Debris")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService"))
+}
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+function IsInTable(Table,Value)
+	for _,v in pairs(Table) do
+		if v == Value then
+			return true
+		end
+	end
+	return false
+end
+function TagHumanoid(humanoid, player)
+	local Creator_Tag = Instance.new("ObjectValue")
+	Creator_Tag.Name = "creator"
+	Creator_Tag.Value = player
+	Services.Debris:AddItem(Creator_Tag, 2)
+	Creator_Tag.Parent = humanoid
+end
+function UntagHumanoid(humanoid)
+	for i, v in pairs(humanoid:GetChildren()) do
+		if v:IsA("ObjectValue") and v.Name == "creator" then
+			v:Destroy()
+		end
+	end
+end
+local LaserSound = script:WaitForChild("Laser",5)
+LaserSound.Parent = Pillar
+wait(.5)
+local PillarTween = Services.TweenService:Create(Pillar,TweenInfo.new(.5,Enum.EasingStyle.Linear,Enum.EasingDirection.Out,0,false,0),{Transparency = 1,Size = Vector3.new(Pillar.Size.X,30,30),Color = Color3.fromRGB(255, 0, 255)})
+local SoundTween = Services.TweenService:Create(LaserSound,TweenInfo.new(.5,Enum.EasingStyle.Linear,Enum.EasingDirection.Out,0,false,0),{Volume = 0})
+for _,light in pairs(Pillar:GetChildren()) do
+	if light:IsA("Light") then
+		local LightTween = Services.TweenService:Create(light,TweenInfo.new(.5,Enum.EasingStyle.Linear,Enum.EasingDirection.Out,0,false,0),{Color = Color3.fromRGB(255, 0, 255)})
+		LightTween:Play()
+	end
+end
+LaserSound:Play()
+PillarTween:Play()
+SoundTween:Play()
+local TaggedHumanoids = {}
+Pillar.Touched:Connect(function(hit)
+	if not hit or not hit.Parent then return end
+	local Humanoid = hit.Parent:FindFirstChildOfClass("Humanoid")
+	if not Humanoid then return end
+	if Creator == Services.Players:GetPlayerFromCharacter(Humanoid.Parent) or IsTeamMate(Creator,Services.Players:GetPlayerFromCharacter(Humanoid.Parent)) or IsInTable(TaggedHumanoids,Humanoid) then return end
+	TaggedHumanoids[#TaggedHumanoids+1]=Humanoid
+	UntagHumanoid(Humanoid)
+	TagHumanoid(Humanoid,Creator)
+	Humanoid:TakeDamage(40)
+end)
+SoundTween.Completed:Wait()
+Pillar:Destroy()]]
+	elseif v.Name == "RainBeam" then
+		source = [[local Creator = script:WaitForChild("Creator",5)
+local Tool = script:WaitForChild("Tool",5).Value
+local PeriFormation = script:WaitForChild("PeriFormation",5):GetChildren()
+if not Creator then script:Destroy() return end
+local Humanoid,Root = Creator.Value.Character:FindFirstChildOfClass("Humanoid"),Creator.Value.Character:WaitForChild("HumanoidRootPart",5)
+if not Humanoid or not Root then script:Destroy() return end
+function Create(ty)
+	return function(data)
+		local obj = Instance.new(ty)
+		for k, v in pairs(data) do
+			if type(k) == 'number' then
+				v.Parent = obj
+			else
+				obj[k] = v
+			end
+		end
+		return obj
+	end
+end
+local Services = {
+	Players = (game:FindService("Players") or game:GetService("Players")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService")),
+	RunService = (game:FindService("RunService") or game:GetService("RunService")),
+	Debris = (game:FindService("Debris") or game:GetService("Debris")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService"))
+}
+local Properties = {
+BaseUrl = "rbxassetid://"
+}
+local Deleteables = {}
+local Periastron = Create("Part"){
+	Locked = true,
+	CanCollide = false,
+	Anchored = true,
+	Size = Vector3.new(1, 0.6, 5.2)*10,
+	Material = Enum.Material.Neon,
+	Color = Color3.new(1,1,1)
+}
+local PeriastronMesh = Create("SpecialMesh"){
+	MeshType = Enum.MeshType.FileMesh,
+	MeshId = Properties.BaseUrl.."80557857",
+	Scale = Vector3.new(1,1,1)*10,
+	Parent = Periastron
+}
+--[[local Surfaces = {"Front","Back","Left","Right","Top","Bottom"}
+local BeamLighting = Create("SurfaceLight"){
+	Color = Color3.fromRGB(1, 1, 1),
+	Angle = 180,
+	Enabled = true,
+	Range = 100,
+	Shadows = false
+}
+local SurfaceLights = {}]
+		local rad = math.rad
+		local info = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0)
+		local Charging = true
+		local Animation = script:WaitForChild("Animations",5):WaitForChild(Humanoid.RigType.Name,10):WaitForChild("Release")
+		function IsTeamMate(Player1, Player2)
+			return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+		end
+		function TagHumanoid(humanoid, player)
+			local Creator_Tag = Instance.new("ObjectValue")
+			Creator_Tag.Name = "creator"
+			Creator_Tag.Value = player
+			Services.Debris:AddItem(Creator_Tag, 2)
+			Creator_Tag.Parent = humanoid
+		end
+		function UntagHumanoid(humanoid)
+			for i, v in pairs(humanoid:GetChildren()) do
+				if v:IsA("ObjectValue") and v.Name == "creator" then
+					v:Destroy()
+				end
+			end
+		end
+		local ReleaseAnim = Humanoid:LoadAnimation(Animation)
+		ReleaseAnim:Play(nil,nil,2)
+		local RainPeri = Periastron:Clone();RainPeri.Name = "RainbowPeriastron";RainPeri.Size = RainPeri.Size/10
+		RainPeri:FindFirstChildOfClass("SpecialMesh").TextureId = Properties.BaseUrl .."157345185"
+		RainPeri.CanCollide = false
+		RainPeri.CFrame = CFrame.new(Tool:WaitForChild("Handle",5).CFrame.p)*CFrame.Angles(rad(90),0,0);RainPeri.Parent = workspace
+		RainPeri.Anchored = true
+
+		local Loc = Root.CFrame.p+Vector3.new(0,55,0)
+		local Orientation = Loc + (Creator.Value.Character.PrimaryPart.CFrame.lookVector*-2)
+		local PartSizeTween = Services.TweenService:Create(RainPeri,info,{Size = RainPeri.Size,CFrame = CFrame.new(Loc,Orientation)})
+		local MeshSizeTween = Services.TweenService:Create(RainPeri:FindFirstChildOfClass("SpecialMesh"),info,{Scale = Vector3.new(1,1,1)*10})
+		MeshSizeTween:Play()
+		PartSizeTween:Play()PartSizeTween.Completed:Wait()
+		local PeriRangers = {} --GO GO PERI RANGERS!!!!
+		local FormationModel = Create("Model"){
+			Name = "PeriRangers",
+			Parent = workspace
+		}
+		Humanoid.Died:Connect(function()--remove the Giant Peri Formation if you happen to die
+			FormationModel:Destroy()
+			RainPeri:Destroy()
+			for _,deletable in pairs(Deleteables) do
+				deletable:Destroy()
+			end
+			script:Destroy()
+			return
+		end)
+		local CenterPiece = Create("Part"){
+			Anchored = true,
+			CanCollide = false,
+			Transparency = 1,
+			Size = Vector3.new(1,1,1)*2,
+			CFrame = RainPeri.CFrame*CFrame.new(0,0,-RainPeri.Size.z/2),
+			Parent = FormationModel
+		}
+		FormationModel.PrimaryPart = CenterPiece 
+		local spin = 0
+		local amount = 10
+		spawn(function()
+			repeat
+				RainPeri.CFrame = CFrame.new(Loc,Loc + (Root.CFrame.lookVector*-2))
+				FormationModel:SetPrimaryPartCFrame((RainPeri.CFrame*CFrame.new(0,0,-RainPeri.Size.z/2))*CFrame.Angles(0,0,rad(spin)))
+				Services.RunService.Stepped:Wait()
+				spin = spin+amount
+			until not Charging or not FormationModel or not FormationModel.PrimaryPart
+		end)
+		RainPeri.Touched:Connect(function(hit)--Spinning blades also kill!
+			local Hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+			if not Hum then return end
+			if Hum == Humanoid or IsTeamMate(Creator.Value,Services.Players:GetPlayerFromCharacter(Hum.Parent)) then return end
+			UntagHumanoid(Hum)
+			TagHumanoid(Hum,Creator.Value)
+			Hum:TakeDamage(Hum.Health)
+		end)
+		for _,Val in pairs(PeriFormation) do
+			local PeriClone = RainPeri:Clone();
+			--[[for i,v in pairs(PeriClone:GetChildren()) do
+				v:Destroy()
+			end]
+			PeriClone.Size = PeriClone.Size*10
+			local Mesh = PeriClone:FindFirstChildOfClass("SpecialMesh")
+			PeriClone.Color = Val.Value
+			Mesh.TextureId = Val.Name;
+			--Mesh.Scale = Mesh.Scale*10
+			PeriClone.Name = "Periastron";
+			PeriClone.Parent = FormationModel
+			PeriRangers[#PeriRangers+1] = PeriClone
+			PeriClone.Touched:Connect(function(hit)--Spinning blades also kill!
+				local Hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+				if not Hum or Hum == Humanoid or IsTeamMate(Creator.Value,Services.Players:GetPlayerFromCharacter(Hum.Parent)) then return end
+				Hum:TakeDamage(Hum.Health)
+			end)
+		end
+		for i,v in pairs(PeriRangers) do
+			local pos = (RainPeri.CFrame*CFrame.Angles(rad(90),i*rad(360/#PeriRangers),0))
+			v.Anchored = true
+			v.CFrame = pos*CFrame.new(0,-v.Size.Z/2,v.Size.Z/2)
+		end
+		local ChargeSound = script:WaitForChild("ChargeSound",5)
+		ChargeSound.Parent = CenterPiece
+		ChargeSound:Play()
+		local Seed = Random.new(tick())
+		local alottedTime = tick()
+		--[[workspace.DescendantRemoving:Connect(function(d)
+			if d == Tool then
+			FormationModel:Destroy()
+			RainPeri:Destroy()
+			end
+		end)]
+		spawn(function()
+			repeat
+				wait(Seed:NextNumber(.05,.2))
+				local Index = Seed:NextInteger(1,#PeriRangers)
+				local Energy = Create("Part"){
+					Material = Enum.Material.Neon,
+					CanCollide = false,
+					Size = Vector3.new(1,1,1)*Seed:NextInteger(3,10),
+					CFrame = (RainPeri.CFrame*CFrame.Angles(rad(Seed:NextInteger(0,360)),rad(Seed:NextInteger(0,360)),rad(Seed:NextInteger(0,360))))*CFrame.new(0,0,Seed:NextInteger(20,50)),
+					Color = (PeriRangers[Index] and PeriRangers[Index].Color) or Color3.new(Seed:NextNumber(0,1),Seed:NextNumber(0,1),Seed:NextNumber(0,1)),
+					Shape = Enum.PartType.Ball,
+					Transparency = 0.5,
+					Parent = workspace,
+				}
+				Deleteables[#Deleteables+1] = Energy
+				Energy:SetNetworkOwner(nil)-- So it wouldn't be so laggy looking :P
+				local Aim = Create("RocketPropulsion"){
+					Target = RainPeri,
+					TargetRadius = 4,
+					MaxThrust = 10^5,
+					TurnD = 10,
+					TurnP = 100,
+					MaxSpeed = 100,
+					CartoonFactor = .8,
+					Parent = Energy	
+				}
+				Aim:Fire()
+				spawn(function()
+					Aim.ReachedTarget:Wait()
+					Energy:Destroy()
+				end)
+				delay(2,function()--safety catch
+					Energy:Destroy()
+				end)
+			until tick()-alottedTime >= ChargeSound.TimeLength-(.15*#PeriFormation)
+
+			Charging = false
+			spawn(function()
+				repeat
+					FormationModel:SetPrimaryPartCFrame(FormationModel.PrimaryPart.CFrame*CFrame.Angles(0,0,rad(amount)))
+					Services.RunService.Stepped:Wait()
+				until not FormationModel or not FormationModel.PrimaryPart
+			end)
+
+			ChargeSound:Stop()
+			wait(1)
+			--warn("FIRE!!!!!")
+
+			local RainBeamEnd = Create("Part"){
+				Material = Enum.Material.Neon,
+				Anchored = true,
+				CanCollide = false,
+				Transparency = .2,
+				Size = Vector3.new(1,1,1)*150,
+				CFrame = (RainPeri.CFrame*CFrame.Angles(0,rad(90),0))*CFrame.new((-150/3)+(RainPeri.Size.Z/2),0,0),
+				Shape = Enum.PartType.Ball,
+				Parent = workspace
+			}
+			local RainBeam = Create("Part"){
+				Material = Enum.Material.Neon,
+				Anchored = true,
+				CanCollide = false,
+				Transparency = .2,
+				Size = Vector3.new(0,150,150),
+				CFrame = RainBeamEnd.CFrame * CFrame.new(0,0,0),
+				Shape = Enum.PartType.Cylinder,
+				Parent = workspace
+			}
+
+		--[[for _,surfaces in pairs(Surfaces) do
+			local Lighting = BeamLighting:Clone()
+			Lighting.Face = Enum.NormalId[surfaces]
+			Lighting.Parent = RainBeamEnd
+			SurfaceLights[#SurfaceLights+1]=Lighting
+		end
+		for _,surfaces in pairs(Surfaces) do
+			local Lighting = BeamLighting:Clone()
+			Lighting.Face = Enum.NormalId[surfaces]
+			Lighting.Parent = RainBeam
+			SurfaceLights[#SurfaceLights+1]=Lighting
+		end]
+
+			Deleteables[#Deleteables+1]=RainBeamEnd
+			Deleteables[#Deleteables+1]=RainBeam
+			RainBeam.Touched:Connect(function(hit)
+				if not hit or not hit.Parent then return end
+				local Hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+				local ForceField = hit.Parent:FindFirstChildOfClass("ForceField")
+				if not Hum or ForceField then return end
+				if Hum == Humanoid or IsTeamMate(Creator.Value,Services.Players:GetPlayerFromCharacter(Hum.Parent)) then return end
+				UntagHumanoid(Hum)
+				TagHumanoid(Hum,Creator.Value)
+				Hum:TakeDamage(Hum.Health)
+				hit:Destroy()
+			end)
+			RainBeamEnd.Touched:Connect(function(hit)
+				if not hit or not hit.Parent then return end
+				local Hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+				local ForceField = hit.Parent:FindFirstChildOfClass("ForceField")
+				if not Hum or ForceField then return end
+				if Hum == Humanoid or IsTeamMate(Creator.Value,Services.Players:GetPlayerFromCharacter(Hum.Parent)) then return end
+				UntagHumanoid(Hum)
+				TagHumanoid(Hum,Creator.Value)
+				Hum:TakeDamage(Hum.Health)
+				hit:Destroy()
+			end)
+			spawn(function()
+
+
+				while RainBeam and RainBeamEnd do
+					--RainBeamEnd.Color = PeriRangers[Seed:NextInteger(1,#PeriRangers)].Color
+					--RainBeam.Color = RainBeamEnd.Color
+					for _,PeriProperty in pairs(PeriFormation) do
+						if PeriProperty.Value then
+							local Tween = Services.TweenService:Create(RainBeam,TweenInfo.new(.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0),{Color = PeriProperty.Value})
+							local Tween2 = Services.TweenService:Create(RainBeamEnd,TweenInfo.new(.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0),{Color = PeriProperty.Value})
+
+						--[[for _,lights in pairs(SurfaceLights) do
+							for _,PeriProperty in pairs(PeriFormation) do
+								if PeriProperty.Value then
+									local LightTween = Services.TweenService:Create(lights,TweenInfo.new(.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0),{Color = PeriProperty.Value})
+									LightTween:Play()	
+								end
+							end
+						end]
+
+							Tween:Play();Tween2:Play()
+							Tween2.Completed:Wait()
+						end
+					end
+					Services.RunService.Stepped:Wait()
+				end
+			end)
+			local FireSound = script:WaitForChild("FireSound",5)
+			FireSound.Parent = CenterPiece
+			local LoopSound = script:WaitForChild("LoopSound",5)
+			LoopSound.Parent = CenterPiece
+			FireSound:Play()
+			LoopSound:Play()
+		--[[local Velo = Create("BodyVelocity"){
+			Velocity = -RainPeri.CFrame.lookVector*100,
+			MaxForce = Vector3.new(1,1,1)*math.huge,
+			Parent = RainBeam,
+		}]
+			local BeamInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0)
+			local SizeTween = Services.TweenService:Create(RainBeam,BeamInfo,{Size = Vector3.new(500,RainBeam.Size.Y,RainBeam.Size.Z),CFrame = (RainBeamEnd.CFrame*CFrame.new(-500/2,0,0))})
+			SizeTween:Play();SizeTween.Completed:Wait()
+			--RainBeam.Anchored = false
+			local CoolDownSound = Create("Sound"){
+				SoundId = "rbxassetid://1899277236",
+				Volume = 2,
+				Looped = false,
+				Parent = CenterPiece
+			}
+			local AlphaTween = Services.TweenService:Create(RainBeam,TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0),{Transparency = 1})
+			AlphaTween:Play()
+			local AlphaTween2 = Services.TweenService:Create(RainBeamEnd,TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0),{Transparency = 1})
+			AlphaTween2:Play();
+			AlphaTween2.Completed:Wait()
+			FireSound:Destroy()
+			LoopSound:Destroy()
+			CoolDownSound:Play()
+			spawn(function()
+				repeat
+					amount = math.clamp(amount-0.05,0,10)
+					Services.RunService.Stepped:Wait()
+				until not FormationModel
+			end)
+			RainBeamEnd:Destroy()
+			RainBeam:Destroy()
+			CoolDownSound.Ended:Wait()
+			delay(1,function()
+				RainPeri:Destroy()
+				FormationModel:Destroy()
+				script:Destroy()
+			end)
+
+		end)
+		]]
+	elseif v.Name == "RevealRainbow" then
+		source = [[function Create(ty)
+	return function(data)
+		local obj = Instance.new(ty)
+		for k, v in pairs(data) do
+			if type(k) == 'number' then
+				v.Parent = obj
+			else
+				obj[k] = v
+			end
+		end
+		return obj
+	end
+end
+local Character = script.Parent
+local Hum = Character:FindFirstChildOfClass("Humanoid")
+local Center = Character:FindFirstChild("Torso") or Character:FindFirstChild("UpperTorso") or Character:FindFirstChild("HumanoidRootPart")
+if not Center then script:Destroy() end
+local Creator = script:WaitForChild("Creator",5)
+local Tool = script:WaitForChild("Tool",5)
+local Range = script:WaitForChild("Range",5)
+if not Creator or not Tool or not Range then script:Destroy() return end
+Creator = Creator.Value
+Tool = Tool.Value
+Range = Range.Value
+local CreatorTorso = Creator:FindFirstChild("HumanoidRootPart") or Creator:FindFirstChild("Torso") or Creator:FindFirstChild("UpperTorso")
+local Services = {
+	RunService = (game:FindService("RunService") or game:GetService("RunService")),
+	Debris = (game:FindService("Debris") or game:GetService("Debris"))
+}
+local SONARPeri = Create("Part"){
+	Name = "SONARPeri",
+	Size = Vector3.new(1,0.6,5.2),
+	Locked = true,
+	Anchored = false,
+	CanCollide = false,
+	Material = Enum.Material.Plastic
+}
+local BaseUrl = "http://www.roblox.com/asset/?id="
+local SONARPeriMesh = Create("SpecialMesh"){
+	MeshType = Enum.MeshType.FileMesh,
+	Offset = Vector3.new(0,0,0),
+	Scale = Vector3.new(1,1,1),
+	VertexColor = Vector3.new(1,1,1),
+	MeshId = BaseUrl.."80557857",
+	TextureId = BaseUrl.."73816926",
+	Parent = SONARPeri
+}
+local Pos = Create("BodyPosition"){
+	MaxForce = Vector3.new(1,1,1)*math.huge,
+	Position = (Center.CFrame * CFrame .new(0,0,-3)).p,
+	D = 1250,
+	P = 10^4,
+	Parent = SONARPeri
+}
+local Beep = script:WaitForChild("SONARBeep",5)
+Beep.Parent = Center
+Beep:Play()
+SONARPeri.CFrame = CFrame.new(Center.CFrame.p+Vector3.new(0,10,0))*CFrame.Angles(math.rad(90),0,0)
+Pos.Position = Center.CFrame.p + Vector3.new(0,10,0)
+SONARPeri.Parent = Character
+local Speed = Hum.WalkSpeed
+for i=25,0,-1 do
+	SONARPeri.Transparency = (i/60)
+	Services.RunService.Heartbeat:Wait()
+end
+repeat
+Pos.Position = Center.CFrame.p + Vector3.new(0,10,0)
+Services.RunService.Heartbeat:Wait()
+--print(Center)
+until (Center.CFrame.p-CreatorTorso.CFrame.p).Magnitude > Range or not Tool:IsDescendantOf(Creator) or not Tool:IsDescendantOf(workspace) or Hum.WalkSpeed ~= Speed or Hum.Health <= 0 or not Center or not Center:IsDescendantOf(workspace) or not Character or not Character:IsDescendantOf(workspace)
+for i=0,25,1 do
+	SONARPeri.Transparency = (i/60)
+	Services.RunService.Heartbeat:Wait()
+end
+SONARPeri:Destroy()
+script:Destroy()]]
+	elseif v.Name == "RockSummon" then
+		source = [[function Create(ty)
+	return function(data)
+		local obj = Instance.new(ty)
+		for k, v in pairs(data) do
+			if type(k) == 'number' then
+				v.Parent = obj
+			else
+				obj[k] = v
+			end
+		end
+		return obj
+	end
+end
+local function VisualizeRay(ray,RayLength)
+	local RayCast = Create("Part"){
+		Material = Enum.Material.Neon,
+		Color = Color3.new(0,1,0),
+		Size = Vector3.new(0.3,0.3,(RayLength or 5)),
+		CFrame = CFrame.new(ray.Origin, ray.Origin+ray.Direction) * CFrame.new(0, 0, -(RayLength or 5) / 2),
+		Anchored = true,
+		CanCollide = false,
+		Parent = workspace
+	}
+	game:GetService("Debris"):AddItem(RayCast,5)
+end
+local Rock = script.Parent
+local Seed = Random.new(tick())
+local Creator = script:WaitForChild("Creator",5).Value
+local RockCollection = {Rock}
+function RayCast(Pos, Dir, Max, IgnoreList)
+	return game:GetService("Workspace"):FindPartOnRayWithIgnoreList(Ray.new(Pos, Dir.unit * (Max or 999.999)), IgnoreList) 
+end
+local RockTemplate = Rock:Clone()
+RockTemplate:ClearAllChildren()
+local SurroundingRockCount = 30
+for i=1,SurroundingRockCount,1 do
+	local Position = ((CFrame.new(Rock.CFrame.p+Vector3.new(0,5,0))*CFrame.Angles(0,math.rad((i*(360/SurroundingRockCount))),0))*CFrame.new(0,0,15)).p
+	local hit,pos = RayCast(Position,((Position + Vector3.new(0,-1,0))-Position).Unit,10,RockCollection)
+	--VisualizeRay(Ray.new(Position,((Position + Vector3.new(0,-1,0))-Position).Unit),10)
+	--print(hit)
+	if hit then
+		local RockBase = RockTemplate:Clone()
+		RockCollection[#RockCollection+1] = RockBase
+		RockBase.Size = Vector3.new(1,1,1)*Seed:NextNumber(7,9)
+		RockBase.Color = hit.Color
+		RockBase.CFrame = CFrame.new(pos)*CFrame.Angles(math.rad(Seed:NextInteger(0,360)),math.rad(Seed:NextInteger(0,360)),math.rad(Seed:NextInteger(0,360)))
+		RockBase.Parent = workspace
+	end
+end
+local Smoke = script:WaitForChild("SmashSmoke",5)
+Smoke.Color = ColorSequence.new(Rock.Color)
+Smoke.Parent = Rock
+Smoke:Emit(Smoke.Rate)
+local ExplosionSound = script:WaitForChild("Explosion",5)
+ExplosionSound.Parent = Rock
+ExplosionSound:Play()
+local CrumnbleSound = script:WaitForChild("Crumble",5)
+CrumnbleSound.Parent = Rock
+CrumnbleSound:Play()
+delay(4,function()
+	for _,rocks in pairs(RockCollection) do
+		rocks:Destroy()
+	end
+	Rock:Destroy()
+end)]]
+	elseif v.Name == "ShieldScript" then
+		source = [[local Character = script.Parent
+local Services = {
+	Players = (game:FindService("Players") or game:GetService("Players")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService")),
+	RunService = (game:FindService("RunService") or game:GetService("RunService")),
+	Debris = (game:FindService("Debris") or game:GetService("Debris"))
+}
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+function Create(ty)
+	return function(data)
+		local obj = Instance.new(ty)
+		for k, v in pairs(data) do
+			if type(k) == 'number' then
+				v.Parent = obj
+			else
+				obj[k] = v
+			end
+		end
+		return obj
+	end
+end
+local BaseUrl = "http://www.roblox.com/asset/?id="
+local Properties = {
+	CurrentRadius = 20
+}
+local Center = (Character:FindFirstChild("HumanoidRootPart"))
+if not Center then script:Destroy() end
+local Shield = Create("Part"){
+	Transparency = 0.5,
+	Shape = Enum.PartType.Ball,
+	Material = Enum.Material.Neon,
+	Locked = true,
+	CanCollide = false,
+	Anchored = false,
+	Size = Vector3.new(1,1,1)*1,
+	CFrame = Center.CFrame,
+	TopSurface = Enum.SurfaceType.Smooth,
+	BottomSurface = Enum.SurfaceType.Smooth,
+	Color = Color3.fromRGB(0,128,0),
+}
+local ShieldMesh = Create("SpecialMesh"){
+	MeshType = Enum.MeshType.Sphere,
+	Offset = Vector3.new(0,0,0),
+	Scale = Vector3.new(0,0,0),
+	VertexColor = Vector3.new(0,1,0)*10^5,
+	--TextureId = BaseUrl.."883311537",
+	Parent = Shield
+}
+local WeldConstraint = Create("WeldConstraint"){
+	Part0 = Center,
+	Part1 = Shield,
+	Parent = Shield
+}
+Shield.CFrame = Center.CFrame
+Shield.Parent = Character
+delay(2,function()
+	Shield:Destroy()
+	script:Destroy()
+end)
+spawn(function()
+	repeat
+	spawn(function()
+		local NegativeRegion = (Center.Position - Vector3.new(ShieldMesh.Scale.X, ShieldMesh.Scale.Y, ShieldMesh.Scale.Z))
+		local PositiveRegion = (Center.Position + Vector3.new(ShieldMesh.Scale.X, ShieldMesh.Scale.Y, ShieldMesh.Scale.Z))
+		local Region = Region3.new(NegativeRegion, PositiveRegion)
+		local Parts = workspace:FindPartsInRegion3WithIgnoreList(Region,{Character,Shield},math.huge)
+		for _,hit in pairs(Parts) do
+			if hit and hit.Parent and not hit.Anchored and (hit.CFrame.p-Shield.CFrame.p).Magnitude <= Properties.CurrentRadius then
+				local Knockback = Create("BodyVelocity"){
+					MaxForce = Vector3.new(1,1,1)*math.huge,
+					Velocity = ((hit.CFrame.p-Shield.CFrame.p).Unit*100)+Vector3.new(0,50,0),
+					Name = "Knockback",
+					Parent = hit
+				}
+				Services.Debris:AddItem(Knockback,.1)
+			end
+		end
+	end)
+	Services.RunService.Stepped:Wait()
+	--Services.RunService.Heartbeat:Wait()
+	until not Shield or not Shield.Parent
+end)
+local CharacterHumanoid = Character:FindFirstChildOfClass("Humanoid")
+--[[spawn(function()
+	repeat
+		CharacterHumanoid.Health = CharacterHumanoid.Health + .5
+		Services.RunService.Heartbeat:Wait()
+	until not Shield or not Shield.Parent or not CharacterHumanoid or not CharacterHumanoid.Parent
+end)]
+		for i=1,20,1 do
+			if Shield and Shield.Parent and Center and Center.Parent then
+				ShieldMesh.Scale = Vector3.new(0,0,0):Lerp(Vector3.new(1,1,1)*Properties.CurrentRadius,i/30)
+				Services.RunService.Heartbeat:Wait()	
+			end
+		end]]
+	elseif v.Name == "StarShard" then
+		source = [[local Shard = script.Parent
+delay(2,function()
+	Shard:Destroy()
+end)
+local Creator = script:WaitForChild("Creator",10)
+local CreatorHumanoid = Creator.Value.Character:FindFirstChildOfClass("Humanoid")
+local Services = {
+	Players = (game:FindService("Players") or game:GetService("Players")),
+	TweenService = (game:FindService("TweenService") or game:GetService("TweenService")),
+	RunService = (game:FindService("RunService") or game:GetService("RunService")),
+	Debris = (game:FindService("Debris") or game:GetService("Debris"))
+}
+local Properties = {
+	CurrentRadius = 7.5
+}
+function IsInTable(Table,Value)
+	for _,v in pairs(Table) do
+		if v == Value then
+			return true
+		end
+	end
+	return false
+end
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+function TagHumanoid(humanoid, player)
+	local Creator_Tag = Instance.new("ObjectValue")
+	Creator_Tag.Name = "creator"
+	Creator_Tag.Value = player
+	Services.Debris:AddItem(Creator_Tag, 2)
+	Creator_Tag.Parent = humanoid
+end
+function UntagHumanoid(humanoid)
+	for i, v in pairs(humanoid:GetChildren()) do
+		if v:IsA("ObjectValue") and v.Name == "creator" then
+			v:Destroy()
+		end
+	end
+end
+local function GetNearestTorso(MarkedPosition,TorsoPopulationTable)
+	local ClosestDistance = math.huge
+	local ClosestTorso
+	for i=1,#TorsoPopulationTable do
+		local distance = (TorsoPopulationTable[i].CFrame.p-MarkedPosition).magnitude
+		if TorsoPopulationTable[i] and  distance < ClosestDistance then
+			ClosestDistance = distance
+			ClosestTorso = TorsoPopulationTable[i]
+		end
+	end
+	--warn("The Closest Person is: "..ClosestTorso.Parent.Name)
+	return ClosestTorso
+end
+local function TrackCharacters(Center,Range)
+	local Characters = {}
+	local Players = {}
+	local NegativeRegion = (Center.Position - Vector3.new(Range, Range, Range))
+	local PositiveRegion = (Center.Position + Vector3.new(Range, Range, Range))
+	local Region = Region3.new(NegativeRegion, PositiveRegion)
+	local Parts = workspace:FindPartsInRegion3(Region,Creator.Value.Character,math.huge)
+	local TaggedHumanoids = {}
+		for _,hit in pairs(Parts) do
+			if string.find(string.lower(hit.Name),"torso") then
+				local ForceField = hit.Parent:FindFirstChildOfClass("ForceField")
+				local Hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+				if Hum and Hum.Parent and Hum.Health > 0 and Creator.Value.Character and Hum ~= Creator.Value.Character:FindFirstChildOfClass("Humanoid") and not IsInTable(TaggedHumanoids,Hum) and not IsTeamMate(Creator.Value,Services.Players:GetPlayerFromCharacter(Hum.Parent)) and not ForceField then
+					TaggedHumanoids[#TaggedHumanoids+1] = Hum
+					if Services.Players:GetPlayerFromCharacter(Hum.Parent) then
+						--print("Is a Player")
+						Players[#Players+1] = hit
+					else
+						--print("Is an NPC")
+						Characters[#Characters+1] = hit
+					end
+				end
+			end
+		end
+	return Characters,Players
+end
+local Rocket = Instance.new("RocketPropulsion")
+Rocket.CartoonFactor = 0.05
+Rocket.TargetRadius = 4
+Rocket.TargetOffset = Vector3.new(0,0,0)
+Rocket.MaxThrust = 10^2
+Rocket.ThrustP = 10^1
+Rocket.TurnP = 10
+Rocket.MaxSpeed = 20
+Rocket.Parent = Shard
+local Touch
+function Damage(hit,TotalDamage)
+	if not hit or not hit.Parent then return end
+	local Hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+	local ForceField = hit.Parent:FindFirstChildOfClass("ForceField")
+	if not Hum or Hum.Health <=0 or Hum:IsDescendantOf(Creator.Value.Character) then return end
+	
+	if IsTeamMate(Creator.Value,Services.Players:GetPlayerFromCharacter(Hum.Parent)) then return end
+	local Player = Services.Players:GetPlayerFromCharacter(Hum.Parent)
+	spawn(function()
+		UntagHumanoid(Hum)
+		TagHumanoid(Hum,Creator.Value)
+		Hum:TakeDamage(TotalDamage)
+		--Hum:UnequipTools()
+		Touch:Disconnect()
+		Shard:Destroy()
+		--wait(.5)
+	end)
+end
+Touch = Shard.Touched:Connect(function(hit)
+	Damage(hit,10)
+end)
+repeat
+	local NPCs,Players = TrackCharacters(Shard,Properties.CurrentRadius)
+	
+	local PriorityTable = ((#Players > 0 and Players) or NPCs)-- Players before NPCs
+	local PriorityTorso = GetNearestTorso(Shard.CFrame.p,PriorityTable)
+	
+	if PriorityTorso and Rocket.Target ~= PriorityTorso then
+		--Track Target
+		Rocket:Abort()
+		Rocket.Target = PriorityTorso
+		Rocket:Fire()
+	end
+	wait(1/10)
+	--Services.RunService.Heartbeat:Wait()
+until not Shard or not Shard.Parent]]
+	elseif v.Name == "LightFade" then
+		source = [[local Light = script.Parent
+local TweenService = (game:FindService("TweenService") or game:GetService("TweenService"))
+local LightFade = TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.In,0,false,.5)
+local ColorCycle = {}
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(0,0,0)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(255,255,255)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(255,0,0)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(255,176,0)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(0,255,0)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(0,0,255)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(102, 51, 0)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(170,0,170)
+ColorCycle[#ColorCycle+1] = Color3.fromRGB(255, 85, 255)
+while Light do
+	for _,Colors in pairs(ColorCycle) do
+		local Tween = TweenService:Create(Light,LightFade,{Color = Colors})
+		Tween:Play()
+		Tween.Completed:Wait()
+	end
+end]]
+	elseif v.Name == "SubspaceMine" then
+		source = [[Mine = script.Parent
+DunDun = Instance.new("Sound")
+DunDun.SoundId = "http://www.roblox.com/asset/?id=11984254"
+DunDun.Parent = Mine
+SubspaceExplosion = Instance.new("Sound")
+SubspaceExplosion.SoundId = "http://www.roblox.com/asset/?id=11984351"
+SubspaceExplosion.Parent = Mine
+Calibrate = Instance.new("Sound")
+Calibrate.SoundId = "http://www.roblox.com/asset/?id=11956590"
+Calibrate.Looped = true
+Calibrate.Parent = Mine
+Calibrate:Play()
+local calibration_time = 2 -- needs to be still/untouched for this long before calibrating
+local cur_time = 0
+local max_life = 120 -- these things last for 2 minutes on their own, once activated
+local calibrated = false
+local connection = nil
+function activateMine()
+	for i=0,1,.1 do
+		Mine.Transparency = i
+		wait(.05)
+	end
+	calibrated = true
+	Calibrate:Stop()
+end
+function pulse()
+	DunDun:Play()
+	for i=.9,.5,-.1 do
+		Mine.Transparency = i
+		wait(.05)
+	end
+	for i=.5,1,.1 do
+		Mine.Transparency = i
+		wait(.05)
+	end
+end
+function explode()
+	connection:disconnect()
+	for i=1,0,-.2 do
+		Mine.Transparency = i
+		wait(.05)
+	end
+	SubspaceExplosion:Play()
+	local e = Instance.new("Explosion")
+	e.BlastRadius = 16
+	e.BlastPressure = 1000000
+	e.Position = Mine.Position
+	e.Parent = Mine
+	local creator = script.Parent:findFirstChild("creator")
+	e.Hit:connect(function(part, distance)  onPlayerBlownUp(part, distance, creator) end)
+	for i=0,1,.2 do
+		Mine.Transparency = i
+		wait(.05)
+	end
+	wait(4)
+	Mine:Remove()
+end
+function update()
+	if (calibrated == false) then
+		if (Mine.Velocity.magnitude > .05) then
+			cur_time = 0
+		end
+		if (cur_time > calibration_time) then
+			activateMine()
+		end
+	else
+		-- calibrated mine
+		if (math.random(1,20) == 2) then
+			pulse()
+		end
+		if (cur_time > max_life) then pulse() Mine:Remove() end
+	end
+end
+function OnTouch(part)
+	if (calibrated == false) then
+		cur_time = 0
+	else
+		explode()
+	end
+end
+function onPlayerBlownUp(part, distance, creator)
+	if (part:getMass() < 300) then
+		part.BrickColor = BrickColor.new(1032)
+		local s = Instance.new("Sparkles")
+		s.Parent = part
+		game.Debris:AddItem(s, 5)
+	end
+	
+	if creator ~= nil and part.Name == "Head" then
+		local humanoid = part.Parent.Humanoid
+		tagHumanoid(humanoid, creator)
+	end
+end
+function tagHumanoid(humanoid, creator)
+	-- tag does not need to expire iff all explosions lethal
+	
+	if creator ~= nil then
+		local new_tag = creator:clone()
+		new_tag.Parent = humanoid
+	end
+end
+function untagHumanoid(humanoid)
+	if humanoid ~= nil then
+		local tag = humanoid:findFirstChild("creator")
+		if tag ~= nil then
+			tag.Parent = nil
+		end
+	end
+end
+connection = Mine.Touched:connect(OnTouch)
+while true do
+	update()
+	local e,g = wait(.5)
+	cur_time = cur_time + e
+end]]
+	elseif v.Name == "SandwichScript" then
+		source = [[local Tool = script.Parent;
+enabled = true
+function onActivated()
+	if not enabled  then
+		return
+	end
+	enabled = false
+	Tool.GripForward = Vector3.new(0.675, -0.675, -0.3)
+	Tool.GripPos = Vector3.new(0.4, -0.9, 0.9)
+	Tool.GripRight = Vector3.new(0.212, -0.212, 0.954)
+	Tool.GripUp = Vector3.new(0.707, 0.707, 0)
+	Tool.Handle.DrinkSound:Play()
+	wait(.8)
+	
+	local h = Tool.Parent:FindFirstChild("Humanoid")
+	if (h ~= nil) then
+		if (h.MaxHealth > h.Health + 1.6) then
+			h.Health = h.Health + 1.6
+		else	
+			h.Health = h.MaxHealth
+		end
+	end
+	Tool.GripForward = Vector3.new(-1, 0, 0)
+	Tool.GripPos = Vector3.new(.2, 0, 0)
+	Tool.GripRight = Vector3.new(0, 0, -1)
+	Tool.GripUp = Vector3.new(0,1,0)
+	enabled = true
+end
+function onEquipped()
+	Tool.Handle.OpenSound:play()
+end
+script.Parent.Activated:connect(onActivated)
+script.Parent.Equipped:connect(onEquipped)]]
+	elseif v.Name == "SlateskinPotionScript" then
+		source = [[--Rescripted by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+GlassScript = script:WaitForChild("GlassScript")
+Sounds = {
+	GlassBreak = Handle:WaitForChild("GlassBreak"),
+	Drink = Handle:WaitForChild("Drink"),
+	Slateskin = Handle:WaitForChild("Slateskin"),
+}
+Grips = {
+	Normal = CFrame.new(0.1, 0, 0.1, 0.217036337, 0, 0.976163626, 0, 1, -0, -0.976163507, 0, 0.217036366),
+	Drinking = CFrame.new(1.5, -0.35, 0.1, 1, 0, -0, -0, 0.651038408, 0.759044766, 0, -0.759044766, 0.651038408),
+}
+ToolEquipped = false
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Tool.Grip = Grips.Normal
+Tool.Enabled = true
+function Transform(character)
+end
+function SlateMe(character)
+	for i, v in pairs(character:GetChildren()) do
+		if v:IsA("Clothing") then
+			v:Destroy()
+		elseif v:IsA("BasePart") then
+			v.Material = Enum.Material.Slate
+			v.BrickColor = BrickColor.new("Dark stone grey")
+		elseif v:IsA("Humanoid") then
+			v.WalkSpeed = (16 * 0.9)
+			v.MaxHealth = 150
+			v.Health = v.MaxHealth
+		end
+	end
+end
+function Activated()
+	if not Tool.Enabled or not CheckIfAlive() then
+		return
+	end
+	
+	if ToolUnequipped then
+		ToolUnequipped:disconnect()
+	end	
+	
+	local CurrentlyEquipped = true
+	ToolUnequipped = Tool.Unequipped:connect(function()
+		CurrentlyEquipped = false
+	end)
+	Tool.Enabled = false
+	Tool.Grip = Grips.Drinking
+	
+	Sounds.Drink:Play()
+	
+	wait(3)
+	
+	if not CurrentlyEquipped then
+		Tool.Grip = Grips.Normal
+		Tool.Enabled = true
+		return
+	end
+	
+	Sounds.Slateskin:Play()
+	
+	SlateMe(Character)
+	Tool.Grip = Grips.Normal
+	wait(1)
+	
+	if CurrentlyEquipped then
+		local Part = Handle:Clone()
+		local GlassBreakSound = Sounds.GlassBreak:Clone()
+		GlassBreakSound.Parent = Part
+		Part.Transparency = 0
+		local Direction = Head.CFrame.lookVector
+		Part.Velocity = (Direction * 45) + Vector3.new(0, 45, 0)
+		Part.CanCollide = true
+		local GlassScriptClone = GlassScript:Clone()
+		GlassScriptClone.Disabled = false
+		GlassScriptClone.Parent = Part
+		Debris:AddItem(Part, 30)
+		Part.Parent = game:GetService("Workspace")
+	end
+	Debris:AddItem(Tool, 0)
+	
+end
+function CheckIfAlive()
+	return (((Player and Player.Parent and Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Head and Head.Parent) and true) or false)
+end
+function Equipped()
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Head = Character:FindFirstChild("Head")
+	if not CheckIfAlive() then
+		return
+	end
+	ToolEquipped = true
+end
+function Unequipped()
+	if ToolUnequipped then
+		ToolUnequipped:disconnect()
+	end
+	for i, v in pairs(Sounds) do
+		v:Stop()
+	end
+	ToolEquipped = false
+end
+Tool.Activated:connect(Activated)
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "GlassScript" then
+		source = [[--Rescripted by Luckymaxer
+Part = script.Parent
+Debris = game:GetService("Debris")
+Sounds = {
+	GlassBreak = Part:WaitForChild("GlassBreak")
+}
+function Touched(Part)
+	local PartTouched
+	PartTouched = Part.Touched:connect(function(Hit)
+		if not Hit or not Hit.Parent then
+			return
+		end
+		Sounds.GlassBreak:Play()
+		if PartTouched then
+			PartTouched:disconnect()
+		end
+	end)
+end
+Touched(Part)
+Debris:AddItem(Part, 30)]]
+	elseif v.Name == "FireScript" and v.Parent:FindFirstChild("ThumbnailPose") then
+		source = [[--Fixed by Luckymaxer
+local fire = script.Parent:FindFirstChild("Fire")
+local light = script.Parent:FindFirstChild("PointLight")
+function largestSide(length,width,height)
+	local large = 0
+	if length > width then
+		large = length
+	else
+		large = width
+	end
+	if large < height then
+		large = height
+	end
+	if large > 30 then
+		return 30
+	end
+	return large
+end
+local largestSize = largestSide(script.Parent.Size.x,script.Parent.Size.y,script.Parent.Size.z)
+local interval = largestSize/15
+while fire and light and fire.Size <= largestSize do
+	fire.Size = fire.Size + interval
+	light.Range=fire.Size*6
+	wait(1)
+	fire = script.Parent:FindFirstChild("Fire")
+	light = script.Parent:FindFirstChild("PointLight")
+end
+wait(3)
+fire = script.Parent:FindFirstChild("Fire")
+light = script.Parent:FindFirstChild("PointLight")
+while fire and light and fire.Size > 2 do
+	fire.Size = fire.Size - interval
+	light.Range=fire.Size*6
+	wait(1)
+	fire = script.Parent:FindFirstChild("Fire")
+	light = script.Parent:FindFirstChild("PointLight")
+end
+if fire and light then
+	fire.Enabled = false
+	light.Enabled=false
+end
+wait(1)
+script:remove()]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("FireScript") then
+		source = [[local Tool = script.Parent
+local debris = game:GetService("Debris")
+local player = nil
+Fire = Tool.Handle:WaitForChild("Fire")
+Tool.Handle:WaitForChild("PointLight")
+Tool.Handle:WaitForChild("Light")
+Tool:WaitForChild("FireScript")
+Fire.Enabled = false
+Tool.Equipped:connect(function()
+	player = Tool.Parent
+end)
+Tool.Handle.Touched:connect(function(part)
+	if Tool.Handle.Fire.Enabled == false then
+		return
+	end
+	local children = part:GetChildren()
+	for i = 1, #children do
+		if children[i].className == "Fire" then
+			return
+		end
+	end
+	if part.Parent == player then
+		return
+	end
+	if part.Material ==  Enum.Material.Wood then
+		local fire = Tool.Handle.Fire:clone()
+		fire.Parent = part
+		local light=Tool.Handle.PointLight:clone()
+		light.Parent=part
+		
+		local fireScript = Tool.FireScript:clone()
+		fireScript.Parent = part
+		fireScript.Disabled = false
+		debris:AddItem(fire,35)
+		debris:AddItem(light,35)
+	end
+end)
+Tool.Activated:connect(function()
+	Tool.Handle.Fire.Enabled = not Tool.Handle.Fire.Enabled
+	Tool.Handle.PointLight.Enabled = not Tool.Handle.PointLight.Enabled
+	Tool.Handle.Light:Play()
+end)]]
+	elseif v.Name == "MoneyBagScript" then
+		source = [[--Updated for R15 avatars by StarWars
+local Tool = script.Parent;
+debris = game:GetService("Debris")
+enabled = true
+local sounds = {Tool.Handle.MoneySound1, Tool.Handle.MoneySound2, Tool.Handle.MoneySound3}
+local buck = nil
+buck = Instance.new("Part")
+buck.formFactor = 2
+buck.Size = Vector3.new(2,.4,1)
+buck.BrickColor = BrickColor.new(28)
+buck.TopSurface = 0
+buck.BottomSurface = 0
+buck.Elasticity = .01 
+local d = Instance.new("Decal")
+d.Face = 4
+d.Texture = "http://www.roblox.com/asset/?id=16658163"
+d.Parent = buck
+local d2 = d:Clone()
+d2.Face = 1
+d2.Parent = buck
+function isTurbo(character)
+	return character:FindFirstChild("Monopoly") ~= nil
+end
+function MakeABuck(pos)
+	local limit = 5
+	if (isTurbo(Tool.Parent) == true) then
+		limit = 15 -- LOL!
+	end
+	for i=1,limit do
+		local b = buck:Clone()
+		local v = Vector3.new(math.random() - .5, math.random() - .5, math.random() - .5).unit
+		b.CFrame = CFrame.new(pos + (v * 2) + Vector3.new(0,4,0), v)
+		b.Parent = game.Workspace
+		debris:AddItem(b, 60)
+	end
+end
+function onActivated()
+	if not enabled  then
+		return
+	end
+	enabled = false
+	local char = Tool.Parent
+	sounds[math.random(3)]:Play()
+	MakeABuck(Tool.Handle.Position)
+	
+	local Torso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+	local RightArm = char:FindFirstChild("Right Arm") or char:FindFirstChild("RightUpperArm")
+	local RightShoulder = Torso:FindFirstChild("Right Shoulder") or RightArm:FindFirstChild("RightShoulder")
+	RightShoulder.MaxVelocity = 0.5
+	RightShoulder.DesiredAngle = 3
+	wait(.2)
+	RightShoulder.MaxVelocity = 0.5
+	RightShoulder.DesiredAngle = 3
+	wait(.2)
+	RightShoulder.MaxVelocity = 0.5
+	RightShoulder.DesiredAngle = 3
+	wait(.2)
+	RightShoulder.MaxVelocity = 0.5
+	RightShoulder.DesiredAngle = 3
+	wait(.2)
+	RightShoulder.MaxVelocity = 1
+--[[
+	Tool.GripForward = Vector3.new(0,-1,0)
+	Tool.GripPos = Vector3.new(0,0,2)
+	Tool.GripRight = Vector3.new(1,0,0)
+	Tool.GripUp = Vector3.new(0,0,-1)
+]
+		enabled = true
+	end
+	script.Parent.Activated:connect(onActivated)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("Handle"):FindFirstChild("Drop") then
+		source = [[--Made by Luckymaxer
+--Updated for R15 avatars by StarWars
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Mesh = Handle:WaitForChild("Mesh")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+RemoteControl = Tool:WaitForChild("RemoteControl")
+ServerControl = (RemoteControl:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = RemoteControl
+ClientControl = (RemoteControl:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = RemoteControl
+SkateboardModule = require(199238756)
+SkateboardFunctions = SkateboardModule.SkateboardFunctions
+Functions = SkateboardModule.Functions
+Skateboard = SkateboardFunctions.GetSkateboard("Segway")
+SkateboardFunctions.CreateConfiguration(Tool, Skateboard)
+SkateboardPlatform = SkateboardFunctions.GetSkateboardPlatform(Skateboard)
+Grips = {
+	Display = CFrame.new(1.5, 3.6, -1.5, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	Equipped = CFrame.new(0, -0.1, -0.2, 0, -1, 0, -1, -0, 0, 0, -0, -1),
+}
+Sounds = {
+	Drop = Handle:WaitForChild("Drop")
+}
+ToolEquipped = false
+ToolEnabled = true
+Tool.Grip = Grips.Equipped
+Tool.Enabled = true
+ServerControl.OnServerInvoke = (function(player, Mode, Value)
+end)
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+function DropSkateboard()
+	
+	local MousePosition = InvokeClient("MousePosition")
+	
+	local DesiredAngle = (math.acos((MousePosition - Handle.Position).unit:Dot(Torso.CFrame.lookVector)))
+	if DesiredAngle > (math.pi / 2) then --Prevents spawning behind character.
+		--return
+	end
+	
+	local SkateboardSize = Skateboard:GetModelSize()	
+	
+	local Direction = CFrame.new(Torso.Position, Vector3.new(MousePosition.X, Torso.Position.Y, MousePosition.Z))
+	local SkateboardCFrame = Direction + Direction.lookVector * (((Torso.Size.Z / 2) + (SkateboardSize.Z / 2)) * 1.5)
+	local SkateboardAngle = CFrame.Angles(0, 0, 0)
+	
+	local RayOffset = Vector3.new(-1.5, 0, -1.5)
+	
+	local RayPoints = { --Border points and center of skateboard used for casting rays.
+		Center = Functions.PositionPart(SkateboardCFrame, 0, 0, 0),
+		BackLeft = Functions.PositionPart(SkateboardCFrame, -((SkateboardSize.X / 2) + RayOffset.X), RayOffset.Y, -((SkateboardSize.Z / 2) + RayOffset.Z)),
+		BackRight = Functions.PositionPart(SkateboardCFrame, ((SkateboardSize.X / 2) + RayOffset.X), RayOffset.Y, -((SkateboardSize.Z / 2) + RayOffset.Z)),
+		FrontLeft = Functions.PositionPart(SkateboardCFrame, -((SkateboardSize.X / 2) + RayOffset.X), RayOffset.Y, ((SkateboardSize.Z / 2) + RayOffset.Z)),
+		FrontRight = Functions.PositionPart(SkateboardCFrame, ((SkateboardSize.X / 2) + RayOffset.X), RayOffset.Y, ((SkateboardSize.Z / 2) + RayOffset.Z)),
+	}
+	
+	local RayData = {
+		Area = { --Cast ray to determine if skateboard will spawn inside something.
+			Offset = Vector3.new(0, (SkateboardSize.Y / 2), 0),
+			Direction = Vector3.new(0, 1, 0),
+			Distance = SkateboardSize.Y
+		},
+		Ground = { --Cast ray to determine if the skateboard can spawn on the ground.
+			Direction = Vector3.new(0, -1, 0),
+			Distance = (SkateboardSize.Y * 4)
+		}
+	}
+	
+	local Ignore = {Character, Skateboard}
+	
+	local HighestGroundRayHit, HighestGroundRayPos --Get the highest point of elevation to spawn the skateboard.
+	for i, v in pairs(RayPoints) do
+		local GroundRayHit, GroundRayPos = Functions.RayCast(v.p, RayData.Ground.Direction, RayData.Ground.Distance, Ignore)
+		if not HighestGroundRayPos or GroundRayPos.Y > HighestGroundRayPos.Y then
+			HighestGroundRayHit, HighestGroundRayPos = GroundRayHit, GroundRayPos
+		end
+	end	
+	
+	local FullAreaIsEmpty = true --Ensure entire area is empty.
+	for i, v in pairs(RayPoints) do
+		local AreaIsEmpty = Functions.RegionEmpty((v.p - RayData.Area.Offset), {Min = Vector3.new(0, 0, 0), Max = (RayData.Area.Direction * RayData.Area.Distance)}, Ignore)
+		if not AreaIsEmpty then
+			FullAreaIsEmpty = false
+		end
+	end
+	
+	if not FullAreaIsEmpty or not HighestGroundRayHit then
+		return
+	end
+	
+	ToolEnabled = false
+	
+	local PosX, PosY, PosZ, R00, R01, R02, R10, R11, R12, R20, R21, R22 = SkateboardCFrame:components()
+	SkateboardCFrame = CFrame.new(PosX, (HighestGroundRayPos.Y + (SkateboardSize.Y / 2)), PosZ, R00, R01, R02, R10, R11, R12, R20, R21, R22)
+	
+	InvokeClient("PlaySound", Sounds.Drop)
+	
+	Tool.Parent = nil
+	
+	SkateboardFunctions.SpawnSkateboard(Skateboard, (SkateboardCFrame * SkateboardAngle))
+	Debris:AddItem(Tool, 0)	
+	Tool:Destroy()
+	
+end
+function CheckIfAlive()
+	return (((Player and Player.Parent and Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent) and true) or false)
+end
+function Activated()
+	if not ToolEquipped or not ToolEnabled or not CheckIfAlive() then
+		return
+	end
+	DropSkateboard()
+end
+function Equipped()
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("UpperTorso")
+	if not CheckIfAlive() then
+		return
+	end
+	ToolEquipped = true
+end
+function Unequipped()
+	ToolEquipped = false
+end
+Tool.Activated:connect(Activated)
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "SpeedBoostScript" then
+		source = [[--Made by Stickmasterluke
+sp = script.Parent
+speedboost = 1		--100% speed bonus
+speedforsmoke = 10	--smoke apears when character running >= 10 studs/second.
+local tooltag = script:WaitForChild("ToolTag",2)
+if tooltag~=nil then
+	local tool=tooltag.Value
+	local h=sp:FindFirstChild("Humanoid")
+	if h~=nil then
+		h.WalkSpeed=16+16*speedboost
+		local hrp = sp:FindFirstChild("HumanoidRootPart")
+		if hrp ~= nil then
+			smokepart=Instance.new("Part")
+			smokepart.FormFactor="Custom"
+			smokepart.Size=Vector3.new(0,0,0)
+			smokepart.TopSurface="Smooth"
+			smokepart.BottomSurface="Smooth"
+			smokepart.CanCollide=false
+			smokepart.Transparency=1
+			local weld=Instance.new("Weld")
+			weld.Name="SmokePartWeld"
+			weld.Part0 = hrp
+			weld.Part1=smokepart
+			weld.C0=CFrame.new(0,-3.5,0)*CFrame.Angles(math.pi/4,0,0)
+			weld.Parent=smokepart
+			smokepart.Parent=sp
+			smoke=Instance.new("Smoke")
+			smoke.Enabled = hrp.Velocity.magnitude>speedforsmoke
+			smoke.RiseVelocity=2
+			smoke.Opacity=.25
+			smoke.Size=.5
+			smoke.Parent=smokepart
+			h.Running:connect(function(speed)
+				if smoke and smoke~=nil then
+					smoke.Enabled=speed>speedforsmoke
+				end
+			end)
+		end
+	end
+	while tool~=nil and tool.Parent==sp and h~=nil do
+		sp.ChildRemoved:wait()
+	end
+	local h=sp:FindFirstChild("Humanoid")
+	if h~=nil then
+		h.WalkSpeed=16
+	end
+end
+if smokepart~=nil then
+	smokepart:Destroy()
+end
+script:Destroy()]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("SpeedBoostScript") then
+		source = [[--Made by Stickmasterluke
+sp = script.Parent
+local speedboostscript = sp:WaitForChild("SpeedBoostScript")
+function Equipped()
+	if sp.Parent:FindFirstChild("SpeedBoostScript") == nil then
+		local s = speedboostscript:clone()
+		local tooltag = Instance.new("ObjectValue")
+		tooltag.Name = "ToolTag"
+		tooltag.Value = sp
+		tooltag.Parent = s
+		s.Parent = sp.Parent
+		s.Disabled = false
+		local sound = sp.Handle:FindFirstChild("CoilSound")
+		if sound ~= nil then
+			sound:Play()
+		end
+	end
+end
+sp.Equipped:connect(Equipped)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("ClientInput") then
+		source = [[--Rescripted by TakeoHonorable
+local Tool = script.Parent
+local Rate=1/30
+local Debris = (game:FindService("Debris") or game:GetService("Debris"))
+local equipped=false
+local check=true
+local Cooldown=12
+local Range=100
+Tool.Grip = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+local Handle = Tool:WaitForChild("Handle")
+local Mesh = Handle:WaitForChild("Mesh")
+local Remote = Tool:WaitForChild("ClientInput")
+Remote.OnServerEvent:Connect(function(Player,MouseLoc)
+	if not check then return end
+	if not Player or not Player.Character then return end
+	local PlayerHumanoid = Player.Character:FindFirstChildOfClass("Humanoid")
+	if not PlayerHumanoid or PlayerHumanoid.Health == 0 then return end
+	local Center = Player.Character:FindFirstChild("HumanoidRootPart")
+	check = false
+	Handle.Transparency = 1
+	
+	if (Center.Position-MouseLoc).magnitude>Range then
+		MouseLoc = Center.Position+(((MouseLoc-Center.Position).unit)*Range)
+	end
+	
+	local cloud = Handle:Clone()
+	cloud.Size = Vector3.new(6,2,8)
+	cloud.CFrame = Handle.CFrame
+	cloud.Name = "EffectCloud"
+	cloud.Transparency = 0
+	cloud.CanCollide = false
+	cloud.Anchored = false
+	Debris:AddItem(cloud,30)
+	
+	local bp = Instance.new("BodyPosition")
+	bp.D = 2000
+	bp.P = 10000
+	bp.MaxForce = Vector3.new(1,1,1)*math.huge--(10^5)
+	bp.Position= MouseLoc + Vector3.new(0,20,0)
+	bp.Parent = cloud
+	cloud.CloudScript.Disabled = false
+	
+	local smoke = cloud:FindFirstChild("Smoke")
+	if smoke then
+		smoke.Enabled = true
+	end
+	cloud.Parent = workspace
+	cloud:SetNetworkOwner(Player)
+	wait(Cooldown)
+	Handle.Transparency=0
+	check=true
+end)]]
+	elseif v.Name == "CloudScript" then
+		source = [[--Made by Stickmasterluke
+sp=script.Parent
+rate=1/30
+local debris=game:GetService("Debris")
+local mesh=sp:WaitForChild("Mesh")
+function checkintangible(hit)
+	if hit then
+		if hit:IsDescendantOf(sp) or hit.Transparency>.8 or hit.Name=="Handle" or string.lower(string.sub(hit.Name,1,6))=="effect" or hit.Name=="Bullet" or hit.Name=="Laser" or string.lower(hit.Name)=="water" or hit.Name=="Rail" or hit.Name=="Arrow" then
+			return true
+		end
+	end
+	return false
+end
+function castray(startpos,vec,length,ignore)
+	local hit,endpos2=game.Workspace:FindPartOnRay(Ray.new(startpos,vec*length),ignore)
+	if hit~=nil then
+		if checkintangible(hit) then
+			hit,endpos2=castray(endpos2+(vec*.01),vec,length-((startpos-endpos2).magnitude),ignore)
+		end
+	end
+	return hit,endpos2
+end
+frames=math.floor(3/rate)
+for frame=1,frames do
+	wait(rate)
+	local percent=frame/frames
+	mesh.Scale=Vector3.new(3,3,3)+(Vector3.new(1,1,1)*8*percent)
+end
+	
+function grow(part,pos)
+	if part and pos then
+		local toobjectspace=part.CFrame:toObjectSpace(CFrame.new(pos+Vector3.new(0,-1,0))*CFrame.Angles(0,math.random()*math.pi*2,0))
+		wait(5)
+		spawn(function()
+			if part and toobjectspace then
+				local growrate=.1
+				local growheight=.5+math.random()
+				local p=Instance.new("Part")
+				p.Name="EffectFrondescence"
+				p.BrickColor=BrickColor.new("Bright green")
+				p.Anchored=false
+				p.CanCollide=false
+				p.TopSurface="Smooth"
+				p.BottomSurface="Smooth"
+				p.FormFactor="Custom"
+				p.Size=Vector3.new(.2,.2,.2)
+				local m=Instance.new("SpecialMesh")
+				if math.random()<=.5 then
+					m.Scale=Vector3.new(1,3,1)
+					m.MeshId="http://www.roblox.com/asset/?id=12212520"
+					m.TextureId="http://www.roblox.com/asset/?id=12212536"
+					m.VertexColor=Vector3.new(math.random(1,3)*.1,7.8,math.random(1,3)*.1)
+				else
+					growheight=1+(math.random()*.5)
+					if math.random()<=.618 then
+						m.MeshId="http://www.roblox.com/asset/?id=111797211"
+						local rc=math.random(1,3)
+						if rc==1 then
+							m.VertexColor=Vector3.new(1,1,1)
+						elseif rc==2 then
+							m.VertexColor=Vector3.new(1,1,0)
+						elseif rc==3 then
+							m.VertexColor=Vector3.new(0,1,1)
+						end
+					else
+						m.MeshId="http://www.roblox.com/asset/?id=111796999"
+					end
+					m.Scale=Vector3.new(.5,.5,.5)
+					m.TextureId="http://www.roblox.com/asset/?id=111796880"
+				end
+				m.Parent=p
+				local w=Instance.new("Motor")
+				w.Part0=part
+				w.Part1=p
+				w.C0=toobjectspace
+				w.Parent=p
+				debris:AddItem(w,15+(math.random()*10))
+				debris:AddItem(p,30)
+				p.Parent=workspace
+				local growframes=math.ceil(5/growrate)
+				for i=1,growframes do
+					if w then
+						wait(growrate)
+						w.C1=CFrame.new(0,-(i/growframes)*growheight,0)
+					end
+				end
+			end
+		end)
+	end
+end
+function raincast(fallrate)
+	local size=sp.Size
+	local rainstart=(sp.CFrame*CFrame.new(size*(-.5))*CFrame.new(size.x*math.random(),0,size.z*math.random())).p
+	local vec=Vector3.new(-1,-10,.5).unit
+	local hit,hitpos=castray(rainstart,vec,50,sp)
+	local hitpos=hitpos or vec*50
+	local dist=(rainstart-hitpos).magnitude
+	
+	local p=Instance.new("Part")
+	p.Name="EffectRain"
+	p.BrickColor=(math.random(1,2)==1 and BrickColor.new("Bright blue")) or BrickColor.new("Deep blue")
+	p.Anchored=true
+	p.CanCollide=false
+	p.FormFactor="Custom"
+	p.TopSurface="Smooth"
+	p.BottomSurface="Smooth"
+	p.Transparency=.5
+	local fallframes=math.ceil(dist/fallrate)
+	p.Size=Vector3.new(.2,.2,(dist/fallframes)*1.618)
+	debris:AddItem(p,3)
+	spawn(function()
+		if hit and math.random()<=.25 then
+			grow(hit,hitpos)
+		end	
+	end)
+	p.Parent=sp
+	for i=1,fallframes do
+		if p then
+			p.CFrame=CFrame.new(rainstart,hitpos)*CFrame.new(0,0,-dist*((i-.5)/fallframes))
+			wait()
+		end
+	end	
+	if p then
+		p:Destroy()
+	end
+end
+local sound=sp:FindFirstChild("Sound")
+if sound then
+	sound:Play()
+end
+rains=90
+for i=1,rains do
+	wait(math.random()*.1)
+	spawn(function()
+		--raincast(math.random(1,4)/2+((1-(i/rains))*2))
+		raincast(3+((1-(i/rains))*2))
+	end)
+end
+if sound then
+	sound:Stop()
+end
+wait(2)
+frames=math.floor(2/rate)
+for frame=1,frames do
+	wait(rate)
+	local percent=frame/frames
+	sp.Transparency=percent
+end
+wait(5)
+sp:Destroy()]]
+	elseif v.Name == "SelfDestruct" then
+		source = [[--Rescripted by Luckymaxer
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+Character = script.Parent
+Humanoid = Character:FindFirstChild("Humanoid")
+Torso = Character:FindFirstChild("Torso")
+Creator = Character:FindFirstChild("Creator")
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+function TagHumanoid(humanoid, player)
+	local CreatorTag = Instance.new("ObjectValue")
+	CreatorTag.Name = "creator"
+	CreatorTag.Value = player
+	Debris:AddItem(CreatorTag, 2)
+	CreatorTag.Parent = humanoid
+end
+function UntagHumanoid(humanoid)
+	for i, v in pairs(humanoid:GetChildren()) do
+		if v:IsA("ObjectValue") and v.Name == "creator" then
+			v:Destroy()
+		end
+	end
+end
+function GetCreator()
+	return (((Creator and Creator.Value and Creator.Value.Parent and Creator.Value:IsA("Player")) and Creator.Value) or nil)
+end
+function SelfDestruct()
+	if not Humanoid or not Torso then
+		return
+	end
+	local Explosion = Instance.new("Explosion")
+	Explosion.ExplosionType = Enum.ExplosionType.NoCraters
+	Explosion.BlastPressure = 15
+	Explosion.BlastRadius = 15
+	Explosion.DestroyJointRadiusPercent = 0
+	Explosion.Position = Torso.Position
+	Explosion.Hit:connect(function(Hit)
+		local CreatorPlayer = GetCreator()
+		local character = Hit.Parent
+		if character:IsA("Hat") or character:IsA("Tool") then
+			character = character.Parent
+		end
+		local humanoid = character:FindFirstChild("Humanoid")
+		local CanBreak = false
+		if humanoid then
+			local player = Players:GetPlayerFromCharacter(character)
+			if CreatorPlayer and (player ~= CreatorPlayer and IsTeamMate(CreatorPlayer, player)) then
+				return
+			end
+			for i, v in pairs(character:GetChildren()) do
+				if v:IsA("ForceField") then
+					return
+				end
+			end
+			UntagHumanoid(humanoid)
+			TagHumanoid(humanoid, CreatorPlayer)
+			CanBreak = true
+		else
+			CanBreak = true
+		end
+		Hit:BreakJoints()
+		Hit.Velocity = (CFrame.new(Explosion.Position, Hit.Position).lookVector * Explosion.BlastPressure)
+	end)
+	Explosion.Parent = game:GetService("Workspace")
+	Debris:AddItem(Character, 3)
+end
+if Humanoid then
+	Humanoid.Died:connect(SelfDestruct)
+end]]
+	elseif v:FindFirstChild("SelfDestruct") then
+		source = [[--Rescripted by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+NPCModule = require(191816425)
+SelfDestruct = script:WaitForChild("SelfDestruct")
+Animations = {
+	Drink = {Animation = Tool:WaitForChild("Drink"), FadeTime = nil, Weight = nil, Speed = nil},
+}
+Sounds = {
+	Drink = Handle:WaitForChild("Drink"),
+}
+ReloadTime = 30
+ToolEquipped = false
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Handle.Transparency = 0
+Tool.Enabled = true
+function CheckIfAlive()
+	return (((Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent and Player and Player.Parent) and true) or false)
+end
+function Equipped()
+	Character = Tool.Parent
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("Torso")
+	Player = Players:GetPlayerFromCharacter(Character)
+	if not CheckIfAlive() then
+		return
+	end
+	local Data = NPCModule.GetTable({Key = "MakeNPC", Player = Player})
+	if not Data then
+		return
+	end
+	NPCData = Data.GetData({Player = Player, Tool = Tool})
+	ToolEquipped = true
+end
+function Unequipped()
+	ToolEquipped = false
+end
+function CreateDecoy()
+	if not ToolEquipped or not CheckIfAlive() then
+		return
+	end
+	local CurrentlyEquipped = true
+	if ToolUnequipped then
+		ToolUnequipped:disconnect()
+	end
+	ToolUnequipped = Tool.Unequipped:connect(function()
+		CurrentlyEquipped = false
+	end)
+	Spawn(function()
+		InvokeClient("PlayAnimation", Animations.Drink)
+	end)
+	wait(0.75)
+	if ToolUnequipped then
+		ToolUnequipped:disconnect()
+	end
+	if not ToolEquipped or not CurrentlyEquipped or not CheckIfAlive() then
+		return
+	end
+	local Decoy = NPCData.MakeNPC({Appearance = Character})
+	local DecoyTorso = Decoy:FindFirstChild("Torso")
+	Decoy.Name = Player.Name
+	local Creator = Instance.new("ObjectValue")
+	Creator.Name = "Creator"
+	Creator.Value = Player
+	Creator.Parent = Decoy
+	local SelfDestructCopy = SelfDestruct:Clone()
+	SelfDestructCopy.Disabled = false
+	SelfDestructCopy.Parent = Decoy
+	Debris:AddItem(Decoy, math.random(60, 90))
+	Decoy.Parent = game:GetService("Workspace")
+	if DecoyTorso then
+		DecoyTorso.CFrame = (Torso.CFrame + Torso.CFrame.lookVector * 10)
+	end
+end
+function Activated()
+	if not ToolEquipped or not CheckIfAlive() or not Tool.Enabled then
+		return
+	end
+	Tool.Enabled = false
+	Sounds.Drink:Play()
+	CreateDecoy()
+	wait(ReloadTime)
+	Tool.Enabled = true
+end
+function OnServerInvoke(player, mode, value)
+	if player ~= Player or not ToolEquipped or not value or not CheckIfAlive() then
+		return
+	end
+end
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+ServerControl.OnServerInvoke = OnServerInvoke
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)
+Tool.Activated:connect(Activated)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("PlantAnim") then
+		source = [[--Rescripted by Luckymaxer
+--[[alexnewtron 2014]
+		Tool = script.Parent
+		Handle = Tool:WaitForChild("Handle")
+		Mesh = Handle:WaitForChild("Mesh")
+		Players = game:GetService("Players")
+		Debris = game:GetService("Debris")
+		Tween = script:WaitForChild("Tween")
+		Tween = require(Tween)
+		Easing = script:WaitForChild("Easing")
+		Easing = require(Easing)
+		Animations = {
+			PlantAnim = {Animation = Tool:WaitForChild("PlantAnim"), FadeTime = nil, Weight = nil, Speed = 0.5, Duration = nil}
+		}
+		Sounds = {
+			PlaceUmbrella = Handle:WaitForChild("PlaceUmbrella")
+		}
+		ReloadTime = 25
+		StandTime = (60 * 2)
+		ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+		ClientControl.Name = "ClientControl"
+		ClientControl.Parent = Tool
+		ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+		ServerControl.Name = "ServerControl"
+		ServerControl.Parent = Tool
+		Handle.Transparency = 0
+		Tool.Enabled = true
+		function InvokeClient(Mode, Value)
+			local ClientReturn = nil
+			pcall(function()
+				ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+			end)
+			return ClientReturn
+		end
+		function CheckIntangible(hit)
+			if hit and hit~=nil then
+				if hit:IsDescendantOf(Character) or hit.Transparency>.8 or hit.Name=="Handle" or string.lower(string.sub(hit.Name,1,6))=="effect" or hit.Name=="Bullet" or hit.Name=="Laser" or string.lower(hit.Name)=="water" or hit.Name=="Rail" or hit.Name=="Arrow" then
+					return true
+				end
+			end
+			return false
+		end
+		function CastRay(startpos,vec,length,ignore)
+			local hit,endpos2=game.Workspace:FindPartOnRayWithIgnoreList(Ray.new(startpos,vec*length),ignore)
+			if hit~=nil then
+				if CheckIntangible(hit) then
+					hit,endpos2=CastRay(endpos2+(vec*.01),vec,length-((startpos-endpos2).magnitude),ignore)
+				end
+			end
+			return hit,endpos2
+		end
+		function Activated()
+			if not CheckIfAlive() or not Tool.Enabled then
+				return
+			end
+			Tool.Enabled = false
+			local CurrentlyEquipped = true
+			if ToolUnequipped then
+				ToolUnequipped:disconnect()
+			end
+			ToolUnequipped = Tool.Unequipped:connect(function()
+				CurrentlyEquipped = false
+			end)
+			local MousePosition = InvokeClient("MousePosition")
+			local IgnoreTable = {}
+			for i, v in pairs(Players:GetChildren()) do
+				if v:IsA("Player") and v.Character then
+					table.insert(IgnoreTable, v.Character)
+				end
+			end
+			local RayHit, RayPos = CastRay(Torso.Position, (Vector3.new(0, -0.5, 0) + (MousePosition - Torso.Position).unit).unit, 15, IgnoreTable)
+			if RayHit then
+				InvokeClient("PlayAnimation", Animations.PlantAnim)
+				local Umbrella = Handle:clone()
+				Umbrella.Name = "Beach Umbrella"
+				Umbrella.Transparency = 1
+				Umbrella.Size = Vector3.new(1, 10, 1)
+				Umbrella.CanCollide = true
+				Umbrella.Velocity = Vector3.new(0,0,0)
+				Umbrella.RotVelocity = Vector3.new(0,0,0)
+				Umbrella:WaitForChild("Mesh").Scale = Vector3.new(3, 4, 3)
+				Umbrella.CFrame = CFrame.new(RayPos + Vector3.new(0, 5, 0)) * CFrame.Angles(0, (math.pi * 2 * math.random()), 0)
+				local w = Instance.new("Weld")
+				w.Part0 = RayHit
+				w.Part1 = Umbrella
+				w.C1 = Umbrella.CFrame:toObjectSpace(RayHit.CFrame)
+				w.Parent = Umbrella
+
+				local CreatorTag = Instance.new("ObjectValue")
+				CreatorTag.Value = Player
+				CreatorTag.Name = "creator"
+				CreatorTag.Parent = Umbrella
+
+				Debris:AddItem(Umbrella, StandTime)
+				Umbrella.Parent = game:GetService("Workspace")
+				Delay(1, function()
+					if not CurrentlyEquipped then
+						return
+					end
+					if Handle then
+						Handle.Transparency = 1
+					end
+					if Umbrella then
+						Umbrella.Transparency = 0
+						Delay(3, function()
+							if not CurrentlyEquipped then
+								return
+							end
+							if Umbrella then
+								Sounds.PlaceUmbrella:Play()
+								local lounge = Instance.new("Seat")
+								lounge.Friction = 1
+								lounge.Elasticity = 0
+								lounge.TopSurface = Enum.SurfaceType.Smooth
+								lounge.BottomSurface = Enum.SurfaceType.Smooth
+								lounge.FormFactor = Enum.FormFactor.Custom
+								local m = Instance.new("SpecialMesh")
+								m.MeshId = "http://www.roblox.com/asset/?id=162383507"
+								m.TextureId = "http://www.roblox.com/asset/?id=162383599"
+								m.Scale = Vector3.new(1.6,0.05,1.6)
+								m.Parent = lounge
+								lounge.Size = Vector3.new(3, 1, 5)
+								lounge.CFrame = Umbrella.CFrame * CFrame.new(3, -2, 3) * CFrame.Angles(0, 0.4, 0)
+								local bg = Instance.new("BodyGyro")
+								Debris:AddItem(bg, 3)
+								bg.Parent = lounge
+								Debris:AddItem(lounge, StandTime)
+								lounge.Parent = game:GetService("Workspace")
+								local a=Tween("forward")a.add(1,{x=0.05},Easing.inOutQuad)a.add(1,{x=1.6},Easing.inOutBack)for x=1,200 do local b=a.getCurrentProperties()m.Scale=Vector3.new(1.6,b.x,1.6)a.update(0.025)wait(0.025)if b.x>=1.6 then break end end
+								local c = Instance.new("Part")
+								c.TopSurface=Enum.SurfaceType.Smooth
+								c.BottomSurface=Enum.SurfaceType.Smooth
+								c.FormFactor=Enum.FormFactor.Custom
+								c.CanCollide = false
+								c.Size = Vector3.new(4.25,1.59,7.72)
+								c.Anchored = true							
+								local cm = Instance.new("SpecialMesh")
+								cm.MeshId = "http://www.roblox.com/asset/?id=162383569"
+								cm.TextureId = "http://www.roblox.com/asset/?id=162383633"
+								cm.Scale = Vector3.new(1, 0.05, 1)
+								cm.Parent = c
+								c.CFrame = Umbrella.CFrame * CFrame.new(-4, -4.1, 4) * CFrame.Angles(0, -0.4, 0)
+								Debris:AddItem(c, StandTime)
+								c.Parent=game:GetService("Workspace")
+								local a=Tween("forward")a.add(1,{x=0.05},Easing.inOutQuad)a.add(1,{x=1},Easing.inOutBack)for x=1,200 do local b=a.getCurrentProperties()cm.Scale=Vector3.new(1,b.x,1)a.update(0.025)wait(0.025)if b.x>=1 then break end end
+							end
+						end)
+					end
+				end)
+			end
+			wait(ReloadTime)
+			Handle.Transparency = 0
+			Tool.Enabled = true
+		end
+		function CheckIfAlive()
+			return (Player and Player.Parent and Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent)
+		end
+		function Equipped()
+			Character = Tool.Parent
+			Player = Players:GetPlayerFromCharacter(Character)
+			Humanoid = Character:FindFirstChild("Humanoid")
+			Torso = Character:FindFirstChild("Torso")
+			if not CheckIfAlive() then
+				return
+			end
+			if ToolUnequipped then
+				ToolUnequipped:disconnect()
+			end
+		end
+		function Unequipped()
+			for i, v in pairs(Animations) do
+				InvokeClient("StopAnimation", v)
+			end
+			if ToolUnequipped then
+				ToolUnequipped:disconnect()
+			end
+			Handle.Transparency = 0
+		end
+		Tool.Activated:connect(Activated)
+		Tool.Equipped:connect(Equipped)
+		Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("Handle"):FindFirstChild("RopeAttachment") then
+		source = [[--Rescripted by Luckymaxer
+--Updated for R15 avatars by StarWars
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Mesh = Handle:WaitForChild("Mesh")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+RbxUtility = LoadLibrary("RbxUtility")
+Create = RbxUtility.Create
+BaseUrl = "http://www.roblox.com/asset/?id="
+Meshes = {
+	GrappleWithHook = 33393806,
+	Grapple = 30308256,
+	Hook = 30307623,
+}
+Animations = {
+	Crouch = {Animation = Tool:WaitForChild("Crouch"), FadeTime = 0.25, Weight = nil, Speed = nil},
+	R15Crouch = {Animation = Tool:WaitForChild("R15Crouch"), FadeTime = 0.25, Weight = nil, Speed = nil}
+}
+Sounds = {
+	Fire = Handle:WaitForChild("Fire"),
+	Connect = Handle:WaitForChild("Connect"),
+	Hit = Handle:WaitForChild("Hit"),
+}
+for i, v in pairs(Meshes) do
+	Meshes[i] = (BaseUrl .. v)
+end
+local BaseRopeConstraint = Instance.new("RopeConstraint")
+BaseRopeConstraint.Thickness = 0.2
+BaseRopeConstraint.Restitution = 1
+BaseRopeConstraint.Color = BrickColor.new("Really black")
+BasePart = Create("Part"){
+	Material = Enum.Material.Plastic,
+	Shape = Enum.PartType.Block,
+	TopSurface = Enum.SurfaceType.Smooth,
+	BottomSurface = Enum.SurfaceType.Smooth,
+	Size = Vector3.new(0.2, 0.2, 0.2),
+	CanCollide = true,
+	Locked = true,
+}
+BaseRope = BasePart:Clone()
+BaseRope.Name = "Effect"
+BaseRope.BrickColor = BrickColor.new("Really black")
+BaseRope.Anchored = true
+BaseRope.CanCollide = false
+Create("CylinderMesh"){
+	Scale = Vector3.new(1, 1, 1),
+	Parent = BaseRope,
+}
+BaseGrappleHook = BasePart:Clone()
+BaseGrappleHook.Name = "Projectile"
+BaseGrappleHook.Transparency = 0
+BaseGrappleHook.Size = Vector3.new(1, 0.4, 1)
+BaseGrappleHook.Anchored = false
+BaseGrappleHook.CanCollide = true
+Create("SpecialMesh"){
+	MeshType = Enum.MeshType.FileMesh,
+	MeshId = (BaseUrl .. "30307623"),
+	TextureId = (BaseUrl .. "30307531"),
+	Scale = Mesh.Scale,
+	VertexColor = Vector3.new(1, 1, 1),
+	Offset = Vector3.new(0, 0, 0),
+	Parent = BaseGrappleHook,
+}
+local RopeAttachment = Instance.new("Attachment")
+RopeAttachment.Name = "RopeAttachment"
+RopeAttachment.Parent = BaseGrappleHook
+Create("BodyGyro"){
+	Parent = BaseGrappleHook,
+}
+for i, v in pairs({Sounds.Connect, Sounds.Hit}) do
+	local Sound = v:Clone()
+	Sound.Parent = BaseGrappleHook
+end
+Rate = (1 / 60)
+MaxDistance = 200
+CanFireWhileGrappling = true
+Crouching = false
+ToolEquipped = false
+ServerControl = (Tool:FindFirstChild("ServerControl") or Create("RemoteFunction"){
+	Name = "ServerControl",
+	Parent = Tool,
+})
+ClientControl = (Tool:FindFirstChild("ClientControl") or Create("RemoteFunction"){
+	Name = "ClientControl",
+	Parent = Tool,
+})
+for i, v in pairs(Tool:GetChildren()) do
+	if v:IsA("BasePart") and v ~= Handle then
+		v:Destroy()
+	end
+end
+Mesh.MeshId = Meshes.GrappleWithHook
+Handle.Transparency = 0
+Tool.Enabled = true
+function CheckTableForString(Table, String)
+	for i, v in pairs(Table) do
+		if string.find(string.lower(String), string.lower(v)) then
+			return true
+		end
+	end
+	return false
+end
+function CheckIntangible(Hit)
+	local ProjectileNames = {"Water", "Arrow", "Projectile", "Effect", "Rail", "Laser", "Bullet", "GrappleHook"}
+	if Hit and Hit.Parent then
+		if ((not Hit.CanCollide or CheckTableForString(ProjectileNames, Hit.Name)) and not Hit.Parent:FindFirstChild("Humanoid")) then
+			return true
+		end
+	end
+	return false
+end
+function CastRay(StartPos, Vec, Length, Ignore, DelayIfHit)
+	local Ignore = ((type(Ignore) == "table" and Ignore) or {Ignore})
+	local RayHit, RayPos, RayNormal = game:GetService("Workspace"):FindPartOnRayWithIgnoreList(Ray.new(StartPos, Vec * Length), Ignore)
+	if RayHit and CheckIntangible(RayHit) then
+		if DelayIfHit then
+			wait()
+		end
+		RayHit, RayPos, RayNormal = CastRay((RayPos + (Vec * 0.01)), Vec, (Length - ((StartPos - RayPos).magnitude)), Ignore, DelayIfHit)
+	end
+	return RayHit, RayPos, RayNormal
+end
+function AdjustRope()
+	if not Rope or not Rope.Parent or not CheckIfGrappleHookAlive() then
+		return
+	end
+	local StartPosition = Handle.RopeAttachment.WorldPosition
+	local EndPosition = GrappleHook.RopeAttachment.WorldPosition
+	local RopeLength = (StartPosition - EndPosition).Magnitude
+	
+	Rope.Size = Vector3.new(1, 1, 1)
+	Rope.Mesh.Scale = Vector3.new(0.1, RopeLength, 0.1)
+	Rope.CFrame = (CFrame.new(((StartPosition + EndPosition) / 2), EndPosition) * CFrame.Angles(-(math.pi / 2), 0, 0))
+end
+function DisconnectGrappleHook(KeepBodyObjects)
+	for i, v in pairs({Rope, GrappleHook, GrappleHookChanged}) do
+		if v then
+			if tostring(v) == "Connection" then
+				v:disconnect()
+			elseif type(v) == "userdata" and v.Parent then
+				v:Destroy()
+			end
+		end
+	end
+	if CheckIfAlive() and not KeepBodyObjects then
+		for i, v in pairs(Torso:GetChildren()) do
+			if string.find(string.lower(v.ClassName), string.lower("Body")) then
+				v:Destroy()
+			end
+		end	
+	end
+	Connected = false
+	Mesh.MeshId = Meshes.GrappleWithHook
+end
+function TryToConnect()
+	if not ToolEquipped or not CheckIfAlive() or not CheckIfGrappleHookAlive() or Connected then
+		DisconnectGrappleHook()
+		return
+	end
+	local DistanceApart = (Torso.Position - GrappleHook.Position).Magnitude
+	if DistanceApart > MaxDistance then
+		DisconnectGrappleHook()
+		return
+	end
+	local Directions = {Vector3.new(0, 1, 0), Vector3.new(0, -1, 0), Vector3.new(1, 0, 0), Vector3.new(-1, 0, 0), Vector3.new(0, 0, 1), Vector3.new(0, 0, -1)}
+	local ClosestRay = {DistanceApart = math.huge}
+	for i, v in pairs(Directions) do
+		local Direction = CFrame.new(GrappleHook.Position, (GrappleHook.CFrame + v * 2).p).lookVector
+		local RayHit, RayPos, RayNormal = CastRay((GrappleHook.Position + Vector3.new(0, 0, 0)), Direction, 2, {Character, GrappleHook, Rope}, false)
+		if RayHit then
+			local DistanceApart = (GrappleHook.Position - RayPos).Magnitude
+			if DistanceApart < ClosestRay.DistanceApart then
+				ClosestRay = {Hit = RayHit, Pos = RayPos, Normal = RayNormal, DistanceApart = DistanceApart}
+			end
+		end
+	end
+	if ClosestRay.Hit then
+		Connected = true
+		local GrappleCFrame = CFrame.new(ClosestRay.Pos, (CFrame.new(ClosestRay.Pos) + ClosestRay.Normal * 2).p) * CFrame.Angles((math.pi / 2), 0, 0)
+		GrappleCFrame = (GrappleCFrame * CFrame.new(0, -(GrappleHook.Size.Y / 1.5), 0))
+		GrappleCFrame = (CFrame.new(GrappleCFrame.p, Handle.Position) * CFrame.Angles(0, math.pi, 0))
+		local Weld = Create("Motor6D"){
+			Part0 = GrappleHook,
+			Part1 = ClosestRay.Hit,
+			C0 = GrappleCFrame:inverse(),
+			C1 = ClosestRay.Hit.CFrame:inverse(),
+			Parent = GrappleHook,
+		}
+		for i, v in pairs(GrappleHook:GetChildren()) do
+			if string.find(string.lower(v.ClassName), string.lower("Body")) then
+				v:Destroy()
+			end
+		end	
+		local HitSound = GrappleHook:FindFirstChild("Hit")
+		if HitSound then
+			HitSound:Play()
+		end
+		local BackUpGrappleHook = GrappleHook
+		wait(0.4)
+		if not CheckIfGrappleHookAlive() or GrappleHook ~= BackUpGrappleHook then
+			return
+		end
+		Sounds.Connect:Play()
+		local ConnectSound = GrappleHook:FindFirstChild("Connect")
+		if ConnectSound then
+			ConnectSound:Play()
+		end
+		
+		for i, v in pairs(Torso:GetChildren()) do
+			if string.find(string.lower(v.ClassName), string.lower("Body")) then
+				v:Destroy()
+			end
+		end	
+		
+		local TargetPosition = GrappleHook.Position
+		local BackUpPosition = TargetPosition
+		
+		local BodyPos = Create("BodyPosition"){
+			D = 1000,
+			P = 3000,
+			maxForce = Vector3.new(1000000, 1000000, 1000000),
+			position = TargetPosition,
+			Parent = Torso,
+		}
+		
+		local BodyGyro = Create("BodyGyro"){
+			maxTorque = Vector3.new(100000, 100000, 100000),
+			cframe = CFrame.new(Torso.Position, Vector3.new(GrappleCFrame.p.X, Torso.Position.Y, GrappleCFrame.p.Z)),
+			Parent = Torso,
+		}
+	
+		Spawn(function()
+			while TargetPosition == BackUpPosition and CheckIfGrappleHookAlive() and Connected and ToolEquipped and CheckIfAlive() do
+				BodyPos.position = GrappleHook.Position
+				wait()
+			end
+		end)
+		
+	end
+end
+function CheckIfGrappleHookAlive()
+	return (((GrappleHook and GrappleHook.Parent --[[and Rope and Rope.Parent]) and true) or false)
+		end
+		function CheckIfAlive()
+	return (((Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent and Player and Player.Parent) and true) or false)
+end
+function Activated()
+	if not Tool.Enabled or not ToolEquipped or not CheckIfAlive() then
+		return
+	end
+	local MousePosition = InvokeClient("MousePosition")
+	if not MousePosition then
+		return
+	end
+	MousePosition = MousePosition.Position
+	if CheckIfGrappleHookAlive() then
+		if not CanFireWhileGrappling then
+			return
+		end
+		if GrappleHookChanged then
+			GrappleHookChanged:disconnect()
+		end
+		DisconnectGrappleHook(true)
+	end
+	if GrappleHookChanged then
+		GrappleHookChanged:disconnect()
+	end
+	Tool.Enabled = false
+	Sounds.Fire:Play()
+	Mesh.MeshId = Meshes.Grapple
+	GrappleHook = BaseGrappleHook:Clone()
+	GrappleHook.CFrame = (CFrame.new((Handle.Position + (MousePosition - Handle.Position).Unit * 5), MousePosition) * CFrame.Angles(0, 0, 0))
+	local Weight = 70
+	GrappleHook.Velocity = (GrappleHook.CFrame.lookVector * Weight)
+	local Force = Create("BodyForce"){
+		force = Vector3.new(0, workspace.Gravity * 0.98 * GrappleHook:GetMass(), 0),
+		Parent = GrappleHook,
+	}
+	GrappleHook.Parent = Tool
+	GrappleHookChanged = GrappleHook.Changed:connect(function(Property)
+		if Property == "Parent" then
+			DisconnectGrappleHook()
+		end
+	end)
+	Rope = BaseRope:Clone()
+	Rope.Parent = Tool
+	Spawn(function()
+		while CheckIfGrappleHookAlive() and ToolEquipped and CheckIfAlive() do
+			AdjustRope()
+			Spawn(function()
+				if not Connected then
+					TryToConnect()
+				end
+			end)
+			wait()
+		end
+	end)
+	wait(2)
+	Tool.Enabled = true
+end
+function Equipped(Mouse)
+	Character = Tool.Parent
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("UpperTorso")
+	Player = Players:GetPlayerFromCharacter(Character)
+	if not CheckIfAlive() then
+		return
+	end
+	Spawn(function()
+		DisconnectGrappleHook()
+		if HumanoidJumping then
+			HumanoidJumping:disconnect()
+		end
+		HumanoidJumping = Humanoid.Jumping:connect(function()
+			DisconnectGrappleHook()
+		end)
+	end)
+	Crouching = false
+	ToolEquipped = true
+end
+function Unequipped()
+	if HumanoidJumping then
+		HumanoidJumping:disconnect()
+	end
+	DisconnectGrappleHook()
+	Crouching = false
+	ToolEquipped = false
+end
+function OnServerInvoke(player, mode, value)
+	if player ~= Player or not ToolEquipped or not value or not CheckIfAlive() then
+		return
+	end
+	if mode == "KeyPress" then
+		local Key = value.Key
+		local Down = value.Down
+		if Key == "q" and Down then
+			DisconnectGrappleHook()
+		elseif Key == "c" and Down then
+			Crouching = not Crouching
+			Spawn(function()
+				local Animation = Animations.Crouch
+				if Humanoid and Humanoid.RigType == Enum.HumanoidRigType.R15 then
+					Animation = Animations.R15Crouch
+				end 
+				InvokeClient(((Crouching and "PlayAnimation") or "StopAnimation"), Animation)
+			end)
+		end
+	end
+end
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+ServerControl.OnServerInvoke = OnServerInvoke
+Tool.Activated:connect(Activated)
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("ArmMesh") then
+		source = [[local Tool = script.Parent
+local Remote = Tool:WaitForChild("Remote")
+local Handle = Tool:WaitForChild("Handle")
+local FriendlyFire = false
+local ArmMesh
+local HitAble = false
+local HitWindup = 0.15
+local HitWindow = 0.75
+local HitDamage = 15
+local HitVictims = {}
+local SwingAble = true
+local SwingRestTime = 1
+--returns the wielding player of this tool
+function getPlayer()
+	local char = Tool.Parent
+	return game:GetService("Players"):GetPlayerFromCharacter(char)
+end
+--helpfully checks a table for a specific value
+function contains(t, v)
+	for _, val in pairs(t) do
+		if val == v then
+			return true
+		end
+	end
+	return false
+end
+--tags a human for the ROBLOX KO system
+function tagHuman(human)
+	local tag = Instance.new("ObjectValue")
+	tag.Value = getPlayer()
+	tag.Name = "creator"
+	tag.Parent = human
+	game:GetService("Debris"):AddItem(tag)
+end
+--used by checkTeams
+function sameTeam(otherHuman)
+	local player = getPlayer()
+	local otherPlayer = game:GetService("Players"):GetPlayerFromCharacter(otherHuman.Parent)
+	if player and otherPlayer then
+		if player == otherPlayer then
+			return true
+		end
+		if otherPlayer.Neutral then
+			return false
+		end
+		return player.TeamColor == otherPlayer.TeamColor
+	end
+	return false
+end
+--use this to determine if you want this human to be harmed or not, returns boolean
+function checkTeams(otherHuman)
+	return not (sameTeam(otherHuman) and not FriendlyFire)
+end
+function onTouched(part)
+	if part:IsDescendantOf(Tool.Parent) then return end
+	if not HitAble then return end
+	
+	if part.Parent and part.Parent:FindFirstChild("Humanoid") then
+		local human = part.Parent.Humanoid
+		
+		if contains(HitVictims, human) then return end
+		
+		local root = part.Parent:FindFirstChild("HumanoidRootPart")
+		if root and not root.Anchored then
+			local myRoot = Tool.Parent:FindFirstChild("HumanoidRootPart")
+			if myRoot and checkTeams(human) then
+				local delta = root.Position - myRoot.Position
+				
+				human.Sit = true
+				tagHuman(human)
+				human:TakeDamage(HitDamage)
+				table.insert(HitVictims, human)
+				
+				local bv = Instance.new("BodyVelocity")
+				bv.maxForce = Vector3.new(1e9, 1e9, 1e9)
+				bv.velocity = delta.unit * 128
+				bv.Parent = root
+				game:GetService("Debris"):AddItem(bv, 0.05)
+				
+				Handle.Smack.Pitch = math.random(90, 110)/100
+				Handle.Smack.TimePosition = 0.15
+				Handle.Smack:Play()
+			end
+		end
+	end
+end
+function onEquip()
+	--put in our right arm
+	local char = Tool.Parent
+	local arm = Tool.ArmMesh:Clone()
+	arm.Parent = char:FindFirstChild("Right Arm")
+	ArmMesh = arm
+end
+function onUnequip()
+	if ArmMesh then
+		ArmMesh:Destroy()
+		ArmMesh = nil
+	end
+end
+function onLeftDown()
+	if not SwingAble then return end
+	
+	SwingAble = false
+	delay(SwingRestTime, function()
+		SwingAble = true
+	end)
+	
+	delay(HitWindup, function()
+		HitAble = true
+		delay(HitWindow, function()
+			HitAble = false
+		end)
+	end)
+	
+	HitVictims = {}
+	
+	Remote:FireClient(getPlayer(), "PlayAnimation", "Swing")
+	
+	wait(0.25)
+	Handle.Boom.Pitch = math.random(80, 100)/100
+	Handle.Boom:Play()
+end
+function onRemote(player, func, ...)
+	if player ~= getPlayer() then return end
+	
+	if func == "LeftDown" then
+		onLeftDown(...)
+	end
+end
+Tool.Equipped:connect(onEquip)
+Tool.Unequipped:connect(onUnequip)
+Handle.Touched:connect(onTouched)
+Remote.OnServerEvent:connect(onRemote)]]
+	elseif v.Name == "BalloonScript" then
+		source = [[local Tool = script.Parent
+local upAndAway = false
+local humanoid = nil
+local head = nil
+local upAndAwayForce = Instance.new("BodyForce")
+local equalizingForce = 236 / 1.2 -- amount of force required to levitate a mass
+local gravity = 1.05 -- things float at > 1
+local height = nil
+local maxRise =  150
+function onTouched(part)
+	local h = part.Parent:FindFirstChild("Humanoid")
+	if h ~= nil then
+		upAndAway = true
+		Tool.Handle.Anchored = false
+	end
+end
+function onEquipped()
+	Tool.Handle.Mesh.MeshId = "http://www.roblox.com/asset/?id=146063878"
+	Tool.Handle.Mesh.TextureId="http://www.roblox.com/asset/?id=146063910"
+	upAndAway = true
+	upAndAwayForce.Parent = Tool.Handle
+	Tool.GripPos = Vector3.new(0,-1,0)
+	Tool.GripForward = Vector3.new(0,1,0)
+	Tool.GripRight = Vector3.new(0,0,-1)
+	Tool.GripUp = Vector3.new(1,0,0)
+	height = Tool.Parent.Torso.Position.y
+	local lift = recursiveGetLift(Tool.Parent)
+	float(lift)
+end
+function onUnequipped()
+	upAndAway = false
+	Tool.GripForward = Vector3.new(1,0,0)
+	Tool.GripRight = Vector3.new(0,0,1)
+	Tool.GripUp = Vector3.new(0,1,0)
+	Tool.Handle.Mesh.Scale = Vector3.new(2,2,2)
+end
+Tool.Unequipped:connect(onUnequipped)
+Tool.Equipped:connect(onEquipped)
+Tool.Handle.Touched:connect(onTouched)
+function recursiveGetLift(node)
+	local m = 0
+	local c = node:GetChildren()
+	if (node:FindFirstChild("Head") ~= nil) then head = node:FindFirstChild("Head") end -- nasty hack to detect when your parts get blown off
+	for i=1,#c do
+		if c[i].className == "Part" then	
+			if (head ~= nil and (c[i].Position - head.Position).magnitude < 10) then -- GROSS
+				if c[i].Name == "Handle" then
+					m = m + (c[i]:GetMass() * equalizingForce * 1) -- hack that makes hats weightless, so different hats don't change your jump height
+				else
+					m = m + (c[i]:GetMass() * equalizingForce * gravity)
+				end
+			end
+		end
+		m = m + recursiveGetLift(c[i])
+	end
+	return m
+end
+function updateBalloonSize()
+	local range = (height + maxRise) - Tool.Handle.Position.y
+	print(range)
+	
+	if range > 100 then
+		Tool.Handle.Mesh.Scale = Vector3.new(2,2,2)
+	elseif range < 100 and range > 50 then
+		Tool.Handle.Mesh.Scale = Vector3.new(3,3,3)
+	elseif range < 50 then
+		Tool.Handle.Mesh.Scale = Vector3.new(4,4,4)
+	end
+end
+function float(lift)
+	while upAndAway do
+		upAndAwayForce.force = Vector3.new(0,lift * 0.98,0)
+		upAndAwayForce.Parent = Tool.Handle
+		wait(3)
+		upAndAwayForce.force = Vector3.new(0,lift * 0.92,0)
+		wait(2)
+		if Tool.Handle.Position.y > height + maxRise then
+			upAndAway = false
+			Tool.Handle.Pop:Play()
+			Tool.GripPos = Vector3.new(0,-0.4,0)
+			Tool.Handle.Mesh.MeshId = "http://www.roblox.com/asset/?id=26725510"
+			Tool.Handle.Mesh.TextureId=""
+			Tool.Handle.Mesh.Scale=Vector3.new(2.5,2.5,2.5)
+			upAndAwayForce.Parent = nil
+		end
+		updateBalloonSize()
+	end
+end]]
+	elseif v.Name == "WeldArm" then
+		source = [[Tool = script.Parent;
+local arms = nil
+local torso = nil
+local welds = {}
+function Equip(mouse)
+wait(0.01)
+arms = {Tool.Parent:FindFirstChild("Left Arm"), Tool.Parent:FindFirstChild("Right Arm")}
+torso = Tool.Parent:FindFirstChild("Torso")
+if arms ~= nil and torso ~= nil then
+local sh = {torso:FindFirstChild("Left Shoulder"), torso:FindFirstChild("Right Shoulder")}
+if sh ~= nil then
+local yes = true
+if yes then
+yes = false
+sh[1].Part1 = nil
+sh[2].Part1 = nil
+local weld1 = Instance.new("Weld")
+weld1.Part0 = torso
+weld1.Parent = torso
+weld1.Part1 = arms[1]
+weld1.C1 = CFrame.new(1.5,0, 0) 
+welds[1] = weld1
+local weld2 = Instance.new("Weld")
+weld2.Part0 = torso
+weld2.Parent = torso
+weld2.Part1 = arms[2]
+weld2.C1 = CFrame.new(-1.5,1.5,0) * CFrame.fromEulerAnglesXYZ(math.pi, 0, 0)
+welds[2] = weld2
+end
+else
+print("sh")
+end
+else
+print("arms")
+end
+end
+function Unequip(mouse)
+if arms ~= nil and torso ~= nil then
+local sh = {torso:FindFirstChild("Left Shoulder"), torso:FindFirstChild("Right Shoulder")}
+if sh ~= nil then
+local yes = true
+if yes then
+yes = false
+sh[1].Part1 = arms[1]
+sh[2].Part1 = arms[2]
+welds[1].Parent = nil
+welds[2].Parent = nil
+end
+else
+print("sh")
+end
+else
+print("arms")
+end
+end
+Tool.Equipped:connect(Equip)
+Tool.Unequipped:connect(Unequip)]]
+	elseif v.Parent:FindFirstChild("LocalScript"):FindFirstChild("PaletteGui") then
+		source = [[-- // Recreated by StarWars
+local Tool = script.Parent
+local GearService = require(1075123174)
+local Gear = GearService:BindGear(Tool)
+Gear:SetupRemoteFunctions()
+local Remotes = Tool:WaitForChild("Remotes")
+local ClientControls = Remotes:WaitForChild("ClientControls") 
+local ServerControls = Remotes:WaitForChild("ServerControls")
+ServerControls.OnServerInvoke = function(player, mode, value)
+	if player ~= Gear.Player then return end 
+	if not mode then return end
+	
+	if mode == "PaintPart" and value then
+		if value.Part and value.Color then
+			value.Part.Color = value.Color
+		end
+	end
+end]]
+	elseif v.Name == "PinataScript" then
+		source = [[local pinata = script.Parent
+local theWholeThing = pinata.Parent
+local health = 100
+local gears = {29100543, 10472779, 34399428, 20056642, 25695001, 16214845, 20056642, 12848902} --Fix implemented by Luckymaxer
+local debris = game:GetService("Debris")
+local scale = 1
+local increment = 0.1
+while scale < 1.6 do
+	pinata.Mesh.Scale = Vector3.new(scale,scale,scale)
+	scale = scale + increment
+	wait()
+end
+function pinataPieces()
+	for i = 1, 20 do
+		local pinataPart = Instance.new("Part")
+		pinataPart.Name = "Pinata Piece"
+		pinataPart.formFactor  = 2
+		pinataPart.Size = Vector3.new(1,0.4,1)
+		local color = math.random(1,3)
+		if color == 1 then pinataPart.BrickColor = BrickColor.new("Bright red")
+		elseif color == 2 then pinataPart.BrickColor = BrickColor.new("Bright yellow")
+		else pinataPart.BrickColor = BrickColor.new("Bright orange") end
+		pinataPart.BottomSurface = 0
+		pinataPart.TopSurface = 0
+		pinataPart.Material = Enum.Material.Grass
+		pinataPart.Position = Vector3.new(pinata.Position.x + math.random(-1,1),pinata.Position.y + math.random(-1,1),pinata.Position.z + math.random(-1,1))
+		pinataPart.Parent = game.Workspace
+		debris:AddItem(pinataPart,4)
+	end
+end
+local breaking = false
+function checkHealth()
+	print(health)
+	-- time to break out some gear!
+	if health <= 0 then
+		if breaking then return end
+		breaking = true
+		local gearInstances = {}
+		for i = 1, #gears do
+			--This call will cause a "wait" until the data comes back
+			local root = game:GetService("InsertService"):LoadAsset(gears[i])
+			local instances = root:GetChildren()
+			if #instances == 0 then
+				root:Remove()
+				return
+			end
+			root = root:GetChildren()
+			root[1].Handle.Position = Vector3.new(pinata.Position.x + math.random(-1,1),pinata.Position.y + math.random(-1,1),pinata.Position.z + math.random(-1,1))
+			table.insert(gearInstances,root[1])
+		end
+		pinata.Transparency = 1
+		pinata.CanCollide = false
+		local co = coroutine.create(pinataPieces)
+		coroutine.resume(co)
+		for i = 1, #gearInstances do
+			gearInstances[i].Parent = game.Workspace
+		end
+		
+		pinata.BrokenSound:Play()
+		theWholeThing:remove()
+		breaking = false
+	end
+end
+local touching = false
+function onTouched(part)
+	if touching then return end
+	touching = true
+	
+	if part.CanCollide then
+		health = health - part.Velocity.magnitude/50
+		checkHealth()
+		wait(0.1)
+	end
+	touching = false
+end
+pinata.Touched:connect(onTouched)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("PinataScript") then
+		source = [[local Tool = script.Parent
+local torso = nil
+function onEquipped()
+	torso = Tool.Parent:FindFirstChild("Torso") or Tool.Parent:FindFirstChild("UpperTorso")
+end
+Tool.Equipped:connect(onEquipped)
+function onUnequipped()
+	if Tool.Handle.Transparency == 1 then
+		Tool.Parent = game.Players:GetPlayerFromCharacter(torso.Parent).Backpack
+	end
+end
+Tool.Unequipped:connect(onUnequipped)
+function pinataExists()
+	return game.Workspace:FindFirstChild(torso.Parent.Name .. "'s Pinata")
+end
+local enabled = false
+function onActivated()
+	if pinataExists() == nil then
+		enabled = false
+	end
+	if enabled then return end
+	enabled = true
+	local pinata = Tool.Handle:clone()
+	pinata.Name = "Head"
+	pinata.CanCollide = true
+	pinata.Size = Vector3.new(3,3,1)
+	pinata.Position = Vector3.new(torso.Position.x + (torso.CFrame.lookVector.unit.x * 8),torso.Position.y,torso.Position.z + (torso.CFrame.lookVector.unit.z * 8))
+	local model = Instance.new("Model")
+	model.Name = torso.Parent.Name .. "'s Pinata"
+	pinata.Parent = model
+	model.Parent = game.Workspace
+	local sound = Instance.new("Sound")
+	sound.Name = "BrokenSound"
+	sound.SoundId = "http://www.roblox.com/asset/?id=34300463"
+	sound.Parent = pinata
+	local humanoid = Instance.new("Humanoid")
+	humanoid.MaxHealth = 0
+	humanoid.Parent = model
+	Tool.Handle.Transparency = 1
+	
+	local script = Tool.PinataScript:clone()
+	script.Parent = pinata
+	script.Disabled = false
+	
+	local bodyPos = Instance.new("BodyPosition")
+	bodyPos.position = Vector3.new(pinata.Position.x,torso.Position.y + 5, pinata.Position.z)
+	bodyPos.P = 8000
+	bodyPos.D = bodyPos.P
+	bodyPos.maxForce = Vector3.new(bodyPos.P,bodyPos.P,bodyPos.P)
+	bodyPos.Parent = pinata
+	local bodyGyro = Instance.new("BodyGyro")
+	bodyGyro.P = 50
+	bodyGyro.D = bodyGyro.P
+	bodyGyro.maxTorque = Vector3.new(bodyGyro.P,0,0)
+	bodyGyro.cframe = pinata.CFrame
+	bodyGyro.Parent = pinata
+	Tool:Destroy()
+	checkForTransparency()
+end
+Tool.Activated:connect(onActivated)
+function checkForTransparency()
+	while pinataExists() do wait(0.5) end
+	Tool.Handle.Transparency = 0
+end]]
+	elseif v:FindFirstChild("Airstrike") then
+		source = [[--Rescripted by StarWars
+local Tool = script.Parent
+local Airstrike = require(script.Airstrike)
+local COOL_DOWN = 20
+local LastStrike = 0
+local OnMouseClickEvent = Instance.new("RemoteEvent")
+OnMouseClickEvent.Name = "OnMouseClick"
+OnMouseClickEvent.OnServerEvent:connect(function(player, location)
+	if tick() - LastStrike > COOL_DOWN then
+		LastStrike = tick()
+		Airstrike:Spawn(player, location)
+	end
+end)
+OnMouseClickEvent.Parent = Tool]]
+	elseif v.Name == "Script" and v:FindFirstChild("SpeedEffect") then
+		source = [[--Rescripted by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+BaseUrl = "http://www.roblox.com/asset/?id="
+Sounds = {
+	Drink = Handle:WaitForChild("Drink"),
+}
+Grips = {
+	Normal = CFrame.new(0.200000003, -0.100000001, 0, 0.217036337, 0, 0.976163626, 0, 1, -0, -0.976163507, 0, 0.217036366),
+	Active = CFrame.new(1.39999998, -0.400000006, 0.300000012, 0.995685041, 0.0927979201, -9.8362565e-005, -0.0508967601, 0.546987712, 0.835591972, 0.0775950029, -0.831981361, 0.54935056),
+}
+SpeedEffect = script:WaitForChild("SpeedEffect")
+ToolEquipped = false
+Handle.Transparency = 0
+Tool.Enabled = true
+function CheckIfAlive()
+	return (((Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Player and Player.Parent) and true) or false)
+end
+function Activated()
+	if not ToolEquipped or not CheckIfAlive() or not Tool.Enabled then
+		return
+	end
+	Tool.Enabled = false
+	Tool.Grip = Grips.Active
+	Sounds.Drink:Play()
+	wait(3)
+	if CheckIfAlive() then
+		local EffectCopy = Character:FindFirstChild(SpeedEffect.Name)
+		if not EffectCopy then
+			EffectCopy = SpeedEffect:Clone()
+			EffectCopy.Disabled = false
+			EffectCopy.Parent = Character
+		end
+	end
+	Tool.Grip = Grips.Normal
+	wait(60)
+	Tool.Enabled = true
+end
+function Equipped()
+	Character = Tool.Parent
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Player = Players:GetPlayerFromCharacter(Character)
+	if not CheckIfAlive() then
+		return
+	end
+	ToolEquipped = true
+end
+function Unequipped()
+	ToolEquipped = false
+end
+Tool.Activated:connect(Activated)
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "SpeedEffect" and v:FindFirstChild("Explosion") then
+		source = [[--Rescripted by Luckymaxer
+--Updated for R15 avatars by StarWars
+Character = script.Parent
+Humanoid = Character:FindFirstChild("Humanoid")
+Head = Character:FindFirstChild("Head")
+Torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("UpperTorso")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+Player = Players:GetPlayerFromCharacter(Character)
+Sounds = {
+	Explosion = script:WaitForChild("Explosion"),
+}
+function DestroyScript()
+	Debris:AddItem(script, 0.5)
+	script:Destroy()
+end
+if not Head or not Torso or not Humanoid or Humanoid.Health == 0 or not Player then
+	DestroyScript()
+	return
+end
+Duration = 30
+Humanoid.WalkSpeed = (16 * 1.6)
+Sparkles = Instance.new("Sparkles")
+Sparkles.SparkleColor = Color3.new(0.8, 0, 0.8)
+Sparkles.Enabled = true
+Debris:AddItem(Sparkles, Duration)
+Sparkles.Parent = Torso
+Count = script:FindFirstChild("CoffeeCount")
+if not Count then
+	Count = Instance.new("IntValue")
+	Count.Name = "CoffeeCount"
+	Count.Value = 1
+	Count.Parent = script
+else
+	if (Count.Value > 3) then
+		if (math.random() > 0.5) then
+			ExplosionSound = Sounds.Explosion:Clone()
+			Debris:AddItem(ExplosionSound, 5)
+			ExplosionSound.Parent = Head
+			ExplosionSound:Play()
+			local Explosion = Instance.new("Explosion")
+			Explosion.ExplosionType = Enum.ExplosionType.NoCraters
+			Explosion.BlastRadius = 2
+			Explosion.BlastPressure = 1000000
+			Explosion.Position = Torso.Position
+			Explosion.Parent = game:GetService("Workspace")
+			
+		end
+	end
+	Count.Value = (Count.Value + 1)
+end
+wait(Duration)
+Humanoid.WalkSpeed = 16
+DestroyScript()]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("AnimationPlayerScript") then
+		source = [[function FindAttachedHumanoid(part)
+	local tpart = part
+	while tpart.Parent do
+		if tpart.Parent:FindFirstChild('Humanoid') then return tpart.Parent.Humanoid end
+		tpart = tpart.Parent
+	end
+	return nil
+end
+function MakeValue(class,name,value,parent)
+	local temp = Instance.new(class)
+	temp.Name = name
+	temp.Value = value
+	temp.Parent = parent
+	return temp
+end	
+local Tool = script.Parent
+local Handle = Tool:WaitForChild('Handle')
+local YellSound = Handle:WaitForChild('Sound')
+local AniScript = Tool:WaitForChild('AnimationPlayerScript')
+--http://www.roblox.com/Asset?ID=111898513'--http://www.roblox.com/Asset?ID=111880514'
+local ThrowAnimation = 'http://www.roblox.com/Asset?ID=111898867'
+local ThrowFace = 'http://www.roblox.com/asset?id=111882478'
+local ThrowTable= Instance.new('Part')
+do
+	--ThrowTable.Shape = 'Ball'
+	ThrowTable.FormFactor='Custom'
+	ThrowTable.Size = Vector3.new(4.8, 2.43, 3.63)
+	ThrowTable.CanCollide = true
+	local tmesh = Instance.new('SpecialMesh')
+	tmesh.MeshId = 'http://www.roblox.com/asset/?id=111868131'
+	tmesh.TextureId = 'http://www.roblox.com/asset/?id=111867655'
+	tmesh.Parent = ThrowTable
+end
+local LookGyro= Instance.new('BodyGyro')
+LookGyro.maxTorque = Vector3.new(0,math.huge,0) 
+local ActivateLock=false
+Tool.Activated:connect(function()
+	if ActivateLock then return end
+	ActivateLock = true
+	local character = Tool.Parent
+	local humanoid = character:WaitForChild('Humanoid')
+	local torso = character:WaitForChild('Torso')
+	local head = character:WaitForChild('Head')
+	local face = head:FindFirstChild('face')
+	local oldFace =''
+	if face then oldFace = face.Texture end
+	humanoid.WalkSpeed = 0
+	LookGyro.cframe = torso.CFrame - torso.CFrame.p
+	LookGyro.Parent = torso
+	
+	local ntable =  ThrowTable:Clone()
+	ntable.CFrame = torso.CFrame+(torso.CFrame.lookVector*3)
+	ntable.Parent = Workspace	
+	
+	MakeValue('StringValue','aniId',ThrowAnimation,AniScript)	
+	wait(.5)
+	YellSound:play()
+	wait(.5)	
+	if face then	
+		face.Texture=ThrowFace
+	end
+	
+	
+	
+	local bAVel = Instance.new('BodyAngularVelocity')
+	bAVel.maxTorque = Vector3.new(math.huge,math.huge,math.huge)
+	bAVel.angularvelocity = ((torso.CFrame*CFrame.Angles(0,math.pi/2,0)).lookVector*10)
+	bAVel.Parent = ntable
+	
+	local bVel = Instance.new('BodyVelocity')
+	bVel.maxForce = Vector3.new(math.huge,0,math.huge)
+	bVel.velocity = (torso.CFrame.lookVector*25)
+	bVel.Parent = ntable
+	ntable.Touched:connect(function(part)
+		--print('GotTouched:' .. part.Name)
+		Spawn(function()
+			if part.Name == 'Terrain' then return end
+			if part.Anchored then return end
+			local hitHumanoid = FindAttachedHumanoid(part)
+			if hitHumanoid then
+				--print('HumanoidParent:'..hitHumanoid.Parent.Name)
+				if hitHumanoid==humanoid then return end
+				hitHumanoid.PlatformStand =true 
+			end
+			if part.Size.x*part.Size.y*part.Size.z<=5*9*5 then
+				part.Velocity = (Vector3.new((math.random()-.5)*2,math.random(),(math.random()-.5)*2).unit)*150
+			end
+			wait(3)
+			print('got past wait')
+			if hitHumanoid then
+				print('unplatformstanding')
+				hitHumanoid.PlatformStand=false 
+				hitHumanoid.Jump = true 
+			end
+		end)
+	end)
+	wait(6)
+	LookGyro.Parent = nil
+	humanoid.WalkSpeed = 16
+	if face then	
+		face.Texture=oldFace
+	end
+	ntable.CanCollide = false
+	game.Debris:AddItem(ntable,5)
+	ActivateLock = false
+end)]]
+	elseif v.Name == "BananaScript" then
+		source = [[wait(0.5)
+local banana = script.Parent
+local touched = false
+function onTouched(part)
+	if touched then
+		return
+	end
+	
+	touched = true
+	local humanoid = part.Parent:FindFirstChild("Humanoid")
+	if humanoid ~= nil then
+		banana.SlipSound:Play()
+		humanoid.Jump = true
+		humanoid.Sit = true
+		wait(0.9)
+		humanoid.Sit = false
+	end
+	touched = false
+end
+banana.Touched:connect(onTouched)]]
+	elseif v.Name == "CompassEffect" then
+		source = [[--Updated for R15 avatars by StarWars
+--print("do compass")
+debris = game:GetService("Debris")
+-- create arrow
+local p = Instance.new("Part")
+p.formFactor = 2
+p.Size = Vector3.new(1,.4,1)
+p.Transparency = .5
+p.BrickColor = BrickColor.new(119)
+p.CanCollide = false
+p.Locked = true
+p.RotVelocity = Vector3.new(math.random(), math.random(), math.random()) * 10
+local Torso = script.Parent:FindFirstChild("Torso") or script.Parent:FindFirstChild("UpperTorso")
+local v = Vector3.new(Torso.CFrame.lookVector.x, 0, Torso.CFrame.lookVector.z)
+p.CFrame = CFrame.new(Torso.CFrame.p + v * 8, v.unit)
+local m = script.ArrowMesh:Clone() -- NASTY......... I agree
+m.Parent = p
+local b = Instance.new("BodyPosition")
+b.position = p.Position
+b.Parent = p
+local g = Instance.new("BodyGyro")
+g.cframe = CFrame.new(Vector3.new(0,0,0), Vector3.new(0,0,1)) -- point North
+g.maxTorque = Vector3.new(7e7, 7e7, 7e7)
+g.Parent = p
+p.Parent = game.Workspace
+debris:AddItem(p, 10)
+wait(5)
+script.Parent = nil]]
+	elseif v.Name == "CompassScript" then
+		source = [[local Tool = script.Parent;
+
+enabled = true
+
+
+
+
+function onActivated()
+	if not enabled  then
+		return
+	end
+
+	enabled = false
+
+
+	Tool.Handle.OpenSound:play()
+	
+	local h = Tool.Parent:FindFirstChild("Humanoid")
+	if (h ~= nil) then
+		local s = script.Parent.CompassEffect:Clone()
+		s.Disabled = false
+		s.Parent = Tool.Parent			
+	end
+
+
+	wait(3)
+
+	enabled = true
+
+end
+
+function onEquipped()
+	Tool.Handle.OpenSound:play()
+end
+
+script.Parent.Activated:connect(onActivated)
+script.Parent.Equipped:connect(onEquipped)
+]]
+	elseif v.Parent.Parent:FindFirstChild("Handle"):FindFirstChild("PleaseNo") then
+		source = [[--Stickmasterluke
+sp=script.Parent
+timer=20
+soundinterval=1
+starttime=tick()
+attached=false
+debris=game:GetService("Debris")
+function makeconfetti()
+	local cp=Instance.new("Part")
+	cp.Name="Effect"
+	cp.FormFactor="Custom"
+	cp.Size=Vector3.new(0,0,0)
+	cp.CanCollide=false
+	cp.Transparency=1
+	cp.CFrame=sp.CFrame
+	cp.Velocity=Vector3.new((math.random()-.5),math.random(),(math.random()-.5)).unit*20
+	delay(.25+(math.random()*.2),function()
+		if cp~=nil then
+			cp.Velocity=cp.Velocity*.1
+			wait(.5)
+		end
+		if cp~=nil then
+			cp.Velocity=Vector3.new(0,-1,0)
+			wait(1)
+		end
+		if cp~=nil then
+			cp.Velocity=Vector3.new(0,-2,0)
+		end
+	end)
+	local cbbg=Instance.new("BillboardGui")
+	cbbg.Adornee=cp
+	cbbg.Size=UDim2.new(7,0,4,0)
+	local cil=Instance.new("ImageLabel")
+	cil.BackgroundTransparency=1
+	cil.BorderSizePixel=0
+	cil.Size=UDim2.new(1,0,1,0)
+	cil.Image="http://www.roblox.com/asset/?id=104606998"
+	cil.Parent=cbbg
+	cbbg.Parent=cp
+	local bf=Instance.new("BodyForce")
+	bf.force=Vector3.new(0,cp:GetMass()*196.2,0)
+	bf.Parent=cp
+	debris:AddItem(cp,7+math.random())
+	cp.Parent=game.Workspace
+end
+sp.Touched:connect(function(hit)
+	if (not attached) and hit and hit~=nil and sp~=nil then
+		local ct=sp:FindFirstChild("creator")
+		if ct.Value~=nil and ct.Value.Character~=nil then
+			if hit.Parent~=ct.Value.Character and hit.Name~="Handle" and hit.Name~="Effect" then
+				local h=hit.Parent:FindFirstChild("Humanoid")
+				local t=hit.Parent:FindFirstChild("Torso")
+				if h~=nil and t~=nil and h.Health>0 then
+					attached=true
+					local w=Instance.new("Weld")
+					w.Part0=t
+					w.Part1=sp
+					w.C0=CFrame.new(0,0,.8)*CFrame.Angles(math.pi/2,3.5,0)
+					w.Parent=sp
+				end
+			end
+		end
+	end
+end)
+while true do
+	local percent=(tick()-starttime)/timer
+	t1,t2=wait(((1-percent)*soundinterval))
+	local beep=sp:FindFirstChild("Beep")
+	if beep~=nil then
+		beep:Play()
+	end
+	local bbg=sp:FindFirstChild("BillboardGui")
+	if bbg~=nil then
+		bbg.Adornee=sp
+		li=bbg:FindFirstChild("LightImage")
+		if li~=nil then
+			li.Visible=true
+		end
+	end
+	if percent>1 then
+		break
+	end
+	wait(.1)
+	if li then
+		li.Visible=false
+	end
+end
+wait(.5)
+local smoke=sp:FindFirstChild("Smoke")
+if smoke then
+	smoke.Enabled=true
+end
+wait(.5)
+local fusesound=sp:FindFirstChild("Fuse")
+if fusesound~=nil then
+	fusesound:Play()
+end
+local bbg=sp:FindFirstChild("BillboardGui")
+if bbg~=nil then
+	bbg.Adornee=sp
+	li=bbg:FindFirstChild("LightImage")
+	if li~=nil then
+		li.Visible=false
+	end
+end
+local partysound=sp:FindFirstChild("PleaseNo")
+if partysound~=nil then
+	partysound:Play()
+end
+for i=1,7 do
+	makeconfetti()
+end
+wait(.5)
+if smoke then
+	smoke.Enabled=false
+end
+wait(2.5)
+sp:remove()]]
+	elseif v.Name == "ToolDropped" then
+		source = [[--Made by Luckymaxer
+Tool = script.Parent
+Players = game:GetService("Players")
+CurrentUFO = Tool:WaitForChild("CurrentUFO")
+Tool.Changed:connect(function(Property)
+	if Property == "Parent" then
+		local Player = Players:GetPlayerFromCharacter(Tool.Parent)
+		if not Tool.Parent:IsA("Backpack") and not Player and CurrentUFO and CurrentUFO.Value and CurrentUFO.Value.Parent then
+			CurrentUFO.Value:Destroy()
+		end
+	end
+end)]]
+	elseif v.Name == "ToolDisplay" then
+		source = [[--Made by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Mesh = Handle:WaitForChild("Mesh")
+ToolDisplays = {
+	Normal = {
+		Grip = CFrame.new(0, -0.75, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+		MeshScale = Vector3.new(0.25, 0.25, 0.25)
+	},
+	Display = {
+		Grip = CFrame.new(1.5, 2.54999995, -1.5, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+		MeshScale = Vector3.new(3, 3, 3)
+	}
+}
+Tool.Grip = ToolDisplays.Normal.Grip
+Mesh.Scale = ToolDisplays.Normal.MeshScale]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("ToolDropped") then
+		source = [[--Made by Luckymaxer
+--[[
+	Fixed by ArceusInator
+	2/23 - The UFO now replicates properly
+--]
+		Tool = script.Parent
+		Handle = Tool:WaitForChild("Handle")
+		Players = game:GetService("Players")
+		Debris = game:GetService("Debris")
+		InsertService = game:GetService("InsertService")
+		UFOModel = InsertService:LoadAsset(162741606)
+		UFO = UFOModel:GetChildren()[1]:Clone()
+		UFOModel:Destroy()
+		CurrentUFO = Tool:WaitForChild("CurrentUFO")
+		SpawnUFO = Tool:WaitForChild("SpawnUFO")
+		RemoverScript = script:WaitForChild("Remover")
+		Grips = {
+			NormalGrip = CFrame.new(0, -0.75, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+			SummoningGrip = CFrame.new(0.25, -0.75, 0, 1.12500096e-007, 1, -0, -0.99999994, 1.12500111e-007, 0, 0, 0, 1),
+		}
+		Equipped = false
+		ReloadTime = 15
+		function TransformModel(Parent, NewCFrame)
+			local Origins = {}
+			for i, v in pairs(Parent:GetChildren()) do
+				if v:IsA("BasePart") then
+					Origins[v] = Parent:GetModelCFrame():toObjectSpace(v.CFrame)
+				end
+			end
+			for i, v in pairs(Origins) do
+				i.CFrame = NewCFrame:toWorldSpace(v)
+			end
+		end
+		function onMouse1Down()
+			if Tool.Enabled and Humanoid and Humanoid.Parent and Humanoid.Health > 0 then
+				Tool.Enabled = false
+				SpawnUFOAnim = Humanoid:LoadAnimation(SpawnUFO)
+				if SpawnUFOAnim then
+					SpawnUFOAnim:Play()
+					wait(0.1)
+					Tool.Grip = Grips.SummoningGrip
+					wait(0.25)
+					if Equipped then
+						local TorsoCFrame = Torso.CFrame
+						Handle.Transparency = 1
+						UFODeploy = Handle:Clone()
+						UFODeploy.Name = "MiniUFO"
+						UFODeploy.Transparency = 0
+						UFODeploy.CanCollide = true
+						UFODeploy.CFrame = CFrame.new(Handle.Position)
+						local UFOCloneY = UFODeploy:Clone()
+						UFOCloneY.CFrame = UFOCloneY.CFrame * CFrame.Angles(math.rad(90), 0, 0)
+						local BodyVelocity = Instance.new("BodyVelocity")
+						BodyVelocity.maxForce = Vector3.new((UFODeploy:GetMass() * 196.20), (UFODeploy:GetMass() * 196.20) * 2, (UFODeploy:GetMass() * 196.20))
+						BodyVelocity.velocity = UFOCloneY.CFrame.lookVector * 1.25
+						BodyVelocity.Parent = UFODeploy
+						local BodyGyro = Instance.new("BodyGyro")
+						BodyGyro.maxTorque = Vector3.new(math.huge, math.huge, math.huge)
+						BodyGyro.cframe = UFODeploy.CFrame
+						BodyGyro.Parent = UFODeploy
+						Debris:AddItem(UFODeploy, 20)
+						UFODeploy.Parent = game:GetService("Workspace")
+						UFODeploy.CFrame = CFrame.new(Handle.Position) + Vector3.new(0, 0.1, 0)
+						Delay(3, function()
+							if UFODeploy and UFODeploy.Parent and BodyVelocity and BodyVelocity.Parent then
+								BodyVelocity.velocity = TorsoCFrame.lookVector * 2.5
+								wait(5)
+								UFODeploy.Anchored = true
+								UFODeploy.CanCollide = false
+								Spawn(function()
+									while UFODeploy and UFODeploy.Parent and UFODeploy.Mesh.Scale.Y < 3 do
+										local NewScale = (UFODeploy.Mesh.Scale.Y + 0.05)
+										UFODeploy.Mesh.Scale = Vector3.new(NewScale, NewScale, NewScale)
+										wait()
+									end
+									if UFODeploy and UFODeploy.Parent then
+										local UFOVehicle = UFO:Clone()
+										local Creator = Instance.new("ObjectValue")
+										Creator.Name = "Creator"
+										Creator.Value = Player
+										Creator.Parent = UFOVehicle
+										local RemoverScriptClone = RemoverScript:Clone()
+										RemoverScriptClone.Disabled = false
+										RemoverScriptClone.Parent = UFOVehicle
+										CurrentUFO.Value = UFOVehicle
+										UFOVehicle.Parent = game:GetService("Workspace")
+										UFOVehicle.Changed:connect(function(Property)
+											if Property == "Parent" and not UFOVehicle.Parent then
+												wait(ReloadTime)
+												Handle.Transparency = 0
+												Tool.Enabled = true
+											end
+										end)
+										TransformModel(UFOVehicle, CFrame.new(UFODeploy.CFrame.p))
+										if UFOVehicle.Engine.Position.Y < UFOVehicle.BeamPart.Position.Y then
+											TransformModel(UFOVehicle, UFOVehicle:GetModelCFrame() * CFrame.Angles(0, math.pi, 0))
+										end
+										UFODeploy:Destroy()
+									end
+								end)
+							end
+						end)
+						wait(2)
+						Tool.Grip = Grips.NormalGrip
+					end
+				end
+			end		
+		end
+		function onKeyDown(key)
+			if key == "x" then
+				if CurrentUFO.Value then
+					CurrentUFO.Value:Destroy()
+				end
+			end
+		end
+		Tool.Input.OnServerEvent:connect(function(client, action, ...)
+			if client.Character == Tool.Parent then
+				if action == 'Mouse1Down' then
+					onMouse1Down()
+				elseif action == 'KeyDown' then
+					onKeyDown(...)
+				end
+			end
+		end)
+		function Equipped()
+			Character = Tool.Parent
+			Player = Players:GetPlayerFromCharacter(Character)
+			Humanoid = Character:FindFirstChild("Humanoid")
+			Torso = Character:FindFirstChild("Torso")
+			if not Player or not Humanoid and Humanoid.Health == 0 or not Torso then
+				return
+			end
+			if not Tool.Enabled and not CurrentUFO.Value then
+				wait(ReloadTime)
+				Tool.Enabled = true
+			end
+			Equipped = true
+			Tool.Grip = Grips.NormalGrip
+		end
+		function Unequipped()
+			Equipped = false
+			if SpawnUFOAnim then
+				SpawnUFOAnim:Stop()
+			end
+			if UFODeploy and UFODeploy.Parent then
+				UFODeploy:Destroy()
+			end
+			Handle.Transparency = 0
+		end
+		Tool.Equipped:connect(Equipped)
+		Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Parent:FindFirstChild("DrumGui") then
+		source = [[--Rescripted by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+function Equipped(Mouse)
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Head = Character:FindFirstChild("Head")
+	if not Player or not Humanoid or Humanoid.Health == 0 or not Head then
+		return
+	end
+	Head.Anchored = true
+	ForceSit = Humanoid.Changed:connect(function(Property)
+		if Property == "Sit" and not Humanoid[Property] then
+			Humanoid[Property] = true
+		end
+	end)
+	Humanoid.Sit = true
+end
+function Unequipped()
+	if ForceSit then
+		ForceSit:disconnect()
+	end
+	if Humanoid and Humanoid.Parent then
+		Humanoid.Sit = false
+	end
+	if Head and Head.Parent then
+		Head.Anchored = false
+	end
+end
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("DisplayModel") then
+		source = [[--Made by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+Assets = require(Tool:WaitForChild("Assets"))
+Data = Assets.Data
+ColorValue = Tool:WaitForChild("CurrentColor")
+BaseUrl = Assets.BaseUrl
+BasePart = Instance.new("Part")
+BasePart.Material = Enum.Material.Plastic
+BasePart.Shape = Enum.PartType.Block
+BasePart.TopSurface = Enum.SurfaceType.Smooth
+BasePart.BottomSurface = Enum.SurfaceType.Smooth
+BasePart.FormFactor = Enum.FormFactor.Custom
+BasePart.Size = Vector3.new(0.2, 0.2, 0.2)
+BasePart.Anchored = false
+BasePart.CanCollide = true
+BasePart.Locked = true
+Colors = {
+	{Texture = 212640675, Color = BrickColor.new("Bright red")}, --Red
+	{Texture = 212640593, Color = BrickColor.new("Bright orange")}, --Orange
+	{Texture = 204410898, Color = BrickColor.new("Bright green")}, --Green
+	{Texture = 212640633, Color = BrickColor.new("Bright blue")}, --Blue
+	{Texture = 212640526, Color = BrickColor.new("Light blue")}, --Light Blue
+	{Texture = 212640552, Color = BrickColor.new("Magenta")}, --Magenta
+}
+CurrentColor = 0
+CycleTick = 0
+CycleTime = 1
+Animations = {
+	Hold = {Animation = Tool:WaitForChild("Hold"), FadeTime = nil, Weight = nil, Speed = nil}
+}
+Sounds = {
+	Honk = Handle:WaitForChild("Honk"),
+	Engine = Handle:WaitForChild("Running")
+}
+Controls = {
+	Forward = {Key = "w", ByteKey = 17, Mode = false},
+	Backward = {Key = "s", ByteKey = 18, Mode = false},
+	Left = {Key = "a", ByteKey = 20, Mode = false},
+	Right = {Key = "d", ByteKey = 19, Mode = false}
+}
+	
+Rate = (1 / 60)
+	
+Gravity = 196.20
+	
+PoseOffset = CFrame.new(0, -2, 0.5) * CFrame.Angles(0, 0, 0) --The offset your character is from the center of the vehicle.
+SpeedBoost = {
+	Allowed = false,
+	Active = false,
+	Enabled = true,
+	Duration = 10,
+	ReloadTime = 30
+}
+Special = {
+	Allowed = false,
+	Enabled = true,
+	Active = false,
+	Duration = 0,
+	ReloadTime = 60
+}
+Speed = {
+	Acceleration = {
+		Normal = 40,
+		Boost = 40
+	},
+	Deceleration = {
+		Normal = 40,
+		Boost = 40
+	},
+	MovementSpeed = {
+		Normal = {Min = 20, Max = 70},
+		Boost = {Min = 20, Max = 70}
+	},
+	TurnSpeed = {
+		Speed = {Min = 5, Max = 5},
+		TurnAlpha = 0.30,
+		AlphaDampening = 0.2
+	},
+}
+MaxSpeed = { --Maximum speed which the vehicle can move and turn at.
+	Movement = Speed.MovementSpeed.Normal,
+	Turn = Speed.TurnSpeed.Speed,
+	Acceleration = Speed.Acceleration.Normal,
+	Deceleration = Speed.Deceleration.Normal
+}
+CurrentSpeed = { --The speed which the vehicle is moving and turning at.
+	Movement = 0,
+	Turn = 0
+}
+Honk = {
+	Honking = false,
+	LastHonk = 0,
+	ReloadTime = 1
+}
+Jump = {
+	Jumping = false,
+	LastJump = 0,
+	ReloadTime = 1.9,
+	JumpForce = 30
+}
+ToolEquipped = false
+DisplayModel = Tool:FindFirstChild("DisplayModel")
+if DisplayModel then
+	DisplayModel:Destroy()
+end
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Tool.Enabled = true
+function RayCast(Position, Direction, MaxDistance, IgnoreList)
+	local IgnoreList = ((type(IgnoreList) == "table" and IgnoreList) or {IgnoreList})
+	return game:GetService("Workspace"):FindPartOnRayWithIgnoreList(Ray.new(Position, Direction.unit * (MaxDistance or 999.999)), IgnoreList)
+end
+function GetAllConnectedParts(Object)
+	local Parts = {}
+	local function GetConnectedParts(Object)
+		for i, v in pairs(Object:GetConnectedParts()) do
+			local Ignore = false
+			for ii, vv in pairs(Parts) do
+				if v == vv then
+					Ignore = true
+				end
+			end
+			if not Ignore then
+				table.insert(Parts, v)
+				GetConnectedParts(v)
+			end
+		end
+	end
+	GetConnectedParts(Object)
+	return Parts
+end
+function EnableFirstPersonView()
+	if not CheckIfAlive() or not ToolEquipped then
+		return
+	end
+	local Limbs = {"Left Arm", "Right Arm"}
+	for i, v in pairs(Limbs) do
+		local Limb = Character:FindFirstChild(v)
+		if Limb:IsA("BasePart") then
+			Spawn(function()
+				InvokeClient("SetLocalTransparencyModifier", {Object = Limb, Transparency = 0, AutoUpdate = false})
+			end)
+		end
+	end
+end
+function ThrustUpdater()
+	
+	for i, v in pairs(CurrentSpeed) do
+		CurrentSpeed[i] = 0
+	end
+	for i, v in pairs(Controls) do
+		Controls[i].Mode = false
+	end
+	while ToolEquipped and Body and Body.Parent and CheckIfAlive() and RotationForce and RotationForce.Parent and ThrustForce and ThrustForce.Parent and TurnGyro and TurnGyro.Parent do
+		
+		RotationForce.angularvelocity = Vector3.new(0, CurrentSpeed.Turn, 0)
+		if math.abs(CurrentSpeed.Turn) > Speed.TurnSpeed.AlphaDampening then
+			CurrentSpeed.Turn = (CurrentSpeed.Turn - (Speed.TurnSpeed.AlphaDampening * (math.abs(CurrentSpeed.Turn) / CurrentSpeed.Turn)))
+		else 
+			CurrentSpeed.Turn = 0		
+		end
+				
+		if not Controls.Forward.Mode or Controls.Backward.Mode then --Slow down if not controlling.
+			CurrentSpeed.Movement = (CurrentSpeed.Movement * 0.99)
+		end
+		
+		local MySpeed = Vector3.new(Body.Velocity.X, 0, Body.Velocity.Z).magnitude
+		local VelocityDifference = math.abs((MySpeed - (ThrustForce.velocity.magnitude)))
+		if MySpeed > 3 and ThrustForce.velocity.magnitude > 3 and VelocityDifference > (0.7 * ThrustForce.velocity.magnitude) then
+			CurrentSpeed.Movement = (CurrentSpeed.Movement * 0.9)
+		end
+		
+		if Controls.Forward.Mode then --Handle acceleration
+			CurrentSpeed.Movement = math.min(MaxSpeed.Movement.Max, (CurrentSpeed.Movement + (MaxSpeed.Acceleration * Rate)))
+		end
+		if Controls.Backward.Mode then --Handle deceleration, if speed is more than 0, decrease quicker.
+			CurrentSpeed.Movement = math.max(-MaxSpeed.Movement.Min, (CurrentSpeed.Movement - (MaxSpeed.Deceleration * ((CurrentSpeed.Movement > 0 and 2.8) or 1) * Rate)))
+		end
+		
+		if Controls.Left.Mode then --Handle left turn speed
+			CurrentSpeed.Turn = math.min(Speed.TurnSpeed.Speed.Max, (CurrentSpeed.Turn + (Speed.TurnSpeed.TurnAlpha)))
+		end
+		if Controls.Right.Mode then --Handle right turn speed
+			CurrentSpeed.Turn = math.max(-Speed.TurnSpeed.Speed.Min, (CurrentSpeed.Turn - (Speed.TurnSpeed.TurnAlpha)))
+		end
+		
+		local Direction = Torso.CFrame.lookVector
+		Direction = Vector3.new(Direction.x, 0, Direction.z).unit
+		
+		local Velocity = (Direction * CurrentSpeed.Movement) --The thrust force which you move.
+		ThrustForce.velocity = Vector3.new(Velocity.X, ThrustForce.velocity.Y, Velocity.Z)
+		
+		local LeanAmount = (-CurrentSpeed.Turn * (math.pi / 6) / 4) --Amount your character leans over.
+		local XZAngle = math.atan2(Torso.CFrame.lookVector.z, 0, Torso.CFrame.lookVector.x) --Handle rotation
+		TurnGyro.cframe = CFrame.Angles((LeanAmount * Direction.x), 0, (LeanAmount * Direction.z))
+		
+		--Wheel animation
+		local DesiredAngle = (999999999 * (-CurrentSpeed.Movement / math.abs(CurrentSpeed.Movement)))
+		local MaxVelocity = (CurrentSpeed.Movement / 250)
+		for i, v in pairs({FrontMotor, BackMotor, LeftMotor, RightMotor}) do
+			if v and v.Parent then
+				v.DesiredAngle = DesiredAngle
+				v.MaxVelocity = MaxVelocity
+			end
+		end
+		
+		--Smoke exhaust from vehicle running.
+		for i, v in pairs(ExhaustSmoke) do
+			if v and v.Parent then
+				v.Opacity = ((math.min(math.abs(CurrentSpeed.Movement), 10) / 10) * 0.5)
+			end
+		end
+		
+		--Engine running sound which pitch changes while in motion.
+		Sounds.Engine.Pitch = (1 + (math.abs(CurrentSpeed.Movement / MaxSpeed.Movement.Max) * 1))
+		
+		if (tick() - CycleTick) >= CycleTime then
+			CycleTick = tick()
+			CurrentColor = (CurrentColor + 1)
+			CurrentColor = ((CurrentColor > #Colors and 1) or CurrentColor)
+			local ColorTable = Colors[CurrentColor]
+			ColorValue.Value = ColorTable.Color.Color
+			local Parts = {Body}
+			for i, v in pairs(Body:GetChildren()) do
+				if v:IsA("BasePart") then
+					table.insert(Parts, v)
+				end
+			end
+			for i, v in pairs(Parts) do
+				if v ~= Body then
+					v.BrickColor = ColorTable.Color
+				end
+				for ii, vv in pairs(v:GetChildren()) do
+					if vv:IsA("FileMesh") then
+						vv.TextureId = (BaseUrl .. ColorTable.Texture)
+					elseif vv:IsA("Light") then
+						vv.Color = ColorTable.Color.Color
+					elseif vv:IsA("BasePart") then
+					end
+				end
+			end
+		end
+		
+		wait(Rate)
+		
+	end
+end
+function SpawnVehicle()
+	
+	Handle.Transparency = 1
+	
+	Spawn(function()
+		InvokeClient("PlaySound", Sounds.Engine)
+		InvokeClient("PlayAnimation", Animations.Hold)
+	end)	
+	
+	Humanoid.PlatformStand = true
+	
+	CurrentColor = math.random(1, #Colors)
+	ColorValue.Value = Colors[CurrentColor].Color.Color
+	
+	local OrigCF = Torso.CFrame
+	
+	local VehicleData = Assets.CreateVehicle()
+	Body = VehicleData.Vehicle
+	local ParticleTable = VehicleData.Tables
+	
+	FrontMotor = Body.FrontMotor
+	BackMotor = Body.BackMotor
+	LeftMotor = Body.LeftMotor
+	RightMotor = Body.RightMotor
+	
+	Seat = Body.Seat
+	Seat.ChildAdded:connect(function(Child)
+		if Child:IsA("Weld") and Child.Name == "SeatWeld" then
+			Child.C1 = (CFrame.new(0, 0.75, -1) * CFrame.Angles(Child.C1:toEulerAnglesXYZ()))
+		end
+	end)
+	
+	ExhaustSmoke = ParticleTable.ExhaustSmoke
+	Lights = ParticleTable.Lights
+	Sparkles = ParticleTable.Sparkles
+	
+	if SpeedBoost.Active then
+		for i, v in pairs(Sparkles) do
+			if v and v.Parent then
+				v.Enabled = true
+			end
+		end
+	end
+	
+	local TorsoWeld = Instance.new("Weld")
+	TorsoWeld.C0 = PoseOffset
+	TorsoWeld.Part0 = Torso
+	TorsoWeld.Part1 = Body
+	TorsoWeld.Parent = Body
+	
+	Body.CanCollide = true
+	RotationForce = Instance.new("BodyAngularVelocity")
+	RotationForce.maxTorque = Vector3.new(0, math.huge, 0)
+	RotationForce.angularvelocity = Vector3.new(0, 0, 0)
+	RotationForce.Parent = Torso
+	
+	ThrustForce = Instance.new("BodyVelocity")
+	ThrustForce.maxForce = Vector3.new(math.huge, 0, math.huge)
+	ThrustForce.velocity = Vector3.new(0, 0, 0)
+	ThrustForce.P = 100
+	ThrustForce.Parent = Torso
+	
+	TurnGyro = Instance.new("BodyGyro")
+	TurnGyro.maxTorque = Vector3.new(5000, 0, 5000)
+	TurnGyro.P = 300
+	TurnGyro.D = 100
+	TurnGyro.Parent = Torso
+	
+	Body.Parent = Tool
+	
+	Torso.CFrame = OrigCF
+	
+	local RayHit, RayPos, RayNormal = RayCast(Torso.Position, Vector3.new(0, -1, 0), (Torso.Size.Y * 2), {Character})
+	if RayHit then
+		Torso.CFrame = Torso.CFrame + Vector3.new(0, ((Character:GetModelSize().Y / 2) + 1.5), 0)
+	end
+	
+	Spawn(ThrustUpdater)
+	
+end
+function FreezePlayer()
+	if CheckIfAlive() then
+		local FreezePart = BasePart:Clone()
+		FreezePart.Name = "FreezePart"
+		FreezePart.Transparency = 1
+		FreezePart.Anchored = true
+		FreezePart.CanCollide = false
+		local FreezeWeld = Instance.new("Weld")
+		FreezeWeld.Part0 = Torso
+		FreezeWeld.Part1 = FreezePart
+		FreezeWeld.Parent = FreezePart
+		Debris:AddItem(FreezePart, 0.125)
+		FreezePart.Parent = Character
+		Torso.Velocity = Vector3.new(0, -25, 0)
+		Torso.RotVelocity = Vector3.new(0, 0, 0)
+	end
+end
+function CleanUp()
+	Handle.Velocity = Vector3.new(0, 0, 0)
+	Handle.RotVelocity = Vector3.new(0, 0, 0)
+	for i, v in pairs({}) do
+		if v then
+			v:disconnect()
+		end
+	end
+	if Seat and Seat.Parent and Seat.Occupant then
+		local humanoid = Seat.Occupant
+		if humanoid and humanoid:IsA("Humanoid") then
+			humanoid.Sit = false
+		end
+	end
+	for i, v in pairs({Body, RotationForce, ThrustForce, TurnGyro}) do
+		if v and v.Parent then
+			v:Destroy()
+		end
+	end
+	for i, v in pairs(Tool:GetChildren()) do
+		if v:IsA("BasePart") and v ~= Handle then
+			v:Destroy()
+		end
+	end
+end
+function CheckIfAlive()
+	return (((Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent and Player and Player.Parent) and true) or false)
+end
+function Equipped(Mouse)
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("Torso")
+	if not CheckIfAlive() then
+		return
+	end
+	for i, v in pairs(Colors) do
+		Spawn(function()
+			InvokeClient("Preload", (BaseUrl .. v.Texture))
+		end)
+	end
+	Spawn(CleanUp)
+	Spawn(EnableFirstPersonView)
+	Spawn(SpawnVehicle)
+	ToolEquipped = true
+end
+function Unequipped()
+	Spawn(CleanUp)
+	Spawn(FreezePlayer)
+	for i, v in pairs(Sounds) do
+		v:Stop()
+		Spawn(function()
+			InvokeClient("StopSound", v)
+		end)
+	end
+	if CheckIfAlive() then
+		Humanoid.PlatformStand = false
+	end
+	Handle.Transparency = 0
+	ToolEquipped = false
+end
+function OnServerInvoke(player, mode, value)
+	if player == Player and ToolEquipped and value and CheckIfAlive() then
+		if mode == "KeyPress" then
+			local Down = value.Down
+			local Key = value.Key
+			local ByteKey = string.byte(Key)
+			for i, v in pairs(Controls) do
+				if Key == v.Key or ByteKey == v.ByteKey then
+					Controls[i].Mode = Down
+				end
+			end
+			if Key == " " and Down then --Jump controller
+				if math.abs(tick() - Jump.LastJump) > Jump.ReloadTime and not Jump.Jumping and ThrustForce and ThrustForce.Parent then
+					Jump.Jumping = true
+					local Parts = GetAllConnectedParts(Body)
+					local Mass = 0
+					for i, v in pairs(Parts) do
+						Mass = (Mass + v:GetMass())
+					end
+					ThrustForce.maxForce = Vector3.new(ThrustForce.maxForce.X, ((Mass * Gravity) * 100), ThrustForce.maxForce.Z)
+					ThrustForce.velocity = (Vector3.new(0, 1, 0) * Jump.JumpForce) + Vector3.new(ThrustForce.velocity.X, 0, ThrustForce.velocity.Z)
+					wait(0.1)
+					ThrustForce.maxForce = Vector3.new(ThrustForce.maxForce.X, 0, ThrustForce.maxForce.Z)
+					ThrustForce.velocity = Vector3.new(ThrustForce.velocity.X, 0, ThrustForce.velocity.Z)
+					Jump.LastJump = tick()
+					Jump.Jumping = false
+				end
+			elseif Key == "x" and Down then --Toggle light(s) on/off.
+				for i, v in pairs(Lights) do
+					if v and v.Parent then
+						v.Enabled = not v.Enabled
+					end
+				end
+			elseif Key == "h" and Down then --Play honk sound.
+				local Sound = Sounds.Honk
+				if (tick() - Honk.LastHonk) >= (Sound.TimeLength + Honk.ReloadTime) and not Honk.Honking then
+					Honk.Honking = true
+					local TempSound = Sound:Clone()
+					Debris:AddItem(TempSound, Sound.TimeLength)
+					TempSound.Parent = Body
+					TempSound:Play()
+					Honk.LastHonk = tick()
+					Honk.Honking = false
+				end
+			elseif Key == "q" and Down then --Activate special.
+				if not Special.Allowed or not Special.Enabled or Special.Active then
+					return
+				end
+				Special.Enabled = false
+				Special.Active = true
+				wait(Special.Duration)
+				Special.Active = false
+				wait(Special.ReloadTime)
+				Special.Enabled = true
+			elseif ByteKey == 48 and Down then --Activate speed boost.
+				if not SpeedBoost.Allowed or not SpeedBoost.Enabled or SpeedBoost.Active then
+					return
+				end
+				SpeedBoost.Enabled = false
+				SpeedBoost.Active = true
+				for i, v in pairs(Sparkles) do
+					if v and v.Parent then
+						v.Enabled = true
+					end
+				end
+				MaxSpeed.Acceleration = Speed.Acceleration.Boost
+				MaxSpeed.Deceleration = Speed.Deceleration.Boost
+				MaxSpeed.Movement = Speed.MovementSpeed.Boost
+				wait(SpeedBoost.Duration)
+				MaxSpeed.Acceleration = Speed.Acceleration.Normal
+				MaxSpeed.Deceleration = Speed.Deceleration.Normal
+				MaxSpeed.Movement = Speed.MovementSpeed.Normal
+				for i, v in pairs(Sparkles) do
+					if v and v.Parent then
+						v.Enabled = false
+					end
+				end
+				SpeedBoost.Active = false
+				wait(SpeedBoost.ReloadTime)
+				SpeedBoost.Enabled = true
+			end
+		end
+	end
+end
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+Spawn(CleanUp)
+ServerControl.OnServerInvoke = OnServerInvoke
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "TrailScript" and v.Parent:FindFirstChild("DisplayModel") then
+		source = [[--Made by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Debris = game:GetService("Debris")
+CurrentColor = Tool:WaitForChild("CurrentColor")
+BasePart = Instance.new("Part")
+BasePart.Shape = Enum.PartType.Block
+BasePart.Material = Enum.Material.Plastic
+BasePart.TopSurface = Enum.SurfaceType.Smooth
+BasePart.BottomSurface = Enum.SurfaceType.Smooth
+BasePart.FormFactor = Enum.FormFactor.Custom
+BasePart.Anchored = false
+BasePart.CanCollide = true
+BasePart.Locked = true
+BaseTrailPart = BasePart:Clone()
+BaseTrailPart.Name = "LaserTrail"
+BaseTrailPart.Transparency = 0.2
+BaseTrailPart.Size = Vector3.new(0.5, 5, 3)
+BaseTrailPart.Material = Enum.Material.SmoothPlastic
+BaseTrailPart.TopSurface = Enum.SurfaceType.SmoothNoOutlines
+BaseTrailPart.BottomSurface = Enum.SurfaceType.SmoothNoOutlines
+BaseTrailPart.LeftSurface = Enum.SurfaceType.SmoothNoOutlines
+BaseTrailPart.RightSurface = Enum.SurfaceType.SmoothNoOutlines
+BaseTrailPart.FrontSurface = Enum.SurfaceType.SmoothNoOutlines
+BaseTrailPart.BackSurface = Enum.SurfaceType.SmoothNoOutlines
+BaseTrailPart.Anchored = true
+BaseTrailPart.CanCollide = false
+TrailLight = Instance.new("PointLight")
+TrailLight.Name = "Light"
+TrailLight.Brightness = 10
+TrailLight.Range = 8
+TrailLight.Shadows = false
+TrailLight.Enabled = true
+TrailLight.Parent = BaseTrailPart
+Rate = (1 / 60)
+function StartTrail(Source, Parent)
+	
+	local TrailParts = {}
+	
+	local SourceAlive = true
+	local NumberOfParts = 60
+	local LastPoint = (Source.CFrame * CFrame.new(0, 0, 4)).p
+	
+	Source.Changed:connect(function(Property)
+		if Property == "Parent" and not Source.Parent then
+			SourceAlive = false
+		end
+	end)
+	
+	while SourceAlive do
+		local CurrentPoint = (Source.CFrame * CFrame.new(-1.125, 0, 4)).p
+		if Source.Velocity.magnitude > 20 then
+			local TrailPart = BaseTrailPart:Clone()
+			TrailPart.BrickColor = BrickColor.new(CurrentColor.Value)
+			TrailPart.Light.Color = CurrentColor.Value
+			TrailPart.Size = Vector3.new(TrailPart.Size.X, TrailPart.Size.Y, (CurrentPoint - LastPoint).magnitude)
+			table.insert(TrailParts, TrailPart)
+			TrailPart.Parent = Parent
+			TrailPart.CFrame = CFrame.new(((CurrentPoint + LastPoint) * 0.5), LastPoint)
+			if #TrailParts > NumberOfParts then
+				local TrailPart = TrailParts[1]
+				if TrailPart and TrailPart.Parent then
+					TrailPart:Destroy()
+				end
+				table.remove(TrailParts, 1)
+			end
+		else
+			local TrailPart = TrailParts[1]
+			if TrailPart and TrailPart.Parent then
+				TrailPart:Destroy()
+			end
+			table.remove(TrailParts, 1)
+		end
+		LastPoint = CurrentPoint
+		wait(Rate)
+	end
+	
+	for i, v in pairs(TrailParts) do
+		if v and v.Parent then
+			v:Destroy()
+		end
+	end
+	
+end
+Tool.ChildAdded:connect(function(Child)
+	if Child.Name == "Body" then
+		Spawn(function()
+			StartTrail(Child, Tool)
+		end)
+	end
+end)]]
+	elseif v.Name == "BlowDryer" then
+		source = [[--Rescripted by Luckymaxer
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+AirScript = script:WaitForChild("AirScript")
+Colors = {"White", "Light stone grey", "Light blue", "Pastel Blue"} 
+BasePart = Instance.new("Part")
+BasePart.Shape = Enum.PartType.Block
+BasePart.Material = Enum.Material.Plastic
+BasePart.TopSurface = Enum.SurfaceType.Smooth
+BasePart.BottomSurface = Enum.SurfaceType.Smooth
+BasePart.FormFactor = Enum.FormFactor.Custom
+BasePart.Size = Vector3.new(0.2, 0.2, 0.2)
+BasePart.CanCollide = true
+BasePart.Locked = true
+BasePart.Anchored = false
+AirBubble = BasePart:Clone()
+AirBubble.Name = "Effect"
+AirBubble.Shape = Enum.PartType.Ball
+AirBubble.Size = Vector3.new(2, 2, 2)
+AirBubble.CanCollide = false
+Gravity = 196.20
+Sounds = {
+	DryerSound = Handle:WaitForChild("DryerSound")
+}
+MouseDown = false
+ToolEquipped = false
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Tool.Enabled = true
+function Fire(Direction)
+	
+	if not Tool.Enabled or not CheckIfAlive() then
+		return
+	end
+	
+	local SpawnPos = Handle.Position + (Direction * 7.5)
+	
+	local Offset = Vector3.new(
+		((math.random() - 0.5) * 50),
+		((math.random() - 0.5) * 50),
+		((math.random() - 0.5) * 50)
+	)
+	local Force = 80
+	local Air = AirBubble:Clone()
+	Air.Transparency = (math.random() * 0.5)
+	Air.CFrame = CFrame.new(SpawnPos, Vector3.new(Offset.X, Offset.Y, Offset.Z))
+	Air.Velocity = (Direction * Force)
+	Air.BrickColor = BrickColor.new(Colors[math.random(1, #Colors)])
+	
+	local Mass = (Air:GetMass() * Gravity)
+	
+	local BodyVelocity = Instance.new("BodyVelocity")
+	BodyVelocity.maxForce = Vector3.new(Mass, Mass, Mass)
+	BodyVelocity.velocity = (Direction * Force)
+	BodyVelocity.Parent = Air
+	
+	local Creator = Instance.new("ObjectValue")
+	Creator.Name = "Creator"
+	Creator.Value = Player
+	Creator.Parent = Air
+	
+	local AirScriptClone = AirScript:Clone()
+	AirScriptClone.Disabled = false
+	AirScriptClone.Parent = Air
+	
+	Debris:AddItem(Air, 2)
+	
+	Air.Parent = game:GetService("Workspace")
+end
+function CheckIfAlive()
+	return (((Player and Player.Parent and Character and Character.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0) and true) or false)
+end
+function Equipped()
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	if not CheckIfAlive() then
+		return
+	end
+	ToolEquipped = true
+end
+function Unequipped()
+	MouseDown = false
+	ToolEquipped = false
+end
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+ServerControl.OnServerInvoke = (function(player, Mode, Value)
+	if player ~= Player or not ToolEquipped or not CheckIfAlive() or not Mode or not Value then
+		return
+	end
+	if Mode == "Button1Click" then
+		local Down = Value.Down
+		if Down and not MouseDown and Tool.Enabled then
+			MouseDown = true
+			Spawn(function()
+				Sounds.DryerSound:Play()
+				local Rate = (1 / 60)
+				local MaxDuration = 2
+				local StartTime = tick()
+				if ToolUnequipped then
+					ToolUnequipped:disconnect()
+				end
+				local CurrentlyEquipped = true
+				ToolUnequipped = Tool.Unequipped:connect(function()
+					CurrentlyEquipped = false
+				end)
+				while MouseDown and ToolEquipped and CheckIfAlive() and (tick() - StartTime) < MaxDuration do
+					local TargetPos = InvokeClient("MousePosition")
+					if TargetPos then
+						TargetPos = TargetPos.Position
+						Spawn(function()
+							for i = 1, math.random(2, 3) do
+								if CurrentlyEquipped then
+									local Direction = (TargetPos - Handle.Position).unit
+									local Offset = Vector3.new(
+										((math.random() - 0.5) * 0.3),
+										((math.random() - 0.5) * 0.3),
+										((math.random() - 0.5) * 0.3)
+									)
+									Fire(Vector3.new((Direction.X + Offset.X), (Direction.Y + Offset.Y), (Direction.Z + Offset.Z)))
+									wait(0.1)
+								end
+							end
+						end)
+					end
+					wait(Rate)
+				end
+				Sounds.DryerSound:Stop()
+				Tool.Enabled = false
+				wait(1)
+				Tool.Enabled = true
+			end)
+		elseif not Down and MouseDown then
+			MouseDown = false
+		end
+	end
+end)
+Tool.Equipped:connect(Equipped)
+Tool.Unequipped:connect(Unequipped)]]
+	elseif v.Name == "AirScript" then
+		source = [[--Rescripted by Luckymaxer
+--Updated for R15 avatar by StarWars
+Part = script.Parent
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+Creator = Part:FindFirstChild("Creator")
+function IsTeamMate(Player1, Player2)
+	return (Player1 and Player2 and not Player1.Neutral and not Player2.Neutral and Player1.TeamColor == Player2.TeamColor)
+end
+function TagHumanoid(humanoid, player)
+	local Creator_Tag = Instance.new("ObjectValue")
+	Creator_Tag.Name = "creator"
+	Creator_Tag.Value = player
+	Debris:AddItem(Creator_Tag, 2)
+	Creator_Tag.Parent = humanoid
+end
+function UntagHumanoid(humanoid)
+	for i, v in pairs(humanoid:GetChildren()) do
+		if v:IsA("ObjectValue") and v.Name == "creator" then
+			v:Destroy()
+		end
+	end
+end
+function Touched(Hit)
+	if not Hit or not Hit.Parent then
+		return
+	end
+	local character = Hit.Parent
+	if character:IsA("Hat") then
+		character = character.Parent
+	end
+	for i, v in pairs(character:GetChildren()) do
+		if v:IsA("ForceField") then
+			return
+		end
+	end
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid or humanoid.Health == 0 then
+		return
+	end
+	local CreatorPlayer = (((Creator and Creator.Value and Creator.Value:IsA("Player")) and Creator.Value) or nil)
+	local player = Players:GetPlayerFromCharacter(character)
+	if CreatorPlayer and player and (CreatorPlayer == player or IsTeamMate(CreatorPlayer, player)) then
+		return
+	end
+	local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+	if not torso then
+		return
+	end
+	local WindEffect = torso:FindFirstChild("WindEffect")
+	if WindEffect then
+		return
+	end
+	local Direction = Part.Velocity.unit
+	local WindEffect = Instance.new("BodyVelocity")
+	WindEffect.Name = "WindEffect"
+	WindEffect.maxForce = Vector3.new(1e7, 1e7, 1e7)
+	WindEffect.P = 125
+	WindEffect.velocity = ((Direction * 75) + Vector3.new(0, 30, 0))
+	Debris:AddItem(WindEffect, 0.5)
+	WindEffect.Parent = torso
+	Debris:AddItem(Part, 0)
+	Part:Destroy()
+end
+Part.Touched:connect(Touched)
+Debris:AddItem(Part, 2)]]
+	elseif v.Parent:FindFirstChild("R15CoastingPose") then
+		source = [[--Rescripted by Luckymaxer
+--Made by Stickmasterluke
+--// Fixed for R15 avatars by StarWars
+-- Fixed for mobile support by Luke, again
+Tool = script.Parent
+Handle = Tool:WaitForChild("Handle")
+Mesh = Handle:WaitForChild("Mesh")
+local Cloud
+Players = game:GetService("Players")
+Debris = game:GetService("Debris")
+BasePart = Instance.new("Part")
+BasePart.Shape = Enum.PartType.Block
+BasePart.Material = Enum.Material.Plastic
+BasePart.TopSurface = Enum.SurfaceType.Smooth
+BasePart.BottomSurface = Enum.SurfaceType.Smooth
+BasePart.FormFactor = Enum.FormFactor.Custom
+BasePart.Anchored = false
+BasePart.Locked = true
+BasePart.CanCollide = true
+Sounds = {
+	Wind = Handle:WaitForChild("Wind")
+}
+BaseScale = Vector3.new(3, 3, 3)
+Rate = (1 / 60)
+Flying = false
+ToolEquipped = false
+ServerControl = (Tool:FindFirstChild("ServerControl") or Instance.new("RemoteFunction"))
+ServerControl.Name = "ServerControl"
+ServerControl.Parent = Tool
+ClientControl = (Tool:FindFirstChild("ClientControl") or Instance.new("RemoteFunction"))
+ClientControl.Name = "ClientControl"
+ClientControl.Parent = Tool
+Mesh.Scale = BaseScale
+Handle.Transparency = 0
+Tool.Enabled = true
+function RemoveFlyStuff()
+	for i, v in pairs(Tool:GetChildren()) do
+		if v:IsA("BasePart") and v.Name == "EffectCloud" then
+			v:Destroy()
+		end
+		for i, v in pairs(Sounds) do
+			v:Stop()
+		end
+	end
+end
+function CheckIfAlive()
+	return (((Player and Player.Parent and Humanoid and Humanoid.Parent and Humanoid.Health > 0 and Torso and Torso.Parent) and true) or false)
+end
+function Equipped()
+	Character = Tool.Parent
+	Player = Players:GetPlayerFromCharacter(Character)
+	Humanoid = Character:FindFirstChild("Humanoid")
+	Torso = Character:FindFirstChild("HumanoidRootPart")
+	if not CheckIfAlive() then
+		return
+	end
+	spawn(function()
+		Handle.Transparency = 0
+		RemoveFlyStuff()
+	end)
+	Flying = false
+	ToolEquipped = true
+end
+function Unequipped()
+	Handle.Transparency = 0
+	RemoveFlyStuff()
+	Flying = false
+	ToolEquipped = false
+end
+function OnServerInvoke(player, mode, value)
+	if player ~= Player or not value or not CheckIfAlive() or not ToolEquipped then
+		return
+	end
+	print(mode)
+	if mode == "Fly" then
+		local Fly = value.Flying
+		Flying = Fly
+		if Cloud and Cloud.Parent then
+			Cloud:Destroy()
+		end
+		Handle.Transparency = ((Flying and 1) or 0)
+		if Flying then
+			Cloud = Handle:Clone()
+			Cloud.Name = "EffectCloud"
+			Cloud.Transparency = 0
+			Cloud.CanCollide = false
+			--[[local Wind = Cloud:FindFirstChildOfClass("Sound")
+			if Wind then
+				Wind:Play()
+			end]
+		local Smoke = Cloud:FindFirstChild("Smoke")
+		if Smoke then
+			Smoke.Enabled = true
+		end
+		local Weld = Instance.new("Weld")
+		Weld.Part0 = Torso
+		Weld.Part1 = Cloud
+		Weld.C0 = (CFrame.new(1, -4, 0) * CFrame.Angles(0, (math.pi / 2), 0))
+		Weld.C1 = CFrame.new(0, 0, 0)
+		Weld.Parent = Cloud
+		Cloud.Parent = Tool
+		return Cloud
+	end
+	elseif mode == "SetSound" then
+	if Sounds.Wind then
+		--print("Changing Sound")
+		Sounds.Wind.Pitch = ((value * 2) + 1)
+		Sounds.Wind.Volume = (value + 0.1)
+	end
+
+elseif mode == "SetMesh" then
+	local CloudMesh = Cloud:FindFirstChildOfClass("SpecialMesh")
+	if Cloud and CloudMesh then
+		print("Changing Mesh")
+		CloudMesh.Scale = Vector3.new(4, 4, (4 + (value * 4)))
+	end
+
+elseif mode == "ToggleSound" then
+	local Sound = Sounds.Wind
+	local Playing = value
+	if not Sound then
+		return
+	end
+	if Playing then
+		Sound:Play()
+	else
+		Sound:Stop()
+	end
+end
+end
+function InvokeClient(Mode, Value)
+	local ClientReturn = nil
+	pcall(function()
+		ClientReturn = ClientControl:InvokeClient(Player, Mode, Value)
+	end)
+	return ClientReturn
+end
+for i, v in pairs(Tool:GetChildren()) do
+	if v:IsA("BasePart") and v ~= Handle then
+		v:Destroy()
+	end
+end
+ServerControl.OnServerInvoke = OnServerInvoke
+Tool.Equipped:Connect(Equipped)
+Tool.Unequipped:Connect(Unequipped)]]
+	elseif v.Name == "SpeedEffect" then
+		source = [[-- assume we are in the character, let's check
+function sepuku()
+	script.Parent = nil
+end
+local debris = game:GetService("Debris")
+local h = script.Parent:FindFirstChild("Humanoid")
+if (h == nil) then sepuku() end
+local torso = script.Parent:FindFirstChild("Torso") or script.Parent:FindFirstChild("UpperTorso")
+if (torso == nil) then sepuku() end
+local head = script.Parent:FindFirstChild("Head")
+if (head == nil) then head = torso end
+local equalizingForce = 236 / 1.2 -- amount of force required to levitate a mass
+local gravity = .75 -- things float at > 1
+local fire = Instance.new("Fire")
+fire.Parent = head
+fire.Heat = 10
+fire.Size = 3
+function recursiveGetLift(node)
+	local m = 0
+	local c = node:GetChildren()
+	if (node:FindFirstChild("Head") ~= nil) then head = node:FindFirstChild("Head") end -- nasty hack to detect when your parts get blown off
+	for i=1,#c do
+		if c[i].className == "Part" then
+			if (head ~= nil and (c[i].Position - head.Position).magnitude < 10) then -- GROSS
+				if c[i].Name == "Handle" then
+					m = m + (c[i]:GetMass() * equalizingForce * 1) -- hack that makes hats weightless, so different hats don't change your jump height
+				else
+					m = m + (c[i]:GetMass() * equalizingForce * gravity)
+				end
+			end
+		end
+		m = m + recursiveGetLift(c[i])
+	end
+	return m
+end
+function jumpIt()
+	local mass = recursiveGetLift(h.Parent)
+	local force = Instance.new("BodyForce")
+	force.force = Vector3.new(0,mass * 2,0)
+	force.Parent = torso
+	debris:AddItem(force,0.5)
+end
+local con = h.Jumping:connect(jumpIt)
+local oldSpeed = h.WalkSpeed
+h.WalkSpeed = h.WalkSpeed * 1.6
+local oldMaxHealth = h.MaxHealth
+h.MaxHealth = oldMaxHealth * 1.5
+h.Health = h.MaxHealth
+local bodySpin = Instance.new("BodyAngularVelocity")
+bodySpin.P = 200000
+bodySpin.angularvelocity = Vector3.new(0,15,0)
+bodySpin.maxTorque = Vector3.new(bodySpin.P,bodySpin.P,bodySpin.P)
+bodySpin.Parent = torso
+wait(30)
+fire:Destroy()
+h.WalkSpeed = oldSpeed
+h.MaxHealth = oldMaxHealth
+if h.Health > 60 then
+	h.Health = 60
+end
+con:disconnect()
+bodySpin:Destroy()
+sepuku()]]
 	end
 	return source
 end
