@@ -57,7 +57,9 @@ for _,v in pairs(hum:GetPlayingAnimationTracks()) do
 if v.Animation.AnimationId == anim4.AnimationId then
 v:Stop()
 end
+if hum.Parent:FindFirstChild("ForceField") then
 hum.Parent:FindFirstChild("ForceField"):Destroy()
+end
 end
 end
 end)
