@@ -17,19 +17,19 @@ local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
 if not block then
 if m1 and not m2 and not m3 then
 local playanim = hum:LoadAnimation(anim1)
-playanim:Play()
+playanim:Play(0,1,1.5)
 m1 = false
 m2 = true
 m3 = false
 elseif not m1 and m2 and not m3 then
 local playanim = hum:LoadAnimation(anim2)
-playanim:Play()
+playanim:Play(0,1,1.5)
 m1 = false
 m2 = false
 m3 = true
 elseif not m1 and not m2 and m3 then
 local playanim = hum:LoadAnimation(anim3)
-playanim:Play()
+playanim:Play(0,1,1.5)
 m1 = true
 m2 = false
 m3 = false
@@ -44,6 +44,7 @@ block = true
 local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
 local playanim = hum:LoadAnimation(anim4)
 playanim:Play()
+Instance.new("ForceField",hum.Parent)
 end
 end)
 
@@ -56,6 +57,7 @@ for _,v in pairs(hum:GetPlayingAnimationTracks()) do
 if v.Animation.AnimationId == anim4.AnimationId then
 v:Stop()
 end
+hum.Parent:FindFirstChild("ForceField"):Destroy()
 end
 end
 end)
