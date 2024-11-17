@@ -9740,7 +9740,7 @@ end))]]
 		source = [[--Do not delete this script. This is what makes the board work.
 require(389325813).Parent = script.Parent
 ]]
-	elseif v.Name == "Main" and v.Parent.Name == "Piano" then
+	elseif v.Name == "Main" and v.Parent:FindFirstChild("Keys") then
 		source = [[Settings = require(script.Parent.Settings)
 Piano = script.Parent
 Box = Piano.Keys.KeyBox
