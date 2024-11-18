@@ -4,6 +4,7 @@ local m3 = false
 local block = false
 local crouch = false
 local dash = false
+local punches = false
 
 local anim1 = Instance.new("Animation")
 anim1.AnimationId = "rbxassetid://243827693"
@@ -15,10 +16,12 @@ local anim4 = Instance.new("Animation")
 anim4.AnimationId = "rbxassetid://97884040"
 local anim5 = Instance.new("Animation")
 anim5.AnimationId = "rbxassetid://287325678"
+local anim6 = Instance.new("Animation")
+anim6.AnimationId = "rbxassetid://126753849"
 
 game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
     local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if not block and not crouch then
+    if not block and not crouch and not punches and not dash then
         if m1 and not m2 and not m3 then
             local playanim = hum:LoadAnimation(anim1)
             playanim:Play(0,1,1.5)
@@ -44,7 +47,7 @@ end)
 game:GetService("UserInputService").InputBegan:Connect(function(input,chat)
     if chat then return end
     if input.KeyCode == Enum.KeyCode.F then
-        if not crouch then
+        if not crouch and not dash and not punches then
             block = true
             local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             local playanim = hum:LoadAnimation(anim4)
@@ -52,7 +55,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(input,chat)
             Instance.new("ForceField",hum.Parent)
         end
     elseif input.KeyCode == Enum.KeyCode.Q then
-        if not crouch and not block then
+        if not crouch and not block and not dash and not punches then
             dash = true
             local uis = game:GetService("UserInputService")
             local char = game.Players.LocalPlayer.Character
@@ -76,7 +79,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(input,chat)
             dash = false
         end
     elseif input.KeyCode == Enum.KeyCode.C then
-        if not block and not dash then
+        if not block and not dash and not punches then
             if crouch then
                 local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
                 for _,v in pairs(hum:GetPlayingAnimationTracks()) do
@@ -92,6 +95,14 @@ game:GetService("UserInputService").InputBegan:Connect(function(input,chat)
                 crouch = true
             end
         end
+    elseif input.KeyCode == Enum.KeyCode.Z then
+        if not block and not crouch and not dash and not punches then
+            punches = true
+            local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local playanim = hum:LoadAnimation(anim6)
+            playanim:Play()
+            punches = false
+        end
     end
 end)
 
@@ -104,9 +115,9 @@ game:GetService("UserInputService").InputEnded:Connect(function(input,chat)
             if v.Animation.AnimationId == anim4.AnimationId then
                 v:Stop()
             end
-            if hum.Parent:FindFirstChild("ForceField") then
-                hum.Parent:FindFirstChild("ForceField"):Destroy()
-            end
+        end
+        if hum.Parent:FindFirstChild("ForceField") then
+            hum.Parent:FindFirstChild("ForceField"):Destroy()
         end
     end
 end)
