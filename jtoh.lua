@@ -9,10 +9,12 @@ tpose.Name = "T-Pose"
 tpose.RequiresHandle = false
 tpose.CanBeDropped = false
 tpose.TextureId = "rbxassetid://6869582429"
+tpose.ToolTip = "Assert dominance"
 heli.Name = "Helicopter Powers"
 heli.RequiresHandle = false
 heli.CanBeDropped = false
 heli.TextureId = "rbxassetid://6235245591"
+heli.ToolTip = "I can see my house from here!"
 tpose.Activated:Connect(function()
 p.Character.CharacterScripts.TouchScript.Disabled = true
 local play = p.Character.Humanoid:LoadAnimation(anim)
