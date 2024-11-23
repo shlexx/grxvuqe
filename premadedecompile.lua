@@ -18987,6 +18987,59 @@ end
 
 
 script.Parent.toaster.Touched:connect(onTouched)]]
+	elseif v.Name == "animate" and v.Parent.Name == "LightsHolder" then
+		source = [[-- Saved by UniversalSynSaveInstance https://discord.gg/wx4ThpAsmw
+
+local v0 = require(game.ReplicatedStorage.Library.Functions);
+local _ = require(game.ReplicatedStorage.Library.Util.ZonesUtil);
+local v2 = require(game.ReplicatedStorage.Library.Client.FFlags);
+if require(game.ReplicatedStorage.Library.Modules.Platform).GetQualityLevel() < 7 then
+    return;
+else
+    local l_Parent_0 = script.Parent;
+    local function v13(v4) --[[ Line: 13 ] --[[ Name: init ]
+		local l_v4_Pivot_0 = v4:GetPivot();
+		local v6 = math.random();
+		local function _(v7) --[[ Line: 17 ] --[[ Name: apply ]
+			local v8 = math.sin(v7) * 3;
+			v4:PivotTo(l_v4_Pivot_0 * CFrame.Angles(math.rad(v8), 0, (math.rad(v8))));
+		end;
+		local v10 = math.sin(v6) * 3;
+		v4:PivotTo(l_v4_Pivot_0 * CFrame.Angles(math.rad(v10), 0, (math.rad(v10))));
+		v0.DistanceRenderStepped(v4, function(v11) --[[ Line: 23 ]
+			if v2.Get(v2.Keys.DisableWorldFrontend) then
+				return;
+			else
+				v6 = v6 + v11;
+				local v12 = math.sin(v6) * 3;
+				v4:PivotTo(l_v4_Pivot_0 * CFrame.Angles(math.rad(v12), 0, (math.rad(v12))));
+				return;
+			end;
+		end);
+	end;
+	for _, v15 in pairs(l_Parent_0:GetChildren()) do
+		if not v15:IsA("Script") then
+			v13(v15);
+		end;
+	end;
+	return;
+end;]]
+	elseif v.Name == "animate" and v.Parent.Name == "Arms" then
+		source = [[-- Saved by UniversalSynSaveInstance https://discord.gg/wx4ThpAsmw
+
+local l_RunService_0 = game:GetService("RunService");
+local l_Parent_0 = script.Parent;
+local l_l_Parent_0_Pivot_0 = l_Parent_0:GetPivot();
+if require(game.ReplicatedStorage.Library.Modules.Platform).GetQualityLevel() <= 3 then
+    return;
+else
+    local v3 = 0;
+    l_RunService_0.RenderStepped:Connect(function(v4) --[[ Line: 13 ]
+		v3 = v3 + v4;
+		l_Parent_0:PivotTo(l_l_Parent_0_Pivot_0 * CFrame.Angles(0, 0, v3));
+	end);
+	return;
+	end;]]
 	end
 	return source
 end
