@@ -15564,7 +15564,7 @@ end
 end
 Tool.Equipped:connect(Equip)
 Tool.Unequipped:connect(Unequip)]]
-	elseif v.Parent:FindFirstChild("LocalScript"):FindFirstChild("PaletteGui") then
+	elseif v.Parent.Name == "PaintBucket" then
 		source = [[-- // Recreated by StarWars
 local Tool = script.Parent
 local GearService = require(1075123174)
@@ -16047,7 +16047,7 @@ end
 script.Parent.Activated:connect(onActivated)
 script.Parent.Equipped:connect(onEquipped)
 ]]
-	elseif v.Parent.Parent:FindFirstChild("Handle"):FindFirstChild("PleaseNo") then
+	elseif v.Parent.Parent.Name == "Fake Bomb" then
 		source = [[--Stickmasterluke
 sp=script.Parent
 timer=20
