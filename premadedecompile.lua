@@ -17411,6 +17411,913 @@ end
 con:disconnect()
 bodySpin:Destroy()
 sepuku()]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("Lobby") and v.Parent:FindFirstChild("Lobby"):IsA("SpawnLocation") then
+		source = [[local Players=game:GetService("Players")
+local plrFromChar=Players.GetPlayerFromCharacter
+local BadgeService=game:GetService("BadgeService")
+local Lobby=script.Parent
+local BadgeId=2124450213
+
+for i,v in pairs(Lobby:GetChildren()) do
+	if v:IsA("BasePart") then
+		if v.Name=="Wall" then
+			v.Touched:Connect(function(part)
+				local c=part:FindFirstAncestorWhichIsA("Model")
+				if c then
+					local p=plrFromChar(Players,c)
+					if p then
+						BadgeService:AwardBadge(p.UserId,BadgeId)
+					end
+				end
+			end)
+		end
+	end
+end]]
+	elseif v.Name == "Kill" and v.Parent.Name == "Baseplate" then
+		source = [[script.Parent.Touched:connect(function(Part)
+	if Part.Parent then
+		local h=Part.Parent:FindFirstChild("Humanoid")
+		if h then
+			h:TakeDamage(h.MaxHealth) -- forcefielded people can pass through
+		end
+	end
+end)
+]]
+	elseif v.Name == "onDied" and v.Parent:FindFirstChildOfClass("Humanoid") then
+		source = [[local char=script.Parent
+local humanoid=char:WaitForChild("Humanoid")
+local hrp=char:WaitForChild("HumanoidRootPart")
+local Alive = true -- since it's copied to the player everytime, everytime this script will run the player will be alive
+local BadgeId=2124444600
+local GroupService=game:GetService("GroupService")
+local BadgeService=game:GetService("BadgeService")
+
+humanoid.Died:connect(function()
+	if Alive == true then -- if the player is alive
+		Alive = false -- then don't let it fire multiple times
+		wait(0.25) -- sometimes the explosion creator values are given after death, so this wait time allows those values to be provided before checking for a creator value (line 12)
+		local player=game.Players:GetPlayerFromCharacter(char)
+		local WOs=player.leaderstats.WOs
+		local KOs=player.leaderstats.KOs
+		local killer=humanoid:FindFirstChild("creator")
+		
+		WOs.Value=WOs.Value+1
+		if killer then
+			print(humanoid.Parent.Name.." was killed by "..killer.Value.Name.."!")
+			if player~=killer.Value then
+				killer.Value.leaderstats.KOs.Value=killer.Value.leaderstats.KOs.Value+1
+				pcall(function()
+					if player.Name==GroupService:GetGroupInfoAsync(game.CreatorId).Owner.Name then
+						if not BadgeService:UserHasBadgeAsync(killer.Value.UserId,BadgeId) then
+							BadgeService:AwardBadge(killer.Value.UserId,BadgeId)
+						end
+					end
+				end)
+			end
+		end
+		local x=workspace:GetDescendants()
+		for i=1,#x do
+			if x[i].Name=="GameValues" then
+				local y=x[i].Teams:GetChildren()
+				for s=1,#y do
+					if y[s].Value==player.TeamColor then
+						if y[s].Spawns.Value==0 then
+							player.TeamColor=BrickColor.new(1001)
+							game.ReplicatedStorage.Remotes.ChangeTeam:FireClient(player,player.TeamColor)
+							player:WaitForChild("AntiTeamKill",5).Value=false
+						end
+					end
+				end
+			end
+		end
+		wait(1) -- -0.5 because of line 7
+		player:LoadCharacter()
+	end
+end)
+
+humanoid.ChildAdded:connect(function(Obj)
+	if Obj.Name=="creator" then
+		wait(.5)
+		Obj:Destroy()
+	end
+end)
+
+hrp.ChildAdded:connect(function(Obj)
+	if Obj:IsA("BodyMover") then
+		wait(.5)
+		Obj:Destroy()
+	end
+end)]]
+	elseif v.Parent:FindFirstChild("RocketDestroyEvent") then
+		source = [[local Rocket = Instance.new("Part")
+Rocket.Locked = true
+Rocket.BackSurface = 3
+Rocket.BottomSurface = 3
+Rocket.FrontSurface = 3
+Rocket.LeftSurface = 3
+Rocket.RightSurface = 3
+Rocket.TopSurface = 3
+Rocket.Size = Vector3.new(1,1,4)
+Rocket.BrickColor = BrickColor.new(23)
+Rocket.CanCollide = false
+
+local ModFx=require(game.ReplicatedStorage.Other)
+local Tool=script.Parent
+local Reload_Enabled=false --Go to StarterPlayer.StarterPlayerScripts.LocalScript for an explnation of why this works
+--local Player=ModFx.GetPlayerFromTool(Tool) --[[This will be refreshed throughout the script 
+--											so that if someone wanted to make the tools 
+--											droppable, itd work with other players	]
+		-- commented cause its useless as a global variable, however not deleted so as to keep the above comments
+		local ColSer=game:GetService("CollectionService")
+		local Debris=game:GetService("Debris")
+
+		local function FireWep(plr,targetPos)
+			if Tool.Enabled==false then return end
+			local Player=ModFx.GetPlayerFromTool(Tool)
+			if plr~=Player then return end
+			local c=plr.Character
+			if not c then return end
+			local h=c:FindFirstChildWhichIsA("Humanoid")
+			local plrTool=c:FindFirstChildWhichIsA("Tool")
+			local Head=c:FindFirstChild("Head")
+			if not Head or not plrTool or not h then return end
+			if plrTool~=Tool then return end
+			if h.Health<=0 then return end
+
+			Tool.Enabled=false
+
+			local dir = targetPos - Head.Position
+			dir = dir*(1/dir.magnitude)
+
+			local pos = Head.Position + (dir * 8)
+			local ad=5000
+
+			local missile = Rocket:clone()
+			missile.Name="Rocket"
+
+			local BV=Instance.new("BodyVelocity")
+			BV.Parent=missile
+			BV.P=12500
+			BV.MaxForce=Vector3.new(ad,ad,ad)
+			BV.Velocity=dir*60
+			missile.CFrame = CFrame.new(pos,  pos + dir)
+
+			local creator_tag = Instance.new("ObjectValue")
+			creator_tag.Value = plr
+			creator_tag.Name = "creator"
+			creator_tag.Parent = missile
+
+			local exp=Tool.Handle.exp:Clone()
+			exp.PlaybackSpeed=math.random(90,110)/100
+			exp.PlayOnRemove=true
+			exp.Parent=missile
+
+			local swoosh=Tool.Handle.swoosh:Clone()
+			swoosh.PlaybackSpeed=math.random(95,105)/100
+			swoosh.Parent=missile
+
+			missile.Parent = workspace
+			ColSer:AddTag(missile,missile.Name) 
+			ColSer:AddTag(missile,plr.Name)
+			missile:SetNetworkOwner(plr)
+			swoosh:Play()
+
+			local effect=plr:FindFirstChild("Effect")
+			if effect and effect.Value~="None" then
+				if effect.Value=="Fire" then
+					Instance.new("Fire",missile)
+				else
+					spawn(function()
+						require(game:GetService("ReplicatedStorage").TrailModule).AddTrail(missile,effect.Value,.5,.5,1)
+					end)
+				end
+			end
+			Debris:AddItem(missile,10)
+			if Reload_Enabled then
+				wait(7)
+			end
+			Tool.Enabled=true
+		end
+
+		Tool.Fire.OnServerEvent:Connect(FireWep)
+
+		local function DestroyRocket(plr,Obj,ClientPos)
+			local x=true
+			local succ,err=pcall(function() 
+				if Obj:GetNetworkOwner()~=plr then x=false end 
+			end) 
+			if err then warn(plr.Name.." may be exploiting") return end -- Not sure how this would happen.
+			if x==false then warn(plr.Name.." is definitely exploiting") --[[plr:Kick("Possible exploit detected")] return end
+			local ServerPos=Obj.Position
+			local creator=Obj:FindFirstChild("creator")
+			local CreatorValue
+			if creator then
+				CreatorValue=creator.Value
+			end
+			local Player=ModFx.GetPlayerFromTool(Tool)
+			if CreatorValue~=nil and CreatorValue==plr and Player and Player==plr and (ServerPos - ClientPos).magnitude < 20 and ColSer:HasTag(Obj,Obj.Name) 
+				and ColSer:HasTag(Obj,plr.Name) then -- all these to ensure that it's a rocket, and its their rocket, and its from their tool
+				-- "(ServerPos - ClientPos).magnitude" = the distance between the serverside and clientside missile on hit
+				Obj:ClearAllChildren()
+				Debris:AddItem(Obj,0)
+				ModFx.Explosion(CreatorValue,"Rocket",ClientPos)
+			end
+		end
+
+		Tool.RocketDestroyEvent.OnServerEvent:connect(DestroyRocket)]]
+	elseif v.Name == "Script" and v.Parent.Name == "Slingshot" then
+		source = [[local Debris = game:GetService("Debris")
+local ball = script.Parent
+local damage = 8
+local Players=game.Players
+local plrFromChar=Players.GetPlayerFromCharacter
+
+local function tagHumanoid(humanoid)
+	local tag = ball:FindFirstChild("creator")
+	if not tag then return end
+	local hc=humanoid:FindFirstChild("creator")
+	if hc then
+		Debris:AddItem(hc,0)
+	end
+	local new_tag = tag:Clone()
+	new_tag.Parent = humanoid
+	Debris:AddItem(new_tag,1)
+end
+
+local function Kill(p1,p2)
+	if not p1 or not p2 then return true end
+	local ATK=p1:FindFirstChild("AntiTeamKill")
+	local eATK=p2:FindFirstChild("AntiTeamKill")
+	if not ATK or not eATK then return true end
+	if ATK.Value==false or eATK.Value==false then return true end
+	if p1.Neutral==true or p2.Neutral==true then return true end
+	if p1.Team==p2.Team then return false end
+end
+
+local function onTouched(hit)
+	
+	local creator=ball:FindFirstChild("creator")
+	if not creator then return end
+	local p=creator.Value
+	if not p then return end
+	local c=creator.Value.Character
+	if not c then return end
+	local h=c:FindFirstChild("Humanoid")
+	if not h then return end
+	local humanoid=hit.Parent:FindFirstChild("Humanoid")
+	
+	if humanoid then
+
+		if humanoid==h then return end
+		if Kill(p,plrFromChar(Players,humanoid.Parent))==false then return end
+		
+		tagHumanoid(humanoid)
+		humanoid:TakeDamage(damage)
+
+		return
+	end
+	damage = damage / 2 -- this doesnt execute if a humanoid exists
+	if damage > 1 then
+		return
+	end
+	connection:disconnect()
+	Debris:AddItem(ball,0)
+end
+
+connection = ball.Touched:connect(onTouched)
+
+r = game:GetService("RunService")
+t, s = r.Stepped:wait()
+d = t + 2.0 - s
+while t < d do
+	t = r.Stepped:wait()
+end
+
+ball:ClearAllChildren()
+Debris:AddItem(ball,0)]]
+	elseif v.Name == "Server" and v.Parent.Name == "Slingshot" then
+		source = [[local Pellet = Instance.new("Part")
+Pellet.Name="Pellet"
+Pellet.Locked = true
+Pellet.BackSurface = 0
+Pellet.BottomSurface = 0
+Pellet.FrontSurface = 0
+Pellet.LeftSurface = 0
+Pellet.RightSurface = 0
+Pellet.TopSurface = 0
+Pellet.Shape = 0
+Pellet.Size = Vector3.new(1,1,1)
+Pellet.BrickColor = BrickColor.new(2)
+
+local ModFx=require(game.ReplicatedStorage.Other)
+local Tool=script.Parent
+local Reload_Enabled=false
+
+local VELOCITY = 85 -- constant
+
+local function FireWep(plr,targetPos)
+	if Tool.Enabled==false then return end
+	if ModFx.GetPlayerFromTool(Tool)~=plr then return end
+	local c=plr.Character
+	if not c then return end
+	local h=c:FindFirstChildWhichIsA("Humanoid")
+	local plrTool=c:FindFirstChildWhichIsA("Tool")
+	local torso=c:FindFirstChild("HumanoidRootPart")
+	local head=c:FindFirstChild("Head")
+	if not h or not plrTool or not torso or not head then return end
+	if plrTool~=Tool then return end
+	if h.Health<=0 then return end
+	
+	Tool.Enabled=false
+	
+	local dir=targetPos-head.Position
+	--start confusing stuff
+	dir=dir*(1/dir.magnitude)
+	local launch=torso.Position+(5*dir)
+	local delta = targetPos - launch
+	local dy = delta.y
+	local new_delta = Vector3.new(delta.x, 0, delta.z)
+	delta = new_delta
+
+	local dx = delta.magnitude
+	local unit_delta = delta.unit
+	
+	local function computeLaunchAngle(dx,dy,grav)
+		local g = math.abs(grav)
+		local inRoot = (VELOCITY^4) - (g*(g*(dx^2) + (2*dy)*(VELOCITY^2)))
+		if inRoot <= 0 then
+			return math.pi/4
+		end
+		local root = math.sqrt(inRoot)
+		local inATan1 = ((VELOCITY^2) + root) / (g*dx)
+	
+		local inATan2 = ((VELOCITY^2) - root) / (g*dx)
+		local answer1 = math.atan(inATan1)
+		local answer2 = math.atan(inATan2)
+		if answer1 < answer2 then return answer1 end
+		return answer2
+	end
+	
+	local theta = computeLaunchAngle(dx, dy, workspace.Gravity)
+
+	local vy = math.sin(theta)
+	local xz = math.cos(theta)
+	local vx = unit_delta.x * xz
+	local vz = unit_delta.z * xz	
+	
+	local vel=Vector3.new(vx,vy,vz) * VELOCITY
+	--end confusing stuff
+	local missile = Pellet:clone()
+	missile.Position=launch
+	missile.Velocity=vel
+	missile.Parent = workspace
+	missile:SetNetworkOwner(plr)
+	
+	local creator_tag = Instance.new("ObjectValue")
+	creator_tag.Value = plr
+	creator_tag.Name = "creator"
+	creator_tag.Parent = missile
+	
+	local damage_value=Instance.new("IntValue")
+	damage_value.Value=8
+	damage_value.Name="damage"
+	damage_value.Parent=missile
+	
+	local l=Tool.Handle.Sound:Clone()
+	l.Parent=Tool.Handle
+	l:Play()
+	l.Ended:connect(function()
+		l:Destroy()
+	end)
+	
+	local newscript=Tool.Script:Clone()
+	newscript.Parent=missile
+	newscript.Disabled=false
+	
+	if Reload_Enabled then
+		wait(0.2)
+	end
+	Tool.Enabled=true
+end
+
+Tool.Fire.OnServerEvent:Connect(FireWep)]]
+	elseif v.Name == "Script" and v.Parent.Name == "Superball" then
+		source = [[local Debris = game:GetService("Debris")
+local ball = script.Parent
+local damage = 55
+local r = game:GetService("RunService")
+local last_sound_time=r.Stepped:wait()
+local Players=game.Players
+local plrFromChar=Players.GetPlayerFromCharacter
+
+local function tagHumanoid(humanoid)
+	local tag = ball:FindFirstChild("creator")
+	if not tag then return end
+	local hc=humanoid:FindFirstChild("creator")
+	if hc then
+		Debris:AddItem(hc,0)
+	end
+	local new_tag = tag:Clone()
+	new_tag.Parent = humanoid
+	Debris:AddItem(new_tag,1)
+end
+
+local function Kill(p1,p2)
+	if not p1 or not p2 then return true end
+	local ATK=p1:FindFirstChild("AntiTeamKill")
+	local eATK=p2:FindFirstChild("AntiTeamKill")
+	if not ATK or not eATK then return true end
+	if ATK.Value==false or eATK.Value==false then return true end
+	if p1.Neutral==true or p2.Neutral==true then return true end
+	if p1.Team==p2.Team then return false end
+end
+
+local function onTouched(hit)
+	local now = r.Stepped:wait()
+	if now - last_sound_time <= .1 then return end--[[ this seems to be a debounce that doesnt allow the 	
+											sound to play more than once during a 0.1s interval]
+		last_sound_time = now
+		if ball.Boing.Playing==false then
+			ball.Boing.PlaybackSpeed=math.random(85,115)/100
+			ball.Boing:play()
+		end
+
+		local creator=ball:FindFirstChild("creator")
+		if not creator then return end
+		local p=creator.Value
+		if not p then return end
+		local c=creator.Value.Character
+		if not c then return end
+		local h=c:FindFirstChild("Humanoid")
+		if not h then return end
+		local humanoid=hit.Parent:FindFirstChild("Humanoid")
+
+		if humanoid then
+			if humanoid==h then return end
+			if Kill(p,plrFromChar(Players,humanoid.Parent))==false then return end
+			tagHumanoid(humanoid)
+			humanoid:TakeDamage(damage)
+			return
+		end
+		damage = damage / 2 -- this doesnt execute if a humanoid exists
+		if damage > 2 then
+			return
+		end
+		connection:disconnect()
+		Debris:AddItem(ball,0)
+	end
+
+	connection = ball.Touched:connect(onTouched)
+
+	t, s = r.Stepped:wait()
+	d = t + 2.0 - s
+	while t < d do
+		t = r.Stepped:wait()
+	end
+
+	ball:ClearAllChildren()
+	Debris:AddItem(ball,0)]]
+	elseif v.Name == "Server" and v.Parent.Name == "Superball" then
+		source = [[local missile = Instance.new("Part")
+missile.Size = Vector3.new(2,2,2)
+missile.Shape = 0
+missile.BottomSurface = 0
+missile.TopSurface = 0 
+missile.Name = "Cannon Shot"
+missile.Elasticity = 1
+missile.Reflectance = .2
+missile.Friction = 0
+
+local ModFx=require(game.ReplicatedStorage.Other)
+local TrailFx=require(game.ReplicatedStorage.TrailModule)
+local Tool=script.Parent
+local Reload_Enabled=false
+local Debris=game:GetService("Debris")
+
+local function FireWep(plr,targetPos)
+	if Tool.Enabled==false then return end
+	local Player=ModFx.GetPlayerFromTool(Tool)
+	if plr~=Player then return end
+	local c=plr.Character
+	if not c then return end
+	local h=c:FindFirstChildWhichIsA("Humanoid")
+	local Head=c:FindFirstChild("Head")
+	local plrTool=c:FindFirstChildWhichIsA("Tool")
+	if not h or not Head or not plrTool then return end
+	if plrTool~=Tool then return end
+	if h.Health<=0 then return end
+	
+	Tool.Enabled=false
+	
+	local lookAt=(targetPos - Head.Position).unit
+	local spawnPos=Head.Position
+	spawnPos=spawnPos+(lookAt*5)
+	
+	local missile2 = missile:Clone()
+	missile2.BrickColor = BrickColor.Random()
+	missile2.Position = spawnPos
+	missile2.Velocity = (lookAt*200)
+	missile2.Parent = workspace
+	missile2:SetNetworkOwner(plr)
+	Tool.Handle.Boing:Play()
+	
+	local creator_tag = Instance.new("ObjectValue")
+	creator_tag.Value = plr
+	creator_tag.Name = "creator"
+	creator_tag.Parent = missile2
+	
+	local newscript=Tool.Script:Clone()
+	newscript.Parent=missile2
+	newscript.Disabled=false
+	
+	local l=Tool.Handle.Boing:Clone()
+	l.Parent=missile2
+	
+	local effect=plr:FindFirstChild("Effect")
+	if effect and effect.Value~="None" then
+		if effect.Value=="Fire" then
+			Instance.new("Fire",missile2)
+		else
+			spawn(function()
+				TrailFx.AddTrail(missile2,effect.Value,1,.4,1)
+			end)
+		end
+	end
+	Debris:AddItem(missile2,5)
+	if Reload_Enabled then
+		wait(2)
+	end
+	Tool.Enabled=true
+end
+
+Tool.Fire.OnServerEvent:Connect(FireWep)
+]]
+	elseif v.Name == "Server" and v.Parent.Name == "Sword" then
+		source = [[local Tool=script.Parent
+local Reload_Enabled=false
+local Damage=Tool:WaitForChild("damage")
+local sword=Tool:WaitForChild("Handle")
+local r = game:service("RunService")
+
+local base_damage = 5
+local slash_damage = 10
+local lunge_damage = 30
+
+local ModFx=require(game.ReplicatedStorage.Other)
+local Player=ModFx.GetPlayerFromTool(Tool)
+
+local trails={
+	["Rainbow"]=function()
+		return game.ServerStorage.Trails.RainbowKeypoints.Color
+	end,
+	["RisingSun"]=function()
+		return game.ServerStorage.Trails.RisingSunKeypoints.Color
+	end,
+	["Arctic"]=function()
+		return game.ServerStorage.Trails.ArcticKeypoints.Color
+	end,
+	["TeamColor"]=function()
+		return ColorSequence.new(Player.TeamColor.Color)
+	end,
+	["Fire"]=function()
+		sword.Trail.Enabled=false -- just in case
+		for i,v in pairs(sword:GetChildren()) do
+			if v:IsA("Attachment") then
+				Instance.new("Fire",v)
+			end
+		end
+	end
+}
+
+local function swordUp()
+	Tool.GripForward = Vector3.new(-1,0,0)
+	Tool.GripRight = Vector3.new(0,1,0)
+	Tool.GripUp = Vector3.new(0,0,1)
+end
+
+local function swordOut()
+	Tool.GripForward = Vector3.new(0,0,1)
+	Tool.GripRight = Vector3.new(0,-1,0)
+	Tool.GripUp = Vector3.new(-1,0,0)
+end
+
+local function IsEffect(str)
+	local a=false
+	for i,v in pairs(trails) do
+		if str==i then
+			a=true
+		end
+	end
+	return a
+end
+
+local function applyTrail(typ)
+	if IsEffect(typ)==false then
+		return
+	end
+	if typ=="Fire" then
+		trails[typ]()
+	else
+		sword.Trail.Enabled=true
+		sword.Trail.Color=trails[typ]()
+	end
+end
+
+local function removeTrail()
+	sword.Trail.Enabled=false
+	for i,v in pairs(sword:GetChildren()) do
+		if v:IsA("Attachment") then
+			v:ClearAllChildren()
+		end
+	end
+end
+
+local function dmg(humanoid,me,ePlayer)
+	humanoid:TakeDamage(Tool.damage.Value) -- cover all humanoids, npc or other
+	if ePlayer then
+		if 	(not humanoid:FindFirstChild("creator")) and 
+			me:FindFirstChild("leaderstats") then
+			local creator = Instance.new("ObjectValue")
+			creator.Value = me
+			creator.Name = "creator"
+			creator.Parent = humanoid
+		end
+		--humanoid:TakeDamage(Tool.damage.Value)
+	end
+end
+
+sword.Touched:connect(function(hit)
+	if hit.Parent then 
+		local humanoid = hit.Parent:FindFirstChild("Humanoid")
+		local vCharacter = Player.Character
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		
+		if humanoid and hum and humanoid~=hum and hum.Health>0 then
+			local ePlayer = game.Players:GetPlayerFromCharacter(humanoid.Parent)
+			if ePlayer then
+				local ATK=Player:FindFirstChild("AntiTeamKill")
+				if 	(ATK and ATK.Value==true) and
+					(Player.Neutral==false and ePlayer.Neutral==false) and
+					Player.TeamColor==ePlayer.TeamColor then
+					return -- force-end the function
+				end
+				dmg(humanoid,Player,ePlayer)
+			else
+				dmg(humanoid,Player)
+			end
+		end
+
+	end 
+end)
+
+local function attack(plr)
+	Damage.Value=slash_damage
+	sword.SwordSlash:Play()
+	local anim = Instance.new("StringValue")
+	anim.Name = "toolanim"
+	anim.Value = "Slash"
+	anim.Parent = Tool
+	Damage.Value=base_damage
+end
+
+local function lunge(plr)
+
+	local effect=Player:FindFirstChild("Effect")
+	if effect then
+		applyTrail(effect.Value)
+	end
+	sword.SwordLunge:Play()
+	Damage.Value=lunge_damage
+	local anim = Instance.new("StringValue")
+	anim.Name = "toolanim"
+	anim.Value = "Lunge"
+	anim.Parent = Tool
+	
+	local vCharacter = Player.Character
+	
+	local force = Instance.new("BodyVelocity")
+	force.velocity = Vector3.new(0,14.5,0) 
+	force.maxForce = Vector3.new(0,5000,0)
+	
+	if Tool.Parent.Name~="Backpack" then
+		force.Parent = vCharacter.HumanoidRootPart
+	end	
+	
+	wait(.25)
+	swordOut()
+--	wait(.25)
+--	force:Destroy() -- now in onDied
+--	wait(.5)
+	wait(.75)
+	swordUp()
+	removeTrail()
+	Damage.Value=base_damage
+end
+
+Tool.Enabled = true
+local last_attack = 0
+
+Tool.Activated:connect(function()
+	if Tool.Enabled==false then return end
+	if Reload_Enabled then
+		Tool.Enabled = false
+	end
+	local humanoid = Player.Character.Humanoid
+	if not humanoid then
+		return
+	end
+	local t = r.Stepped:wait()
+	if humanoid.Health~=0 then
+		if (t - last_attack < .2) then
+			lunge()
+		else
+			attack()
+		end
+	end
+	last_attack = t
+	--wait(.5)
+	Tool.Enabled = true
+end)
+
+Tool.Equipped:connect(function(mouse)
+	sword.Unsheath:Play()
+end)
+]]
+	elseif v.Name == "Server" and v.Parent:FindFirstChild("ResetTime") then
+		source = [[local bomb = Instance.new("Part")
+bomb.Size = Vector3.new(2,2,2)
+bomb.BrickColor = BrickColor.new("Really black")
+bomb.Shape = 0
+bomb.BottomSurface = 0
+bomb.TopSurface = 0
+bomb.Name = "Bomb"
+bomb.Locked = true
+
+local ModFx=require(game.ReplicatedStorage.Other)
+local Tool=script.Parent
+local Reload_Enabled=false
+--To change the blast radius, go to ReplicatedStorage.Other
+
+local function FireWep(plr,cf) -- cant use .activated cause we need the camera orientation in localscript
+	if Tool.Enabled==false then return end
+	local Player=ModFx.GetPlayerFromTool(Tool)
+	if plr~=Player then return end
+	local c=plr.Character
+	if not c then return end
+	local h=c:FindFirstChildWhichIsA("Humanoid")
+	local plrTool=c:FindFirstChildWhichIsA("Tool")
+	if not h or not plrTool then return end
+	if plrTool~=Tool then return end
+	if h.Health<=0 then return end
+	if plr:DistanceFromCharacter(cf.p)>30 then return end -- jan 11 2019 - changed from 20 to 30 studs
+		
+	Tool.Enabled=false
+		
+	local bomb2=bomb:Clone()
+	
+	local exp=Tool.Handle.exp:Clone()
+	exp.PlaybackSpeed=math.random(90,110)/100
+	exp.PlayOnRemove=true
+	exp.Parent=bomb2
+	
+	local click=Tool.Handle.Click:Clone()
+	click.PlaybackSpeed=math.random(95,105)/100
+	click.Parent=bomb2
+	
+--	local creator_tag = Instance.new("ObjectValue") -- Don't need this anymore, as the module only needs the player value
+--	creator_tag.Value = plr
+--	creator_tag.Name = "creator"
+--	creator_tag.Parent = bomb2
+	
+	bomb2.CFrame=cf
+	bomb2.Parent=workspace.BombHolder
+	
+	game.ServerScriptService.b:Fire(plr,"Bomb",bomb2.Position,bomb2)
+	
+	if Reload_Enabled then
+		wait(6)
+	end
+	
+	Tool.Enabled=true
+end
+
+Tool.Fire.OnServerEvent:Connect(FireWep)]]
+	elseif v.Parent.Name == "Trowel" then
+		source = [[local wallHeight = 4
+local brickSpeed = 0.04
+local wallWidth = 12
+local int=1
+
+local ModFx=require(game.ReplicatedStorage.Other)
+local Tool=script.Parent
+local Reload_Enabled=false
+
+local Player=ModFx.GetPlayerFromTool(Tool)
+
+local effectTable={
+	["RisingSun"]={
+		BrickColor.new(21),
+		BrickColor.new(106),
+		BrickColor.new(333),
+		BrickColor.new(24)
+	},
+	["Arctic"]={
+		BrickColor.new(104),
+		BrickColor.new(110--[[219]),
+		BrickColor.new(213),
+BrickColor.new(1013)
+},
+["TeamColor"]={
+	Player.TeamColor,
+}
+}
+
+local brick = Instance.new("Part")
+brick.BottomSurface="Weld"
+brick.Name="Trowel Wall"
+
+local function snap(v)
+	local absX=math.abs(v.x)
+	local absZ=math.abs(v.z)
+	if absX>absZ then
+		return Vector3.new(v.x/absX,0,0)
+	else
+		return Vector3.new(0,0,v.z/absZ)
+	end
+end
+
+local function placeBrick(cf, pos, color,f)
+	local newbrick=brick:Clone()
+	newbrick.BrickColor = color
+	newbrick.CFrame = cf * CFrame.new(pos + newbrick.Size / 2)
+	newbrick.Parent = f
+	newbrick:MakeJoints()
+	return newbrick, pos +  newbrick.Size
+end
+
+
+local function FireWep(plr,targetPos)	
+	if Tool.Enabled==false then return end
+	Player=ModFx.GetPlayerFromTool(Tool) -- refresh it
+	if plr~=Player then return end
+	local c=plr.Character
+	if not c then return end
+	local h=c:FindFirstChildWhichIsA("Humanoid") 
+	if not h then return end
+	if h.Health<=0 then return end
+	local plrTool=c:FindFirstChildWhichIsA("Tool")
+	if not plrTool then return end
+	if plrTool~=Tool then return end
+	if Reload_Enabled then
+		Tool.Enabled=false
+	end
+
+	Tool.Handle.BuildSound:Play()
+	local lookAt = snap((targetPos - plr.Character.Head.Position).unit)
+	local cf = CFrame.new(targetPos, targetPos + lookAt)
+	local color = BrickColor.Random()
+	local bricks = {}
+
+	local effect=plr:FindFirstChild("Effect")
+	local fx=nil
+	if effect and effect.Value and effectTable[effect.Value] then
+		fx=effect.Value -- dont want people switching trails mid-build
+	end
+
+	assert(wallWidth>0)
+	local y = 0
+	local folder=Instance.new("Folder")
+	folder.Name="WallHolder"
+	folder.Parent=workspace
+	game.Debris:AddItem(folder, 15) -- Roblox starts a coroutine outside the script, so no need to make your own cleanup scripts
+	--game:GetService("CollectionService"):AddTag(folder,plr.Name)
+	while y < wallHeight do
+		if fx then
+			for i,v in pairs(effectTable[fx]) do
+				if int==i then
+					color=v
+				end
+			end
+			int=int+1
+		end
+		local p
+		local x = -wallWidth/2
+		while x < wallWidth/2 do
+			local brick
+			brick, p = placeBrick(cf, Vector3.new(x, y, 0), color, folder)
+			x = p.x
+			table.insert(bricks, brick)
+			wait(brickSpeed)
+		end
+		y = p.y
+	end
+	int=1
+
+	wait(5)
+	Tool.Enabled=true
+end
+
+Tool.Fire.OnServerEvent:Connect(FireWep)]]
 	end
 	return source
 end
