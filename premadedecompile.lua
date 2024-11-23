@@ -2557,7 +2557,7 @@ end
 -- Events to listen to any player inputs
 Seat1.Changed:connect(OnSeatsChange)
 Seat2.Changed:connect(OnSeatsChange)]]
-	elseif v.Name == "SwingScript" then
+	elseif v.Name == "SwingScript" and v.Parent:FindFirstChild("Hinge2") then
 		source = [[local Home = script.Parent
 local Supports = Home:WaitForChild("Supports")
 local Swing1 = Home:WaitForChild("Swing1")
@@ -18318,6 +18318,675 @@ local function FireWep(plr,targetPos)
 end
 
 Tool.Fire.OnServerEvent:Connect(FireWep)]]
+	elseif v.Name == "Amura Made This" then
+		source = [[Amura initially made this island for Stickmasterluke's disaster game.
+Props to him. ;D
+]]
+	elseif v.Name == "Weather Machine Power" then
+		source = [[--Made by Stickmasterluke
+
+
+local sp = script.Parent
+
+
+--todo: steam particles form stacks
+--todo: spinning turbine
+--todo: adjustable speed of globespin
+--todo: engine colors
+--todo: tube colors
+
+local powerLevelTag = sp:WaitForChild('PowerLevel')
+local globeTag = sp:WaitForChild('Globe'):WaitForChild('SpinGlobeEnabled')
+local screenFrame = sp:WaitForChild('Screen'):WaitForChild('SurfaceGui'):WaitForChild('TextLabelFull')
+local tube1 = sp:WaitForChild('Tube1')
+local tube2 = sp:WaitForChild('Tube2')
+local engineColor = sp:WaitForChild('EngineColor')
+local emitter1 = sp:WaitForChild('Stacks'):WaitForChild('Union1'):WaitForChild('ParticleEmitter')
+local emitter2 = sp:WaitForChild('Stacks'):WaitForChild('Union2'):WaitForChild('ParticleEmitter')
+
+local mainPart = sp:WaitForChild('MainPart')
+local letterSorting = mainPart:WaitForChild('LetterSorting')
+local powerDown = mainPart:WaitForChild('PowerDown')
+local powerUpSound = mainPart:WaitForChild('PowerUpSound')
+
+
+local engineColors = {
+	[0] = 'Black',
+	[1] = 'Pastel Blue',
+	[2] = 'Pastel violet',
+	[3] = 'Alder',
+	[4] = 'Carnation pink',
+	[5] = 'Persimmon',
+	[6] = 'Bright red',
+	[7] = 'Really red',
+	[8] = 'Toothpaste',
+	[9] = 'Lime green',
+}
+
+local lastValue = powerLevelTag.Value
+function updateState()
+	local val = powerLevelTag.Value
+	if val > lastValue then
+		powerUpSound:Play()
+	end
+	lastValue = val
+
+	screenFrame.Text = tostring(val)
+
+	tube1.BrickColor = BrickColor.new(val >= 1 and 'Cyan' or 'Light blue')
+	tube2.BrickColor = BrickColor.new(val >= 3 and 'Cyan' or 'Light blue')
+	engineColor.BrickColor = BrickColor.new(engineColors[val] or 'Institutional white')
+	emitter2.Enabled = val >= 2
+	emitter1.Enabled = val >= 4
+
+	if val <= 0 then
+		globeTag.Value = false
+		powerDown:Play()
+		letterSorting:Stop()
+	else
+		letterSorting.Pitch = val*.5
+		letterSorting:Play()
+		globeTag.Value = true
+	end
+end
+
+updateState()
+
+powerLevelTag.Changed:connect(updateState)
+
+
+]]
+	elseif v.Name == "OrbSpinyScript" then
+		source = [[--Made by Stickmasterluke
+
+
+local sp = script.Parent
+
+local frame = sp:WaitForChild('Frame')
+local spinGlobeValue = sp:WaitForChild('SpinGlobeEnabled')
+random = math.random
+
+local ringAVs = {}
+
+for _,ring in pairs(sp:GetChildren()) do
+	if ring.Name == 'SpinningRingUnion' then
+		local bp = Instance.new('BodyPosition',ring)
+		bp.maxForce = Vector3.new(1,1,1)*40000
+		bp.Position = frame.Position
+		local bav = Instance.new('BodyAngularVelocity',ring)
+		ring.Anchored = false
+		table.insert(ringAVs,bav)
+	end
+end
+
+while true do
+	wait(2)
+	if spinGlobeValue.Value then
+		for _,ringAV in pairs(ringAVs) do
+			ringAV.AngularVelocity = Vector3.new(random(-2,2),random(-2,2),random(-2,2)) * 3
+		end
+	else
+		for _,ringAV in pairs(ringAVs) do
+			ringAV.AngularVelocity = Vector3.new(0,0,0)
+		end
+	end
+end
+
+
+]]
+	elseif v.Parent.Name == "WaterLevel" then
+		source = [[--Made by Stickmasterluke
+
+sp=script.Parent
+midhight=16
+radius=4.5		--hight
+wavetime=10		--seconds
+shakeradius=6
+phi=.618033988
+a=0
+while true do
+	wait()
+	a=a+1
+	sp.CFrame=CFrame.new(math.sin((a/(wavetime*30/phi))*math.pi)*shakeradius,midhight+math.sin((a/(wavetime*30))*math.pi)*radius,math.sin((a/(wavetime*30*phi))*math.pi)*shakeradius)
+end
+]]
+	elseif v.Name == "CompassScript" then
+		source = [[
+--
+
+
+--todo:this could and should all be in a local script, with a bindable event
+
+local sp = script.Parent
+local event = game:GetService("ReplicatedStorage"):WaitForChild('Event')
+local player = nil
+
+local equipped = false
+local equipCount = 0
+
+sp.Equipped:connect(function()
+	equipCount = equipCount + 1
+	local thisEquip = equipCount
+	equipped = true
+	while equipped and thisEquip == equipCount do
+		local character = sp.Parent
+		player = game.Players:GetPlayerFromCharacter(character)
+		if player then
+			event:FireClient(player, 'OpenCompass')
+		end
+		wait(1)
+	end
+end)
+sp.Unequipped:connect(function()
+	equipped = false
+	if player then
+		event:FireClient(player, 'CloseCompass')
+	end
+end)
+
+
+]]
+	elseif v.Name == "BalloonScript" then
+		source = [[--
+
+
+local Tool = script.Parent
+local handle=Tool:WaitForChild("Handle",5)
+local upAndAway = false
+local humanoid = nil
+local head = nil
+local upAndAwayForce=handle.BodyForce
+isfloating=false
+
+local equalizingForce = 236 / 1.2 -- amount of force required to levitate a mass
+local gravity = 1.05 -- things float at > 1
+
+local height = nil
+local maxRise =  75
+
+function float(lift)
+	if not isfloating then
+		isfloating=true
+		while equipped do
+			lift=recursiveGetLift(Tool.Parent)
+			upAndAwayForce.force=Vector3.new(0,lift*.8,0)
+			--if Tool.Handle.Position.y > height + maxRise then
+			if Tool.Handle.Position.y>300 then
+				equipped=false
+				Tool.Handle.Pop:Play()
+				Tool.GripPos=Vector3.new(0,-.4,0)
+				Tool.Handle.Mesh.MeshId = "http://www.roblox.com/asset/?id=26725510"
+			end
+			for i=1,4 do
+				updateBalloonSize()
+				wait(1/20)
+			end
+		end
+		upAndAwayForce.force=Vector3.new(0,0,0)
+		isfloating=false
+	end
+end
+
+function onEquipped()
+	Tool.Handle.Mesh.MeshId="http://www.roblox.com/asset/?id=25498565"
+	equipped = true
+	--[[Tool.GripPos = Vector3.new(0,-1,0)
+	Tool.GripForward = Vector3.new(0,1,0)
+	Tool.GripRight = Vector3.new(0,0,-1)
+	Tool.GripUp = Vector3.new(1,0,0)]
+		Tool.Grip = CFrame.new(0,-1,0,0,1,0,0,0,-1,-1,0,0)
+		local hrp = Tool.Parent:FindFirstChild('HumanoidRootPart')
+		if hrp then
+			height = hrp.Position.y
+		else
+			height = 0
+		end
+		lift=recursiveGetLift(Tool.Parent)
+		float(lift)
+	end
+
+	function onUnequipped()
+		equipped = false
+	--[[Tool.GripForward = Vector3.new(1,0,0)
+	Tool.GripRight = Vector3.new(0,0,1)
+	Tool.GripUp = Vector3.new(0,1,0)]
+		handle.Mesh.Scale = Vector3.new(1,1,1)
+	end
+
+	Tool.Unequipped:connect(onUnequipped)
+	Tool.Equipped:connect(onEquipped)
+
+	function recursiveGetLift(node)
+		local m = 0
+		local c = node:GetChildren()
+		if (node:FindFirstChild("Head") ~= nil) then head = node:FindFirstChild("Head") end -- nasty hack to detect when your parts get blown off
+
+		for i=1,#c do
+			if c[i]:IsA("BasePart") then	
+				if (head ~= nil and (c[i].Position - head.Position).magnitude < 10) then -- GROSS
+					if c[i].Name == "Handle" then
+						m = m + (c[i]:GetMass() * equalizingForce * 1) -- hack that makes hats weightless, so different hats don't change your jump height
+					else
+						m = m + (c[i]:GetMass() * equalizingForce * gravity)
+					end
+				end
+			end
+			m = m + recursiveGetLift(c[i])
+		end
+		return m
+	end
+
+	function updateBalloonSize()
+		local range=(height+maxRise)-Tool.Handle.Position.y
+	--[[if range<maxRise/3 then
+		Tool.Handle.Mesh.Scale=Vector3.new(1,1,1)*2
+	elseif range<maxRise*(2/3) then
+		Tool.Handle.Mesh.Scale=Vector3.new(1,1,1)*1.5
+	else
+		Tool.Handle.Mesh.Scale=Vector3.new(1,1,1)
+	end]
+		Tool.Handle.Mesh.Scale=Vector3.new(1,1,1)*(2-math.min(1,math.max(0,range/maxRise)))
+	end
+
+--[[
+while true do
+	wait(1)
+	script.Parent.Handle.BillboardGui.TextLabel1.Text = 'Server: '..tostring(script.Parent.Handle.BodyForce.force.Y)
+	randomshade = .8+math.random()*.2
+	script.Parent.Handle.BillboardGui.TextLabel1.BackgroundColor3 = Color3.new(randomshade,randomshade,randomshade)
+end
+]
+
+
+	]]
+	elseif v.Name == "AppleScript" then
+		source = [[--Made by Stickmasterluke
+
+
+local sp=script.Parent
+
+
+local healamount=15
+local extrawait=6
+
+local handle=sp:WaitForChild('Handle',5)
+local eatsound=handle:WaitForChild('EatSound',5)
+local sparkles=handle:WaitForChild('Sparkles',5)
+local event=sp:WaitForChild('Event')
+
+local equipped=false
+local check=true
+local chr=nil
+local h=nil
+local plr=nil
+local equipinstant=nil
+
+
+sp.Activated:connect(function()
+	if check and equipped and h and h.Health>0 then
+		check=false
+		event:FireClient(plr,'EatAnim')
+		wait(1)
+		if h.Health>0 and equipped then
+			--print('Healing',h.Parent,h.Health,'to',h.Health+healamount)
+			if h.Health < 100 then	--Will overheal without this check
+				h:TakeDamage(-healamount)
+			end
+			--h.Health=h.Health+healamount
+			if eatsound then
+				eatsound:Play()
+			end
+		end
+		wait(.62+extrawait)
+		check=true
+	end
+end)
+
+sp.Equipped:connect(function(mouse)
+	equipped=true
+	chr=sp.Parent
+	plr=game.Players:GetPlayerFromCharacter(chr)
+	h=chr:FindFirstChild('Humanoid')
+
+	local myequipinstant={}
+	equipinstant=myequipinstant
+	wait(2)
+	if equipped and myequipinstant==equipinstant then
+		sparkles.Enabled=true
+		wait(.3)
+		sparkles.Enabled=false
+	end
+end)
+
+sp.Unequipped:connect(function()
+	equipped=false
+end)
+
+
+]]
+	elseif v.Name == "Bounce" and v.Parent.Parent:FindFirstChild("SMallRailing") then
+		source = [[function onTouched(part)
+	if part.Parent ~= nil then
+		local h = part.Parent:findFirstChild("Humanoid")
+		local hrp = part.Parent:FindFirstChild('HumanoidRootPart')
+		if h~=nil and hrp and h.Health > 0 then
+			hrp.Velocity=Vector3.new(0,58,0)
+			wait(0.5)
+		end			
+	end
+end
+
+script.Parent.Touched:connect(onTouched)
+]]
+	elseif v.Name == "Script" and v.Parent.Parent:FindFirstChild("MissileSystem1") then
+		source = [[function onChildAdded(child)
+	if child.Name == "SeatWeld" then
+		child.C0 = CFrame.new(0,(script.Parent.Size.y/2 + 1.5),0)
+		child.C1 = CFrame.new(0,0,0)
+	end
+end
+
+script.Parent.ChildAdded:connect(onChildAdded)]]
+	elseif v.Name == "Script" and v.Parent.Parent:FindFirstChild("TopSeat") then
+		source = [[--Made by Stickmasterluke
+]]
+	elseif v.Name == "MusicScript" and v.Parent.Name == "Music" and v.Parent:IsA("Sound") then
+		source = [[--
+
+
+local sp = script.Parent
+
+wait(5)
+
+sp:Play()
+]]
+	elseif v.Name == "FountianScript" then
+		source = [[--Made by Stickmasterluke
+	--OLD CODE
+
+
+local sp = script.Parent
+
+local debris = game:GetService("Debris")
+
+local baseupvelocity = 40
+local variety = 15
+local colors = {"Bright blue", "Medium blue", "Pastel Blue"}
+
+local originalPosition = Vector3.new(0,0,0)
+
+
+wait(1)
+if sp and sp.Parent then
+	originalPosition = sp.Position
+end
+
+while sp and sp.Parent and ((sp.Position-originalPosition).magnitude<2) do
+	local p = Instance.new("Part")
+	p.Name = "FountainWater"
+	p.formFactor = "Symmetric"
+	p.Shape = "Ball"
+	p.Material = 'Foil'
+	p.Transparency = .5
+	if math.random()<.5 then
+		p.CanCollide = false
+	end
+	p.Size = Vector3.new(1,1,1)
+	p.BrickColor = BrickColor.new(colors[math.random(1,#colors)])
+	p.TopSurface = "Smooth"
+	p.BottomSurface = "Smooth"
+	p.CFrame = CFrame.new(sp.Position+Vector3.new(0,1.5,0))
+	p.Velocity = Vector3.new((math.random()-.5)*variety,baseupvelocity+((math.random()-.5)*variety),(math.random()-.5)*variety)
+	p.RotVelocity = Vector3.new((math.random()-.5)*variety,(math.random()-.5)*variety,(math.random()-.5)*variety)
+	p.Elasticity = 0
+	p.Friction = 1
+	debris:AddItem(p, 2.5)
+	p.Parent = sp
+	wait(.2+(math.random()*.1))
+end
+
+
+
+]]
+	elseif v.Name == "HammerGame" and v.Parent.Name == "HammerGame" then
+		source = [[--Made by Stickmasterluke
+
+
+local sp = script.Parent
+
+local button = sp:WaitForChild('Button')
+
+local debounce = false
+
+button.Touched:connect(function(hit)
+	if hit and hit.Parent and not debounce and button and button.Velocity.magnitude == 0 then
+		local strength = math.abs(hit.Velocity.y)
+		local hitSound = button:FindFirstChild('HitSound')
+		if strength > 10 and hitSound then
+			hitSound:Play()
+		end
+		wait(.1)
+		if strength > 65 then
+			debounce = true
+			local bell = sp:FindFirstChild('Bell')
+			if bell then
+				local bellSound = bell:FindFirstChild('BellSound')
+				if bellSound then
+					bellSound:Play()
+				end
+				local bellMesh = bell:FindFirstChild('Mesh')
+				if bellMesh then
+					bellMesh.Scale = Vector3.new(1.25,1.25,1.25)
+				end
+				wait(1)
+				if bellMesh then
+					bellMesh.Scale = Vector3.new(1,1.25,1)
+				end
+			end
+			wait(1)
+			debounce = false
+		end
+	end
+end)
+
+
+]]
+	elseif v.Name == "SwingScript" and v.Parent.Name == "MotorPiece" then
+		source = [[--Made by Stickmasterluke
+
+local sp = script.Parent
+
+
+while sp and sp.Parent and sp:IsDescendantOf(game.Workspace) do
+	sp.FrontParamB = .05
+	for i=1,2 do
+		sp.FrontParamB = sp.FrontParamB * -1
+		wait(2)
+	end
+	sp.FrontParamB = .1
+	for i=1,4 do
+		sp.FrontParamB = sp.FrontParamB * -1
+		wait(2)
+	end
+	sp.FrontParamB = .2
+	for i=1,2 do
+		sp.FrontParamB = sp.FrontParamB * -1
+		wait(2)
+	end
+	sp.FrontParamB = .05
+	for i=1,2 do
+		sp.FrontParamB = sp.FrontParamB * -1
+		wait(2)
+	end
+	sp.FrontParamB = 0
+	wait(10)
+end
+
+]]
+	elseif v.Name == "WhackAMoleScript" then
+		source = [[--Made by Stickmasterluke
+
+
+local sp = script.Parent
+
+local clickDistance = 16
+local difficultyCycle = 60 --seconds
+
+wait(1)
+
+local points = 0
+local moles = {}
+local startTime = tick()
+
+for _,part in pairs(sp:GetChildren()) do
+	if part.Name == 'Mole' then
+		local clickDetector = part:FindFirstChild('ClickDetector')
+		local hitSound = part:FindFirstChild('HitSound')
+		if clickDetector and hitSound then
+			table.insert(moles, part)
+			clickDetector.MouseClick:connect(function()
+				if part.Transparency == 0 and part.CanCollide then
+					part.Transparency = 1
+					part.CanCollide = false
+					if hitSound then
+						hitSound.Pitch = .8+math.random()*.4
+						hitSound:Play()
+					end
+					if clickDetector then
+						clickDetector.MaxActivationDistance = 0
+					end
+					points = points + 1
+				end
+			end)
+		end
+	end
+end
+
+while sp and sp.Parent and sp:IsDescendantOf(game.Workspace) do
+	local difficulty = (math.sin(((startTime-tick())*math.pi)/difficultyCycle)+1)/2
+
+	local adjustedDifficulty = .25+difficulty*.75
+	if #moles > 0 then
+		local mole = moles[math.random(#moles)]
+		if mole then
+			local clickDetector = mole:FindFirstChild('ClickDetector')
+			if mole.CanCollide or mole.Transparency < 1 or not clickDetector then
+				mole.CanCollide = false
+				mole.Transparency = 1
+				if clickDetector then
+					clickDetector.MaxActivationDistance = 0
+				end
+			else
+				mole.CanCollide = true
+				mole.Transparency = 0
+				clickDetector.MaxActivationDistance = clickDistance
+				delay((2+math.random()*5)*adjustedDifficulty,function()
+					if mole then
+						mole.CanCollide = false
+						mole.Transparency = 1
+						if clickDetector then
+							clickDetector.MaxActivationDistance = 0
+						end
+					end
+				end)
+			end
+		end
+	end
+	wait((.5+math.random()*3)*adjustedDifficulty)
+end
+
+
+]]
+	elseif v.Name == "Weld" and v.Parent.Name == "GasLamp" then
+		source = [[--
+
+t = script.Parent
+
+function stick(x, y)
+	weld = Instance.new("Weld") 
+	weld.Part0 = x
+	weld.Part1 = y
+	local HitPos = x.Position
+	local CJ = CFrame.new(HitPos) 
+	local C0 = x.CFrame:inverse() *CJ 
+	local C1 = y.CFrame:inverse() * CJ 
+	weld.C0 = C0 
+	weld.C1 = C1 
+	weld.Parent = x
+end
+
+function Weldnow()
+	c = t:children()
+	for n = 1, #c do
+		if (c[n].className == "Part") then
+			if (c[n].Name ~= "MainPart") then
+				stick(c[n], t.MainPart)
+			end
+		end
+		if (c[n].className == "WedgePart") then
+			if (c[n].Name ~= "MainPart") then
+				stick(c[n], t.MainPart)
+				wait()
+			end
+		end
+		if (c[n].className == "VehicleSeat") then
+			if (c[n].Name ~= "MainPart") then
+				stick(c[n], t.MainPart)
+			end
+		end
+		if (c[n].className == "Seat") then
+			if (c[n].Name ~= "MainPart") then
+				stick(c[n], t.MainPart)
+			end
+		end
+	end
+end
+
+wait()
+Weldnow()
+]]
+	elseif v.Name == "Script" and v.Parent.Name == "toaster1" then
+		source = [[humanoid = nil
+
+function onTouched(part)
+	if part.Parent ~= nil then
+	local h = part.Parent:findFirstChild("Humanoid")
+		if h~=nil then
+			if isenabled~=0 then
+				if h==humanoid then
+					return
+				end
+
+				local toast=script.Parent.toast:clone()
+				isenabled=0
+				toast.Parent=game.Workspace
+				toast.Transparency=0
+				toast.Locked=false
+				toast.Anchored=false
+				toast.CanCollide=false
+				toast.RotVelocity=Vector3.new(math.random(1,10)/5,math.random(1,10)/5,math.random(1,10)/5)
+----TODO>: toast.position
+				local toastrot=CFrame.new(0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 1, 0)
+				toast.CFrame = script.Parent.toaster.CFrame * CFrame.new(Vector3.new(.75,1,0)) * toastrot
+				wait(0.4)
+				toast.CanCollide=true
+
+				wait(1)
+				isenabled=1
+
+				--IF YOU WANT TOAST TO DISAPPEAR AFTER A WHILE, REMOVE THE -- before next two lines.
+				
+				--wait(120)
+				--toast:destroy()
+				
+
+			end
+		end
+	end
+end
+
+
+script.Parent.toaster.Touched:connect(onTouched)]]
 	end
 	return source
 end
