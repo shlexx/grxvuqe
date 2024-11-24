@@ -19040,6 +19040,420 @@ else
 	end);
 	return;
 	end;]]
+	elseif v.Name == "CookieScript" and v.Parent.Name == "Cookie" then
+		source = [[local Tool = script.Parent
+
+
+enabled = true
+
+function onActivated()
+	if not enabled  then
+		return
+	end
+
+	enabled = false
+	local Char = Tool.Parent
+	Tool.GripForward = Vector3.new(0.439, 0.878, 0.189)
+	Tool.GripPos = Vector3.new(-0.3, 1.2, -1.3)
+	Tool.GripRight = Vector3.new(0.0844, 0.169, -0.982)
+	Tool.GripUp = Vector3.new(0.894, -0.347, 0)
+
+
+	Tool.Handle.EatSound:Play()
+
+	script.Parent.Bites.Value = script.Parent.Bites.Value + 1
+	wait(.8)
+	
+	if (script.Parent.Bites.Value == 3) then
+		local mesh = Instance.new("SpecialMesh", Char:FindFirstChild("Torso"))
+		mesh.MeshType = Enum.MeshType.Sphere
+		for i = 1, 10 do
+			mesh.Scale = Vector3.new(1 + i/10,1 + i/10,1 + (i*2)/10)
+			wait(0.1)
+		end
+		Tool:Destroy()
+	end
+
+
+	Tool.GripForward = Vector3.new(-1, 1, -0)
+	Tool.GripPos = Vector3.new(0.1, -0.3, 0)
+	Tool.GripRight = Vector3.new(0,0, -1)
+	Tool.GripUp = Vector3.new(1,0,0)
+
+
+	enabled = true
+
+end
+
+script.Parent.Activated:connect(onActivated)]]
+	elseif v.Name == "Eat" and v.Parent.Name == "Jawbreaker" then
+		source = [[local Tool = script.Parent;
+
+enabled = true
+
+
+
+
+function onActivated()
+	if not enabled  then
+		return
+	end
+
+	enabled = false
+	Tool.GripForward = Vector3.new(-0.857, -0.514, -0)
+	Tool.GripPos = Vector3.new(-0.35, -0.45, -1.62)
+	Tool.GripRight = Vector3.new(0, 0, -1)
+	Tool.GripUp = Vector3.new(-0.514, 0.857, 0)
+
+	wait(.8)
+	
+	local char = Tool.Parent
+	char.Head.Mesh.Scale = Vector3.new(3,3,3)
+	script.Parent:remove()
+end
+
+function onEquipped()
+end
+
+script.Parent.Activated:connect(onActivated)
+script.Parent.Equipped:connect(onEquipped)
+]]
+	elseif v.Name == "SandwichScript" and v.Parent.Name == "Kandy Bar" then
+		source = [[local Tool = script.Parent;
+
+enabled = true
+
+
+
+
+function onActivated()
+	local char = Tool.Parent
+	if not enabled  then
+		return
+	end
+
+	enabled = false
+	Tool.GripForward = Vector3.new(-0.976,0,-0.217)
+	Tool.GripPos = Vector3.new(.95,-0.76,1.4)
+	Tool.GripRight = Vector3.new(0.217,0, 0.976)
+	Tool.GripUp = Vector3.new(0,1,0)
+	
+	Tool.Handle.EatSound:Play()
+	
+	script.Parent.Bites.Value = script.Parent.Bites.Value + 1
+	wait(.8)
+	
+	if (Tool.Bites.Value == 5) then
+		local hat = game.ReplicatedStorage.Hats.Glove:Clone()
+		hat.Parent = char
+		hat.Handle.SpongeSound:Play()
+		Tool:Destroy()
+	end
+
+	Tool.GripForward = Vector3.new(0,0,1)
+	Tool.GripPos = Vector3.new(0,0,0)	
+	Tool.GripUp = Vector3.new(1,0,0)
+	Tool.GripRight = Vector3.new(0,1,0)
+
+
+	enabled = true
+
+end
+
+function onEquipped()
+	Tool.Handle.OpenSound:play()
+end
+
+script.Parent.Activated:connect(onActivated)
+script.Parent.Equipped:connect(onEquipped)
+]]
+	elseif v.Name == "Eat" and v.Parent.Name == "Krabby Patty" then
+		source = [[local Tool = script.Parent
+
+
+enabled = true
+
+function onActivated()
+	if not enabled  then
+		return
+	end
+
+	enabled = false
+	local Char = Tool.Parent
+	Tool.GripForward = Vector3.new(-1, 0, 0)
+	Tool.GripPos = Vector3.new(-0.5, -0.8, -1.5)
+	Tool.GripRight = Vector3.new(0,0, -1)
+	Tool.GripUp = Vector3.new(0, 1, 0)
+
+
+	Tool.Handle.EatSound:Play()
+
+	script.Parent.Bites.Value = script.Parent.Bites.Value + 1
+	wait(.8)
+	
+	if (script.Parent.Bites.Value == 3) then
+		local mesh = Instance.new("SpecialMesh", Char:FindFirstChild("Left Leg"))
+		local mesh2 = Instance.new("SpecialMesh", Char:FindFirstChild("Right Leg"))
+		mesh.MeshType = Enum.MeshType.Sphere
+		mesh2.MeshType = Enum.MeshType.Sphere
+		for i = 1, 10 do
+			mesh.Scale = Vector3.new(1 + i/10,1 + i/10,1 + (i*2)/10)
+			mesh2.Scale = Vector3.new(1 + i/10,1 + i/10,1 + (i*2)/10)
+			wait(0.1)
+		end
+		Tool:Destroy()
+	end
+
+
+	Tool.GripForward = Vector3.new(-1, 0, 0)
+	Tool.GripPos = Vector3.new(0.1, -0.6, -0.1)
+	Tool.GripRight = Vector3.new(0,0, -1)
+	Tool.GripUp = Vector3.new(0, 1, 0)
+
+
+	enabled = true
+
+end
+
+script.Parent.Activated:connect(onActivated)]]
+	elseif v.Name == "EatScript" and v.Parent.Name == "Spinach" then
+		source = [[local Tool = script.Parent
+
+local TIME_BETWEEN_USES = 32
+local BEFORE_SOUND_TIME = 0.5
+local AFTER_SOUND_TIME = 1.5
+
+local LeftArmMesh = nil
+local RightArmMesh = nil
+
+local Anims = {}
+
+local CLOSED_C1 = CFrame.new(-0.00384521484, -0.523071289, -0.435760498, 0.999947309, -0.00898111332, 0.00493008271, 0.010026129, 0.758797944, -0.651248157, 0.00210815505, 0.651264191, 0.758848369)
+
+local function Attach(part0, part1, name)
+	local motor = Instance.new("Motor6D")
+	motor.Part0 = part0
+	motor.Part1 = part1
+	motor.C0 = CFrame.new()
+	motor.C1 = CLOSED_C1
+	if name then
+		motor.Name = name
+	end
+	motor.Parent = part0
+	return motor
+end
+
+local function Play(animationName)
+	if not Anims[animationName] then
+		local humanoid = Tool.Parent:FindFirstChild('Humanoid')
+		if humanoid and humanoid.ClassName == 'Humanoid' then
+			local unloadedAnim = Tool:FindFirstChild(animationName)
+			if unloadedAnim then
+				Anims[animationName] = humanoid:LoadAnimation(unloadedAnim)
+			end
+		end
+	end
+	if Anims[animationName] then
+		Anims[animationName]:Play()
+	end
+end
+
+local function Stop(animationName)
+	if Anims[animationName] then 
+		Anims[animationName]:Stop()
+	end
+end
+
+function OnActivated()
+	if Tool.Enabled then
+		Tool.Enabled = false
+		local character = Tool.Parent
+		if character  then
+		
+			Play('EatAnim')
+			wait(BEFORE_SOUND_TIME)
+			if character == Tool.Parent then	-- Check that character is still drinking
+			
+				local drinkSound = Tool:FindFirstChild('DrinkSound')
+				if drinkSound then drinkSound:Play() end
+				wait(AFTER_SOUND_TIME)
+				local mesh = Instance.new("SpecialMesh", character:FindFirstChild("Left Arm"))
+				local mesh2 = Instance.new("SpecialMesh", character:FindFirstChild("Right Arm"))
+				mesh.MeshType = Enum.MeshType.Sphere
+				mesh2.MeshType = Enum.MeshType.Sphere
+				for i = 1, 10 do
+					mesh.Scale = Vector3.new(1 + i/10,1 + i/10,1 + (i*2)/10)
+					mesh2.Scale = Vector3.new(1 + i/10,1 + i/10,1 + (i*2)/10)
+					wait(0.1)
+				end
+				Stop('EatAnim')
+				Stop('EquipAnim')
+				Tool:Destroy()
+			
+			else
+				Tool.Enabled = true
+			end
+
+		end
+	end
+end
+
+function OnEquipped()
+	Attach(Tool.Handle, Tool.Lid)
+	Stop('EatAnim')
+	Play('EquipAnim')
+end
+
+function OnUnequipped()
+	Stop('EatAnim')
+	Stop('EquipAnim')
+end
+	
+
+Tool.Equipped:connect(OnEquipped)
+Tool.Activated:connect(OnActivated)
+Tool.Unequipped:connect(OnUnequipped)
+
+]]
+	elseif v.Name == "AICode" then
+		source = [[--[[
+	OUTLINE: 
+		Abilities Needed:
+			- Pathfinding
+			- Picking up Tools
+			- Straffing*
+--]
+
+		----------------------
+		---define variables---
+		----------------------
+		local pathfinding=game:GetService("PathfindingService");--the service used to compute paths
+		local AI=script.Parent;--the AI
+		local humanoid=AI:WaitForChild("KillerNPC");--the Humanoid object
+		local torso=AI:WaitForChild("Torso");--the Torso object
+		---- user inputs ----
+		local maxWalkDistance=500;--the maximum walking distance
+		local pickUpTools=true;--will pick up and equip tools that are touched
+
+		----------------------
+		---define functions---
+		----------------------
+
+		--Moves to specific point 'finish' if a path is possible to follow
+		function MoveTo(finish,TD)
+			local path=pathfinding:ComputeRawPathAsync(torso.Position,finish,maxWalkDistance);
+			--if the path is followable/reachable
+			if path.Status.Value<3 then
+				for _,v in ipairs(path:GetPointCoordinates()) do
+					humanoid:MoveTo(v);
+					local distance=0;
+					repeat
+						distance=TD and (Vector2.new(v.x,v.z)-Vector2.new(torso.Position.x,torso.Position.z)).magnitude or (v-torso.Position).magnitude;
+						Wait();
+					until distance<2
+				end
+			end
+		end
+
+		--returns all of the instances of a specific instance in a model
+		function GetSpecificInstances(model,type)
+			local tab={};
+			for _,v in pairs(model:GetChildren()) do
+				if v:IsA(type) then
+					table.insert(tab,v);
+				end
+			end
+			return tab;
+		end
+
+		--------------
+		---run code---
+		--------------
+
+		--equip tools
+		if pickUpTools then
+			for _,v in pairs(GetSpecificInstances(AI,"Part")) do
+				v.Touched:connect(function(part)
+					if part.Name=="Handle" and part.Parent:IsA("Tool") then
+						if (#GetSpecificInstances(part.Parent.Parent,"Humanoid")==0 or part.Parent.Parent==workspace) and #GetSpecificInstances(AI,"Tool")==0 then
+							part.Parent.Parent=AI;
+						end end
+				end
+				);
+			end
+		end
+
+		--while true do
+		--local point=Vector3.new(math.random(-256,256),torso.Position.y,math.random(-256,256));
+		--MoveTo(point,true);
+		--wait(math.random(3,5))
+		--end
+		]]
+	elseif v.Name == "Sound" and v.Parent.Name == "Knight" then
+		source = [[-- util
+
+function waitForChild(parent, childName)
+	local child = parent:findFirstChild(childName)
+	if child then return child end
+	while true do
+		child = parent.ChildAdded:wait()
+		if child.Name==childName then return child end
+	end
+end
+
+function newSound(id)
+	local sound = Instance.new("Sound")
+	sound.SoundId = id
+	sound.archivable = false
+	sound.Parent = script.Parent.Head
+	return sound
+end
+
+-- declarations
+
+local sDied = newSound("rbxasset://sounds/uuhhh.wav")
+local sFallingDown = newSound("rbxasset://sounds/splat.wav")
+local sFreeFalling = newSound("rbxasset://sounds/swoosh.wav")
+local sGettingUp = newSound("rbxasset://sounds/hit.wav")
+local sJumping = newSound("rbxasset://sounds/button.wav")
+local sRunning = newSound("rbxasset://sounds/bfsl-minifigfoots1.mp3")
+sRunning.Looped = true
+
+local Figure = script.Parent
+local Head = waitForChild(Figure, "Head")
+local Humanoid = waitForChild(Figure, "KillerNPC")
+
+-- functions
+
+function onDied()
+	sDied:Play()
+end
+
+function onState(state, sound)
+	if state then
+		sound:Play()
+	else
+		sound:Pause()
+	end
+end
+
+function onRunning(speed)
+	if speed>0.01 then
+		sRunning:Play()
+	else
+		sRunning:Pause()
+	end
+end
+
+-- connect up
+
+Humanoid.Died:connect(onDied)
+Humanoid.Running:connect(onRunning)
+Humanoid.Jumping:connect(function(state) onState(state, sJumping) end)
+Humanoid.GettingUp:connect(function(state) onState(state, sGettingUp) end)
+Humanoid.FreeFalling:connect(function(state) onState(state, sFreeFalling) end)
+Humanoid.FallingDown:connect(function(state) onState(state, sFallingDown) end)
+]]
 	end
 	return source
 end
