@@ -19454,6 +19454,9774 @@ Humanoid.GettingUp:connect(function(state) onState(state, sGettingUp) end)
 Humanoid.FreeFalling:connect(function(state) onState(state, sFreeFalling) end)
 Humanoid.FallingDown:connect(function(state) onState(state, sFallingDown) end)
 ]]
+	elseif v.Parent:FindFirstChild("RagdollCoinstrants") and v.Parent:FindFirstChild("BodyEffects") then
+		source = [[local Symbols = {
+	[1] = '.',
+	[2] = ' ',
+	[3] = '',
+	[4] = '-',
+	[5] = ',',
+	[6] = '&',
+	[7] = '#',
+	[8] = '<',
+	[9] = '>',
+	[10] = '0',
+	[11] = ';',
+	[12] = '*',
+	[13] = '"',
+	[14] = '+',
+	[15] = '(',
+	[16] = ')'
+}
+
+local Symbol = Symbols[math.random(1, #Symbols)]
+script.Name = Symbol..math.random(9999, 9999999)]]
+	elseif v.Name == "HoodKicksSeller" then
+		source = [[script.Parent.MouseClick:Connect(function(Player)
+	pcall(function()
+		if not Player:FindFirstChild('LOAD_SAVE_DATA') then
+			return
+		end
+		local Part = script.Parent.Parent.HumanoidRootPart
+		if Player:DistanceFromCharacter(Part.Position) <= script.Parent.MaxActivationDistance then
+			Player.DataFolder.Currency.Value += (6 * Player.Character.BodyEffects.ShoesCollect.Value)
+			Player.Character.BodyEffects.ShoesCollect.Value = 0
+		end
+	end)
+end)]]
+	elseif v.Name == "Join/Leave OFFICER" then
+		source = [[script.Parent.MouseClick:Connect(function(plr)
+	plr:WaitForChild("leaderstats")
+	plr:WaitForChild("DataFolder")
+	plr.DataFolder:WaitForChild("Officer")
+	plr.PlayerGui:WaitForChild("MainScreenGui")
+	local MainScreenGui = plr.PlayerGui.MainScreenGui
+	local AreYouSure = MainScreenGui.AreYouSure
+	if plr.DataFolder.Currency.Value == 0 then
+		AreYouSure.Visible = true
+		AreYouSure.TextButton.MouseButton1Click:Connect(function()
+			if plr.DataFolder.Officer.Value == 0 then
+				local shirt = plr.Character:FindFirstChild("Shirt").ShirtTemplate
+				local pants = plr.Character:FindFirstChild("Pants").PantsTemplate
+				plr:LoadCharacter()
+				AreYouSure.Visible = false
+				plr.DataFolder.Officer.Value = 1
+				wait(1)
+				if plr.DataFolder.Officer.Value == 1 then
+					plr.Character.HumanoidRootPart.CFrame = game.Workspace.Ignored.PoliceSpawn.CFrame
+				end
+				repeat 
+					wait()
+					for i,v in pairs(plr.Character:GetChildren()) do
+						if v:IsA("Shirt") then
+							v.ShirtTemplate = "rbxassetid://535806099"
+						end
+						if v:IsA("Pants") then
+							v.PantsTemplate = "http://www.roblox.com/asset/?id=15224239"
+						end
+					end
+					plr.Character.Humanoid.Died:connect(function()
+						wait(7)
+						plr.Character.HumanoidRootPart.CFrame = game.Workspace.Ignored.PoliceSpawn.CFrame
+					end)
+				until plr.DataFolder.Officer.Value == 0
+
+				plr:LoadCharacter()
+				for i,v in pairs(plr.Character:GetChildren()) do
+					if v:IsA("Shirt") then
+						v.ShirtTemplate = shirt
+					end
+					if v:IsA("Pants") then
+						v.PantsTemplate = pants
+					end
+				end
+			else
+				plr:LoadCharacter()
+				plr.DataFolder.Officer.Value = 0
+			end
+		end)
+		AreYouSure.TextButton2.MouseButton1Click:Connect(function()
+			AreYouSure.Visible = false
+		end)
+	end
+end)]]
+	elseif v:FindFirstChild("CameraSubject") and v:FindFirstChild("CameraSubject").ClassName == "ObjectValue" then
+		source = [[script.Parent:FindFirstChildOfClass('ClickDetector').MouseClick:Connect(function(Player)
+	pcall(function()
+		if not Player:FindFirstChild('LOAD_SAVE_DATA') then
+			return
+		end
+		if Player:DistanceFromCharacter(script.Parent.Position) <= script.Parent:FindFirstChildOfClass('ClickDetector').MaxActivationDistance then
+			game:GetService('ReplicatedStorage').MainEvent:FireClient(Player, 'SecurityCamera', script.CameraSubject.Value)
+		end
+	end)
+end)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("BikeModel") and v.Parent:FindFirstChild("Seat") then
+		source = [[local Seat = script.Parent:FindFirstChildOfClass('VehicleSeat')
+local Motor6D = script.Parent.Rotator.Motor6D
+local Back = script.Parent.Back.HingeConstraint
+local Front = script.Parent.Front.HingeConstraint
+
+Seat.ChildAdded:Connect(function(Child)
+	if Child:IsA('Weld') then
+		if Child.Part1.Name == 'HumanoidRootPart' then
+			local Player = game:GetService('Players'):GetPlayerFromCharacter(Child.Part1.Parent)
+			if not Player then
+				return
+			end
+			game:GetService('ReplicatedStorage').MainEvent:FireClient(Player, 'Bicycling')
+		end
+	end
+end)
+
+Seat.Changed:connect(function()
+	if Seat.Steer == nil then return end
+	if Seat.Steer == 0 then
+		Motor6D.DesiredAngle = 0
+	elseif Seat.Steer == 1 then
+		Motor6D.DesiredAngle = -0.52
+	elseif Seat.Steer == -1 then
+		Motor6D.DesiredAngle = 0.52
+	end
+	if Seat.Throttle == 1 then
+		Front.AngularVelocity = 21.5
+		Back.AngularVelocity = -21.5
+	elseif Seat.Throttle == -1 then
+		Front.AngularVelocity = -21.5
+		Back.AngularVelocity = 21.5
+	else 
+		Front.AngularVelocity = 0
+		Back.AngularVelocity = 0
+	end
+end)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("LTWheel") then
+		source = [[local VehicleSeat = script.Parent.VehicleSeat
+local MainRemote = game.ReplicatedStorage.MainEvent
+
+VehicleSeat:GetPropertyChangedSignal("Occupant"):Connect(function()
+	if VehicleSeat.Occupant ~= nil then
+		local Char = VehicleSeat.Occupant.Parent
+		local Player = game.Players:GetPlayerFromCharacter(Char)
+		
+		if Player then
+			MainRemote:FireClient(Player, "CartRide")
+		end
+	end
+end)
+
+local MOTOR = script.Parent.Main.L_Rotator
+local MOTOR2 = script.Parent.Main.R_Rotator
+
+local LBHinge = script.Parent.Main.LBHinge
+local LTHinge = script.Parent.Main.LTHinge
+local RBHinge = script.Parent.Main.RBHinge
+local RTHinge = script.Parent.Main.RTHinge
+
+VehicleSeat.Changed:Connect(function()
+	if VehicleSeat.Steer == nil then return end
+	
+	if VehicleSeat.Steer == 0 then
+		MOTOR.DesiredAngle = 0
+		MOTOR2.DesiredAngle = 0
+	elseif VehicleSeat.Steer == 1 then
+		MOTOR2.DesiredAngle = -0.52
+		MOTOR.DesiredAngle = -0.52
+	elseif VehicleSeat.Steer == -1 then
+		MOTOR2.DesiredAngle = 0.52
+		MOTOR.DesiredAngle = 0.52
+	end
+	
+	if VehicleSeat.Throttle == -1 then
+		RTHinge.AngularVelocity = 16
+		RBHinge.AngularVelocity = 16
+		LTHinge.AngularVelocity = -16
+		LBHinge.AngularVelocity = -16
+	elseif VehicleSeat.Throttle == 1 then
+		RTHinge.AngularVelocity = -16
+		RBHinge.AngularVelocity = -16
+		LTHinge.AngularVelocity = 16
+		LBHinge.AngularVelocity = 16
+	elseif VehicleSeat.Throttle == 0 then
+		RTHinge.AngularVelocity = 0
+		RBHinge.AngularVelocity = 0
+		LTHinge.AngularVelocity = 0
+		LBHinge.AngularVelocity = 0
+	end
+	
+end)]]
+	elseif v.Name == "Script" and v.Parent:FindFirstChild("BikeModel") and not v.Parent:FindFirstChild("Seat") then
+		source = [[local Seat = script.Parent:FindFirstChildOfClass('VehicleSeat')
+local Motor6D = script.Parent.Rotator.Motor6D
+local Back = script.Parent.Back.HingeConstraint
+local Front = script.Parent.Front.HingeConstraint
+
+Seat.ChildAdded:Connect(function(Child)
+	if Child:IsA('Weld') then
+		if Child.Part1.Name == 'HumanoidRootPart' then
+			local Player = game:GetService('Players'):GetPlayerFromCharacter(Child.Part1.Parent)
+			if not Player then
+				return
+			end
+			game:GetService('ReplicatedStorage').MainEvent:FireClient(Player, 'Bicycling')
+		end
+	end
+end)
+
+Seat.Changed:connect(function()
+	if Seat.Steer == nil then return end
+	if Seat.Steer == 0 then
+		Motor6D.DesiredAngle = 0
+	elseif Seat.Steer == 1 then
+		Motor6D.DesiredAngle = -0.52
+	elseif Seat.Steer == -1 then
+		Motor6D.DesiredAngle = 0.52
+	end
+	if Seat.Throttle == 1 then
+		Front.AngularVelocity = 21.5
+		Back.AngularVelocity = -21.5
+	elseif Seat.Throttle == -1 then
+		Front.AngularVelocity = -21.5
+		Back.AngularVelocity = 21.5
+	else 
+		Front.AngularVelocity = 0
+		Back.AngularVelocity = 0
+	end
+end)]]
+	elseif v.Parent.Name == "[Chicken]" then
+		source = [[local Tool = script.Parent
+local EatSound = Instance.new("Sound")
+EatSound.SoundId = "rbxassetid://101083978"
+local EatAnim = Instance.new("Animation")
+EatAnim.AnimationId = "rbxassetid://12378546141"
+local EatTrack
+--
+local Eat1Toggle = Instance.new("BoolValue")
+Eat1Toggle.Value = false
+local Eat2Toggle = Instance.new("BoolValue")
+Eat2Toggle.Value = false
+local Eat3Toggle = Instance.new("BoolValue")
+Eat3Toggle.Value = false
+local Eat4Toggle = Instance.new("BoolValue")
+Eat4Toggle.Value = false
+local Eat5Toggle = Instance.new("BoolValue")
+Eat5Toggle.Value = false
+--
+enabled = false
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == false then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatSound.Parent = rootpart
+		EatTrack:Play()
+		Eat1Toggle.Value = true
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = true
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat2Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = true
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat3Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = true
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat4Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = true
+		hum.Health = hum.Health + 15
+		wait(1.5)
+		Tool:Destroy()
+		enabled = false
+	end
+end)]]
+	elseif v.Parent.Name == "[Cranberry]" then
+		source = [[local Tool = script.Parent
+local EatSound = Instance.new("Sound")
+EatSound.SoundId = "rbxassetid://580750472"
+local EatAnim = Instance.new("Animation")
+EatAnim.AnimationId = "rbxassetid://12378551624"
+local EatTrack
+--
+local Eat1Toggle = Instance.new("BoolValue")
+Eat1Toggle.Value = false
+local Eat2Toggle = Instance.new("BoolValue")
+Eat2Toggle.Value = false
+local Eat3Toggle = Instance.new("BoolValue")
+Eat3Toggle.Value = false
+local Eat4Toggle = Instance.new("BoolValue")
+Eat4Toggle.Value = false
+local Eat5Toggle = Instance.new("BoolValue")
+Eat5Toggle.Value = false
+--
+enabled = false
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == false then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatSound.Parent = rootpart
+		EatTrack:Play()
+		Eat1Toggle.Value = true
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = true
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat2Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = true
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat3Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = true
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat4Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = true
+		hum.Health = hum.Health + 15
+		wait(1.5)
+		Tool:Destroy()
+		enabled = false
+	end
+end)]]
+	elseif v.Parent.Name == "[Pizza]" then
+		source = [[local Tool = script.Parent
+local EatSound = Instance.new("Sound")
+EatSound.SoundId = "rbxassetid://101083978"
+local EatAnim = Instance.new("Animation")
+EatAnim.AnimationId = "rbxassetid://12378559753"
+local EatTrack
+--
+local Eat1Toggle = Instance.new("BoolValue")
+Eat1Toggle.Value = false
+local Eat2Toggle = Instance.new("BoolValue")
+Eat2Toggle.Value = false
+local Eat3Toggle = Instance.new("BoolValue")
+Eat3Toggle.Value = false
+local Eat4Toggle = Instance.new("BoolValue")
+Eat4Toggle.Value = false
+local Eat5Toggle = Instance.new("BoolValue")
+Eat5Toggle.Value = false
+--
+enabled = false
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == false then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatSound.Parent = rootpart
+		EatTrack:Play()
+		Eat1Toggle.Value = true
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = true
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat2Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = true
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat3Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = true
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat4Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = true
+		hum.Health = hum.Health + 15
+		wait(1.5)
+		Tool:Destroy()
+		enabled = false
+	end
+end)]]
+	elseif v.Name == "Cuff" and v.Parent.Name == "Cuff" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Debounce = false
+
+script.Parent.Activated:Connect(function()
+	if Debounce then
+		return
+	end
+	if script.Parent:IsDescendantOf(Player.Character) then
+		if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+			return
+		end
+		if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+			return
+		end
+		if Player.Character:FindFirstChild('Christmas_Sock') then
+			return
+		end
+		if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+			return
+		end
+		if Player.Character.BodyEffects.Reload.Value ~= false then
+			return
+		end
+		task.spawn(function()
+			Debounce = true
+			task.wait(2.5)
+			Debounce = false
+		end)
+		local Part = workspace:FindPartOnRayWithIgnoreList(Ray.new(Player.Character.LowerTorso.Position, Vector3.new(0, -Player.Character.UpperTorso.Size.y * 4.5, 0)), { Player.Character, unpack(require(game:GetService('ReplicatedStorage').MainModule).Ignored) })
+		if Part then
+			pcall(function()
+				local Humanoid
+				if Part.Parent:FindFirstChildOfClass('Humanoid') then
+					Humanoid = Part.Parent:FindFirstChildOfClass('Humanoid')
+				elseif Part.Parent.Parent:FindFirstChildOfClass('Humanoid') then
+					Humanoid = Part.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				elseif Part.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid') then
+					Humanoid = Part.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value ~= false then
+					if Humanoid.Parent:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+					if not Plr then
+						return
+					end
+					if Plr.DataFolder.Officer.Value == 1 then
+						return
+					end
+					if Plr.DataFolder.Information.Wanted.Value > 0 then
+						local Time = 0
+						if Plr.DataFolder.Information.Wanted.Value < 45 then
+							Time = 30 
+						else 
+							if Plr.DataFolder.Information.Wanted.Value <= 250 then
+								Time = Plr.DataFolder.Information.Wanted.Value
+							else 
+								Time = 250
+							end
+						end
+						if not Plr.DataFolder.Information:FindFirstChild('Jail') then
+							local Jail = Instance.new('StringValue', Plr.DataFolder.Information)
+							Jail.Name = 'Jail'
+						end						
+						Player.DataFolder.Information.Wanted.Value -= 55
+						Player.DataFolder.Currency.Value += math.floor(Plr.DataFolder.Information.Wanted.Value/2)
+						Player.leaderstats.Wanted.Value = Player.DataFolder.Information.Wanted.Value
+						Plr.DataFolder.Information.Jail.Value = tostring(Time)
+						Plr.DataFolder.Information.Wanted.Value = 0
+						Plr.leaderstats.Wanted.Value = Plr.DataFolder.Information.Wanted.Value
+						Plr:LoadCharacter()
+					end
+				end
+			end)
+		end
+	end
+end)]]
+	elseif v.Parent.Name == "[Cleaning Bucket]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local TweenService = game:GetService('TweenService')
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local Range = 12.5
+local Debounce = false
+
+script.Parent.Activated:Connect(function()
+	pcall(function()
+		if Player.Character then
+			if script.Parent:IsDescendantOf(Player.Character) then
+				if Player.Character:FindFirstChild('BodyEffects') then
+					if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if Player.Character.BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if Debounce then
+						return
+					end
+					if Player.Character:FindFirstChild('HumanoidRootPart') then
+						local Position = ReplicatedStorage.RemoteFunction.RemoteFunction:InvokeClient(Player, 'MOUSEPOS')
+						if (Player.Character.HumanoidRootPart.Position - Position).magnitude <= Range then
+							pcall(function()
+								local rayParams = RaycastParams.new()
+								rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+								rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+								rayParams.IgnoreWater = true
+								local ray = Ray.new(script.Parent.Handle.Position, (Position - script.Parent.Handle.Position).Unit * 25)
+								local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams)
+								if not game:GetService('Players'):FindFirstChild(result.Instance.Name) then
+									return
+								end
+								if (#result.Instance:GetChildren() ~= 1 or result.Instance:FindFirstChildOfClass('Decal').Transparency ~= 0) then
+									return
+								end
+								task.spawn(function()
+									local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+									local Animation = Instance.new('Animation')
+									Animation.AnimationId = 'rbxassetid://11709993259'
+									local Track = Humanoid:LoadAnimation(Animation)
+									Track:Play()
+									script.Parent.Handle.Splash:Play()
+									Debounce = true
+									task.wait(0.75)
+									Debounce = false
+								end)
+								local Tween = TweenService:Create(result.Instance:FindFirstChildOfClass('Decal'), TweenInfo.new(0.75), {Transparency = 1})
+								Tween:Play()
+								task.spawn(function()
+									task.wait(0.2)
+									local Decal = Instance.new('Decal')
+									Decal.Face = 'Front'
+									Decal.Texture = 'rbxassetid://68354402'
+									Decal.Transparency = 0
+									Decal.Parent = result.Instance
+									local Tween2 = TweenService:Create(Decal, TweenInfo.new(0.75), {Transparency = 1})
+									Tween2:Play()
+								end)
+								Tween.Completed:Connect(function()
+									task.wait(0.2)
+									result.Instance:Destroy()
+								end)
+								Player.DataFolder.Currency.Value += 3
+							end)
+						end
+					end
+				end
+			end
+		end
+	end)
+end)]]
+	elseif v.Name == "Script" and v.Parent.Name == "Shooters" then
+		source = [[local serverstorage = game:GetService("ServerStorage")
+local projectile = serverstorage:WaitForChild("Projectile")
+
+local tool = script.Parent
+local character = tool.Parent
+local activate = tool:WaitForChild("Activate")
+
+local runservice = game:GetService("RunService")
+local work = game:GetService("Workspace")
+
+local function equipped()
+	character = tool.Parent
+	local primarypart = character.PrimaryPart
+end
+
+local function activated(player, result)
+	local Attack1 = Instance.new("Animation")
+	Attack1.AnimationId = "rbxassetid://11831734394"
+	local track1
+	track1 = script.Parent.Parent.Humanoid:LoadAnimation(Attack1)
+	track1.Priority = Enum.AnimationPriority.Action
+	track1.Looped = false
+
+	local heartbeat
+	local shot = tick()
+	local newprojectile = projectile:Clone()
+	local primarypart = newprojectile.PrimaryPart
+
+	newprojectile.Parent = game.Workspace
+	newprojectile:SetPrimaryPartCFrame(CFrame.lookAt(character.PrimaryPart.Position, result))
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Blacklist
+	params.FilterDescendantsInstances = {character}
+	local lookvector = primarypart.CFrame.LookVector
+	
+	local function update(deltatime)
+		if tick() - shot >= 15 then
+			heartbeat:Disconnect()
+			newprojectile:Destroy()
+			return
+		end
+		
+		local result = work:Raycast(primarypart.Position, lookvector, params)
+		if result then
+			local humanoid = result.Instance.Parent:FindFirstChild("Humanoid")
+			if humanoid then
+				if humanoid.Parent ~= character then
+					heartbeat:Disconnect()
+					humanoid.Health = math.clamp(humanoid.Health - 40, 0.5, humanoid.MaxHealth)
+					newprojectile:Destroy()
+				end
+				return
+			else
+				heartbeat:Disconnect()
+				newprojectile:Destroy()
+				return
+			end
+		end
+		
+		newprojectile:SetPrimaryPartCFrame(primarypart.CFrame + (primarypart.CFrame.LookVector * 60) * deltatime)
+	end
+	
+	heartbeat = runservice.Heartbeat:Connect(update)
+end
+
+local function unequipped()
+
+	end
+
+tool.Equipped:Connect(equipped)
+activate.OnServerEvent:Connect(activated)
+tool.Unequipped:Connect(unequipped)]]
+	elseif v.Name == "TitanScript" and v.Parent.Name == "Titan" then
+		source = [[------------------------------------- Tool -----------------------------------
+local Equiped = script.Parent
+local Unequiped = script.Parent
+------------------------------------- Titan -----------------------------------
+------- Face -------
+local TitanFace = Instance.new("Decal")
+TitanFace.Name = "FakeFace"
+TitanFace.Texture = "http://www.roblox.com/asset/?id=6517815805"
+------------------------------------- Values -----------------------------------
+Toggle1 = Instance.new("BoolValue")
+Toggle1.Value = false
+Toggle2 = Instance.new("BoolValue")
+Toggle2.Value = false
+------------------------------------- Animations -----------------------------------
+local EquipedAnimation = Instance.new("Animation")
+EquipedAnimation.AnimationId = "rbxassetid://9551906760" -- Change Animation Equiped (Optional)
+local UnequipedAnimation = Instance.new("Animation")
+UnequipedAnimation.AnimationId = "rbxassetid://9379610744" -- Change Animation Unequiped (Optional)
+------------------------------------- Cooldown -----------------------------------
+local enabled = false
+------------------------------------- Tracks -----------------------------------
+local track1
+local track2
+------------------------------------- Main -----------------------------------
+Equiped.Activated:Connect(function()
+	if Toggle1.Value == false then
+		if enabled then
+			return
+		end
+		enabled = true
+		local vCharacter = Equiped.Parent
+		local childs = vCharacter:GetChildren()
+		---------- Ignore -----------
+		local human = vCharacter:FindFirstChild("Humanoid")
+		local shirt = vCharacter:FindFirstChild("Shirt")
+		local pants = vCharacter:FindFirstChild("Pants")
+		local Tshirt = vCharacter:FindFirstChild("Shirt Graphics")
+		local face = vCharacter:FindFirstChild("Head"):FindFirstChild("face")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		local serverstorage = game:FindFirstChild("ServerStorage")
+		--------- Main Part ----------
+		human.Health = 5000
+		human.MaxHealth = 5000
+		human.BodyDepthScale.Value = 4
+		human.BodyHeightScale.Value = 4
+		human.BodyProportionScale.Value = 0
+		human.BodyTypeScale.Value = 0.5
+		human.BodyWidthScale.Value = 4.1
+		human.HeadScale.Value = 4
+		--
+		TitanFace.Parent = vCharacter.Head
+		shirt.Parent = script.Parent.TitanScript
+		pants.Parent = script.Parent.TitanScript
+		face.Parent = script.Parent.TitanScript
+		Toggle1.Value = true
+		Toggle2.Value = false
+		track1 = script.Parent.Parent.Humanoid:LoadAnimation(EquipedAnimation)
+		track1.Priority = Enum.AnimationPriority.Action
+		track1.Looped = false
+		track1:Play()
+		wait(2)
+		enabled = false
+	end
+end)
+Unequiped.Activated:Connect(function()
+	if Toggle1.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Equiped.Parent
+		local childs = vCharacter:GetChildren()
+		---------- Ignore -----------
+		local human = vCharacter:FindFirstChild("Humanoid")
+		local shirt = vCharacter:FindFirstChild("Shirt")
+		local pants = vCharacter:FindFirstChild("Pants")
+		local Tshirt = vCharacter:FindFirstChild("Shirt Graphics")
+		local face = vCharacter:FindFirstChild("Head"):FindFirstChild("face")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		local serverstorage = game:FindFirstChild("ServerStorage")
+		--------- Main Part ----------
+		human.Health = 100
+		human.MaxHealth = 100
+		human.BodyDepthScale.Value = 1
+		human.BodyHeightScale.Value = 1
+		human.BodyProportionScale.Value = 0
+		human.BodyTypeScale.Value = 0
+		human.BodyWidthScale.Value = 1
+		human.HeadScale.Value = 1
+		--
+		TitanFace.Parent = script.Parent.TitanScript
+		script.Parent.TitanScript.Shirt.Parent = vCharacter
+		script.Parent.TitanScript.Pants.Parent = vCharacter
+		script.Parent.TitanScript.face.Parent = vCharacter.Head
+		enabled = true
+		Toggle1.Value = false
+		Toggle2.Value = true
+		track2 = script.Parent.Parent.Humanoid:LoadAnimation(UnequipedAnimation)
+		track2.Priority = Enum.AnimationPriority.Action
+		track2.Looped = false
+		track2:Play()
+		wait(2)
+		enabled = false
+	end
+end)]]
+	elseif v.Parent.Name == "[Bat]" then
+		source = [[local BodyParts = {"Head","LeftFoot","LeftHand","LeftLowerArm","LeftLowerLeg","LeftUpperArm","LeftUpperLeg","LowerTorso","RightFoot","RightHand","RightLowerArm","RightLowerLeg","RightUpperArm","RightUpperLeg","UpperTorso","HumanoidRootPart"}
+local anim1 = Instance.new("Animation")
+anim1.AnimationId = "rbxassetid://11870084379" 
+local db = {}
+script.Parent.Activated:Connect(function()
+	local plr = game.Players:GetPlayerFromCharacter(script.Parent.Parent)
+	if db[plr] == true then return end
+	if plr.Character.BodyEffects.Reload.Value == true then return end
+	if plr.Character:FindFirstChild("FULLY_LOADED_CHAR") == nil then return end
+	if plr.Character.BodyEffects.Attacking.Value == true then return end
+	plr.Character.BodyEffects.Attacking.Value = true
+	db[plr] = true
+	local anim1Track = plr.Character.Humanoid:LoadAnimation(anim1)
+	local hit = Instance.new("Folder")
+	local function DoDamage(humanoid, character,ATM)
+		if ATM == false then
+			local theplr = game.Players:GetPlayerFromCharacter(humanoid.Parent)
+			if not character.UpperTorso:FindFirstChild(plr.Name.."HIT") then
+				hit.Parent = character.UpperTorso
+				hit.Name = plr.Name.."HIT"
+				if theplr.DataFolder.Crew.Value == plr.DataFolder.Crew.Value and theplr.DataFolder.Information.Crew.Value ~= 0 then
+					humanoid.Health = math.clamp(humanoid.Health - 0, 0.2, humanoid.MaxHealth)
+					local HITSOUND = Instance.new("Sound", character.HumanoidRootPart)
+					HITSOUND.SoundId = "rbxassetid://541909913"
+					HITSOUND:Play()
+				else
+					humanoid.Health = math.clamp(humanoid.Health - 35, 0.2, humanoid.MaxHealth)
+					local HITSOUND = Instance.new("Sound", character.HumanoidRootPart)
+					HITSOUND.SoundId = "rbxassetid://541909913"
+					HITSOUND:Play()
+				end
+			end
+		else
+			if humanoid.Parent:FindFirstChild(plr.Name.."HIT") then return end
+			humanoid.Parent.Head.Punch:Play()
+			hit.Parent = humanoid.Parent
+			hit.Name = plr.Name.."HIT"
+			humanoid:TakeDamage(35)
+		end
+	end
+	anim1Track:Play()
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Blacklist
+	params.FilterDescendantsInstances = {
+		workspace.Ignored,
+		plr,
+		plr.Character,
+	}
+	local Direction = plr.Character.HumanoidRootPart.CFrame.p + plr.Character.HumanoidRootPart.CFrame.LookVector * 60 
+	local oer = 4.5+(plr.DataFolder.Information.MuscleInformation.Value/2)
+	local dire =  (Direction-plr.Character.UpperTorso.Position).Unit * oer
+	local StringValue = Instance.new("StringValue", plr.Character.BodyEffects.Movement)
+	StringValue.Name = "ReduceWalk"
+	local StringValue2 = Instance.new("StringValue", plr.Character.BodyEffects.Movement)
+	StringValue2.Name = "NoJumping"
+	repeat wait()
+		local ray = workspace:Raycast(plr.Character.HumanoidRootPart.Position,dire, params)
+		if ray then
+			if ray.Instance:IsDescendantOf(workspace.Players) then
+				if ray.Instance.Name == "Handle" then
+					local CharOfShotPlayer = ray.Instance.Parent.Parent
+					if CharOfShotPlayer:FindFirstChild("FULLY_LOADED_CHAR") then
+						DoDamage(CharOfShotPlayer.Humanoid,CharOfShotPlayer,false)
+					end
+				elseif table.find(BodyParts, ray.Instance.Name) then
+					local CharOfShotPlayer
+					if ray.Instance.Parent.Name == "SpecialParts" then
+						CharOfShotPlayer = ray.Instance.Parent.Parent.Parent
+					else
+						CharOfShotPlayer = ray.Instance.Parent
+					end
+					if CharOfShotPlayer:FindFirstChild("FULLY_LOADED_CHAR") then
+						DoDamage(CharOfShotPlayer.Humanoid,CharOfShotPlayer,false)
+					end
+				end
+			elseif ray.Instance:IsDescendantOf(workspace.Cashiers) then
+				DoDamage(ray.Instance.Parent.Humanoid, nil, true)
+			end
+		end
+	until anim1Track.isPlaying == false
+	StringValue:Destroy()
+	StringValue2:Destroy()
+	hit:Destroy()
+	db[plr] = false
+	plr.Character.BodyEffects.Attacking.Value = false
+end)
+]]
+	elseif v.Parent.Parent.Name == "[Bat]" then
+		source = [[dmg = false
+
+local function DoDamage(amount, humanoid, character)
+	local theplr = game.Players:GetPlayerFromCharacter(character)
+	local Player = game.Players:GetPlayerFromCharacter(script.Parent.Parent.Parent)
+	if theplr.DataFolder.Crew.Value == Player.DataFolder.Crew.Value and theplr.DataFolder.Crew.Value ~= 0 then
+		humanoid.Health = math.clamp(humanoid.Health - 0, 0.2, humanoid.MaxHealth)
+	elseif character.BodyEffects.Blocking.Value == true then
+		local prob1 = math.random(1,4)
+		local prob2 = math.random(10,30)
+		if prob1 == 1 and theplr.Character.BodyEffects.Defense.Value > prob2 then
+			humanoid.Health = math.clamp(humanoid.Health - 0, 0.2, humanoid.MaxHealth)
+			character.HumanoidRootPart.DefenseBBGUI.ImageLabel.ImageTransparency = 0
+			game:GetService("TweenService"):Create(character.HumanoidRootPart.DefenseBBGUI.ImageLabel, TweenInfo.new(2), {
+				ImageTransparency = 1
+			}):Play()
+			theplr.Character.BodyEffects.Defense.Value -= prob2
+		elseif prob1 == 2 and theplr.Character.BodyEffects.Defense.Value > prob2  then
+			humanoid.Health = math.clamp(humanoid.Health - 10, 0.2, humanoid.MaxHealth)
+			character.HumanoidRootPart.DefenseBBGUI.ImageLabel.ImageTransparency = 0
+			game:GetService("TweenService"):Create(character.HumanoidRootPart.DefenseBBGUI.ImageLabel, TweenInfo.new(2), {
+				ImageTransparency = 1
+			}):Play()
+			theplr.Character.BodyEffects.Defense.Value -= prob2
+		elseif prob1 == 3 and theplr.Character.BodyEffects.Defense.Value > prob2  then
+			humanoid.Health = math.clamp(humanoid.Health - 20, 0.2, humanoid.MaxHealth)
+			character.HumanoidRootPart.DefenseBBGUI.ImageLabel.ImageTransparency = 0
+			game:GetService("TweenService"):Create(character.HumanoidRootPart.DefenseBBGUI.ImageLabel, TweenInfo.new(2), {
+				ImageTransparency = 1
+			}):Play()
+			theplr.Character.BodyEffects.Defense.Value -= prob2
+		elseif prob1 == 4 and theplr.Character.BodyEffects.Defense.Value > prob2  then
+			humanoid.Health = math.clamp(humanoid.Health - 15, 0.2, humanoid.MaxHealth)
+			character.HumanoidRootPart.DefenseBBGUI.ImageLabel.ImageTransparency = 0
+			game:GetService("TweenService"):Create(character.HumanoidRootPart.DefenseBBGUI.ImageLabel, TweenInfo.new(2), {
+				ImageTransparency = 1
+			}):Play()
+			theplr.Character.BodyEffects.Defense.Value -= prob2
+		elseif prob2 > theplr.Character.BodyEffects.Defense.Value then
+			if theplr.Character.BodyEffects.Defense.Value == 0 then
+				humanoid.Health = math.clamp(humanoid.Health - 40, 0.2, humanoid.MaxHealth)
+			else
+				humanoid.Health = math.clamp(humanoid.Health - 40, 0.2, humanoid.MaxHealth)
+				character.HumanoidRootPart.DefenseBBGUI.ImageLabel.ImageTransparency = 0
+				character.HumanoidRootPart.DefenseBBGUI.ImageLabel.ImageColor3 = Color3.fromRGB(62, 255, 75)
+				game:GetService("TweenService"):Create(character.HumanoidRootPart.DefenseBBGUI.ImageLabel, TweenInfo.new(2), {
+					ImageTransparency = 1
+				}):Play()
+				theplr.Character.BodyEffects.Defense.Value = 0
+				wait(2)
+				character.HumanoidRootPart.DefenseBBGUI.ImageLabel.ImageColor3 = Color3.fromRGB(255, 150, 21)
+			end
+
+		end	
+	elseif character.BodyEffects.Blocking.Value == false then
+		humanoid.Health = math.clamp(humanoid.Health - 40, 0.2, humanoid.MaxHealth)
+	end	
+end
+script.Parent.Parent.Handle.Touched:Connect(function(damage, player)
+	if damage.Parent:FindFirstChild("Humanoid") and dmg == false or player then
+		local hitshound = Instance.new("Sound", damage.Parent.HumanoidRootPart)
+		hitshound.Volume = 1 hitshound.SoundId = "rbxassetid://541909913"
+		DoDamage(40, damage.Parent.Humanoid, damage.Parent)
+		hitshound:Play()
+		dmg = true
+		wait(4)
+		dmg = false
+	end
+end)
+
+]]
+	elseif v.Parent.Name == "[Boombox]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Toggled = false
+
+script.Parent.Equipped:Connect(function()
+	pcall(function()
+		if script.Parent:IsDescendantOf(Player.Character) then
+			if Toggled ~= true then
+				Toggled = true
+				game:GetService('ReplicatedStorage').MainEvent:FireClient(Player, 'BOOMBOX', script.Parent)
+			end
+			if Player.Character:FindFirstChild('BOOMBOXHANDLE') then
+				Player.Character.BOOMBOXHANDLE:Destroy()
+			end
+		end
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		if not Player.Character:FindFirstChild('BOOMBOXHANDLE') then
+			local BOOMBOXHANDLE = game:GetService('ServerStorage').Storage.Misc.Boombox.BOOMBOXHANDLE:Clone()
+			BOOMBOXHANDLE.Weld.Part0 = Player.Character.UpperTorso
+			BOOMBOXHANDLE.Weld.Part1 = BOOMBOXHANDLE
+			BOOMBOXHANDLE.Parent = Player.Character
+		end
+	end)
+end)]]
+	elseif v.Name == "Script" and v.Parent.Name == "CONFIRM" then
+		source = [[script.Parent.RemoteEvent.OnServerEvent:Connect(function(p,txt)
+	p.Character:FindFirstChild("[Firework]"):FindFirstChildOfClass("StringValue").Value = game:GetService("Chat"):FilterStringForBroadcast(txt,p)
+	script.Parent.Parent.Parent:Destroy()
+end)]]
+	elseif v.Parent.Name == "[Flashbang]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Used = false
+local Pin = false
+
+script.Parent.Activated:Connect(function()
+	if Used then
+		return
+	end
+	if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+		return
+	end
+	if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+		return
+	end
+	if Player.Character:FindFirstChild('Christmas_Sock') then
+		return
+	end
+	if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+		return
+	end
+	if script.Parent:IsDescendantOf(Player.Character) then
+		if Pin == false then
+			Pin = true
+			script.Parent.Handle.Pin:Play()
+		else 
+			if Used ~= true then
+				game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.Flashbang:Fire(script.Parent.Handle:Clone(), Player)
+				script.Parent:Destroy()
+			end
+		end
+	end
+end)]]
+	elseif v.Parent.Name == "[Flashlight]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Debounce = false
+
+script.Parent.Activated:Connect(function()
+	if Debounce then
+		return
+	end
+	if script.Parent:IsDescendantOf(Player.Character) then
+		pcall(function()
+			if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+				return
+			end
+			if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+				return
+			end
+			if Player.Character:FindFirstChild('Christmas_Sock') then
+				return
+			end
+			if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+				return
+			end
+			if Player.Character.BodyEffects.Reload.Value ~= false then
+				return
+			end
+			task.spawn(function()
+				Debounce = true
+				task.wait(0.5)
+				Debounce = false
+			end)
+			script.Parent.Handle.Sound:Play()
+			script.Parent.Handle.SpotLight.Enabled = not script.Parent.Handle.SpotLight.Enabled
+		end)
+	end
+end)]]
+	elseif v.Parent.Name == "[Grenade]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Used = false
+local Pin = false
+
+script.Parent.Activated:Connect(function()
+	if Used then
+		return
+	end
+	if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+		return
+	end
+	if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+		return
+	end
+	if Player.Character:FindFirstChild('Christmas_Sock') then
+		return
+	end
+	if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+		return
+	end
+	if script.Parent:IsDescendantOf(Player.Character) then
+		if Pin == false then
+			Pin = true
+			script.Parent.Handle.Pin:Play()
+		else 
+			if Used ~= true then
+				game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.Grenade:Fire(script.Parent.Handle:Clone(), Player)
+				script.Parent:Destroy()
+			end
+		end
+	end
+end)]]
+	elseif v.Parent.Name == "[HeavyWeights]" then
+		source = [[local Equipped = false
+local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+script.Parent.Activated:Connect(function()
+	if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+		return
+	end
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+			return
+		end
+		if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+			return
+		end
+		if Player.Character:FindFirstChild('Christmas_Sock') then
+			return
+		end
+		if Player.Character.BodyEffects.Reload.Value ~= false then
+			return
+		end
+		_G.PlayerData.Players[Player].Debounces.Action.Action = true
+		if not Player.DataFolder.Information:FindFirstChild('MuscleInformation') then
+			local MuscleInformation = Instance.new('StringValue', Player.DataFolder.Information)
+			MuscleInformation.Name = 'MuscleInformation'
+			MuscleInformation.Value = tostring(2)
+		else
+			if tonumber(Player.DataFolder.Information.MuscleInformation.Value) + 2 < game:GetService('ReplicatedStorage').MaxMuscle.Value then
+				Player.DataFolder.Information.MuscleInformation.Value = tostring(tonumber(Player.DataFolder.Information.MuscleInformation.Value) + 2)
+			else
+				Player.DataFolder.Information.MuscleInformation.Value = tostring(game:GetService('ReplicatedStorage').MaxMuscle.Value)
+			end
+		end
+		local Animation = Instance.new('Animation')
+		Animation.AnimationId = 'rbxassetid://11831738782'
+		local AnimationTrack = Player.Character:FindFirstChildOfClass('Humanoid'):LoadAnimation(Animation)
+		AnimationTrack:Play()
+		task.wait(5)
+		pcall(function()
+			_G.PlayerData.Players[Player].Debounces.Action.Action = false
+			AnimationTrack:Stop()
+		end)
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	Equipped = true
+end)
+
+script.Parent.Unequipped:Connect(function()
+	Equipped = false
+end)]]
+	elseif v.Parent.Name == "[Key]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Used = false
+
+script.Parent.Equipped:Connect(function()
+	pcall(function()
+		if Used then
+			return
+		end
+		if Player.Character.BodyEffects['K.O'].Value ~= false then
+			return
+		end
+		if Player.Character.BodyEffects['Grabbed'].Value ~= nil then
+			return
+		end
+		if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+			return
+		end
+		if Player.Character:FindFirstChild('Christmas_Sock') then
+			return
+		end
+		if Player.DataFolder.Officer.Value ~= 0 then
+			return
+		end
+		if script.Parent:IsDescendantOf(Player.Character) then
+			if Player.DataFolder.Information:FindFirstChild('Jail') then
+				local Jail = Player.DataFolder.Information.Jail
+				if Player.Character.BodyEffects.Cuff.Value == true then
+					if tonumber(Jail.Value) > 0 and tonumber(Jail.Value) <= 250 then
+						Player.Character.BodyEffects.Cuff.Value = false 
+						Player.Character.LeftLowerArm.CUFF.Transparency = 1
+						Player.Character.RightLowerArm.CUFF.Transparency = 1
+						Jail.Value = tostring(0)
+						Used = true
+						for i,v in pairs(Player.Character:FindFirstChildOfClass('Humanoid'):GetPlayingAnimationTracks()) do
+							if v.Animation.AnimationId == 'rbxassetid://11831740805' then
+								v:Stop()
+								v:Destroy()
+							end
+						end
+						script.Parent:Destroy()
+					end
+				end
+			end
+		end
+	end)
+end)
+
+script.Parent.Activated:Connect(function()
+	if Used then
+		return
+	end
+	if Player.Character.BodyEffects['K.O'].Value ~= false then
+		return
+	end
+	if Player.DataFolder.Officer.Value ~= 0 then
+		return
+	end
+	pcall(function()
+		if script.Parent:IsDescendantOf(Player.Character) then
+			local HRP = Player.Character.HumanoidRootPart
+			for i,v in pairs(workspace.Players:GetChildren()) do 
+				if v:FindFirstChild('HumanoidRootPart') then
+					if (HRP.Position - v.HumanoidRootPart.Position).magnitude < 10 then
+						if v:FindFirstChild('BodyEffects') then
+							if v.BodyEffects:FindFirstChild('Cuff') then
+								if v.BodyEffects.Cuff.Value == true then
+									local Plr = game:GetService('Players'):GetPlayerFromCharacter(v)
+									if Plr then
+										if Plr.DataFolder.Information:FindFirstChild('Jail') then
+											local Jail = Plr.DataFolder.Information.Jail
+											if tonumber(Jail.Value) > 0 and tonumber(Jail.Value) <= 250 then
+												local Character = v
+												Character.BodyEffects.Cuff.Value = false 
+												Character.LeftLowerArm.CUFF.Transparency = 1
+												Character.RightLowerArm.CUFF.Transparency = 1
+												Jail.Value = tostring(0)
+												Used = true
+												for i,v in pairs(Character:FindFirstChildOfClass('Humanoid'):GetPlayingAnimationTracks()) do
+													if v.Animation.AnimationId == 'rbxassetid://11703413428' then
+														v:Stop()
+														v:Destroy()
+													end
+												end
+												script.Parent:Destroy()
+												break
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[Knife]" then
+		source = [[local BodyParts = {"Head","LeftFoot","LeftHand","LeftLowerArm","LeftLowerLeg","LeftUpperArm","LeftUpperLeg","LowerTorso","RightFoot","RightHand","RightLowerArm","RightLowerLeg","RightUpperArm","RightUpperLeg","UpperTorso","HumanoidRootPart"}
+local anim1 = Instance.new("Animation")
+anim1.AnimationId = "rbxassetid://11870085564" 
+local db = {}
+script.Parent.Activated:Connect(function()
+	local plr = game.Players:GetPlayerFromCharacter(script.Parent.Parent)
+	if db[plr] == true then return end
+	if plr.Character.BodyEffects.Reload.Value == true then return end
+	if plr.Character:FindFirstChild("FULLY_LOADED_CHAR") == nil then return end
+	if plr.Character.BodyEffects.Attacking.Value == true then return end
+	plr.Character.BodyEffects.Attacking.Value = true
+	db[plr] = true
+	local anim1Track = plr.Character.Humanoid:LoadAnimation(anim1)
+	local hit = Instance.new("Folder")
+	local function DoDamage(humanoid, character,ATM)
+		if ATM == false then
+			local theplr = game.Players:GetPlayerFromCharacter(humanoid.Parent)
+			if not character.UpperTorso:FindFirstChild(plr.Name.."HIT") then
+				hit.Parent = character.UpperTorso
+				hit.Name = plr.Name.."HIT"
+				if theplr.DataFolder.Crew.Value == plr.DataFolder.Crew.Value and theplr.DataFolder.Information.Crew.Value ~= 0 then
+					humanoid.Health = math.clamp(humanoid.Health - 0, 0.2, humanoid.MaxHealth)
+					local HITSOUND = Instance.new("Sound", character.HumanoidRootPart)
+					HITSOUND.SoundId = "rbxassetid://566593606"
+					HITSOUND:Play()
+				else
+					humanoid.Health = math.clamp(humanoid.Health - 35, 0.2, humanoid.MaxHealth)
+					local HITSOUND = Instance.new("Sound", character.HumanoidRootPart)
+					HITSOUND.SoundId = "rbxassetid://566593606"
+					HITSOUND:Play()
+				end
+			end
+		else
+			if humanoid.Parent:FindFirstChild(plr.Name.."HIT") then return end
+			humanoid.Parent.Head.Punch:Play()
+			hit.Parent = humanoid.Parent
+			hit.Name = plr.Name.."HIT"
+			humanoid:TakeDamage(35)
+		end
+	end
+	anim1Track:Play()
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Blacklist
+	params.FilterDescendantsInstances = {
+		workspace.Ignored,
+		plr,
+		plr.Character,
+	}
+	local Direction = plr.Character.HumanoidRootPart.CFrame.p + plr.Character.HumanoidRootPart.CFrame.LookVector * 60 
+	local oer = 4.5+(plr.DataFolder.Information.MuscleInformation.Value/2)
+	local dire =  (Direction-plr.Character.UpperTorso.Position).Unit * oer
+	local StringValue = Instance.new("StringValue", plr.Character.BodyEffects.Movement)
+	StringValue.Name = "ReduceWalk"
+	local StringValue2 = Instance.new("StringValue", plr.Character.BodyEffects.Movement)
+	StringValue2.Name = "NoJumping"
+	repeat wait()
+		local ray = workspace:Raycast(plr.Character.HumanoidRootPart.Position,dire, params)
+		if ray then
+			if ray.Instance:IsDescendantOf(workspace.Players) then
+				if ray.Instance.Name == "Handle" then
+					local CharOfShotPlayer = ray.Instance.Parent.Parent
+					if CharOfShotPlayer:FindFirstChild("FULLY_LOADED_CHAR") then
+						DoDamage(CharOfShotPlayer.Humanoid,CharOfShotPlayer,false)
+					end
+				elseif table.find(BodyParts, ray.Instance.Name) then
+					local CharOfShotPlayer
+					if ray.Instance.Parent.Name == "SpecialParts" then
+						CharOfShotPlayer = ray.Instance.Parent.Parent.Parent
+					else
+						CharOfShotPlayer = ray.Instance.Parent
+					end
+					if CharOfShotPlayer:FindFirstChild("FULLY_LOADED_CHAR") then
+						DoDamage(CharOfShotPlayer.Humanoid,CharOfShotPlayer,false)
+					end
+				end
+			elseif ray.Instance:IsDescendantOf(workspace.Cashiers) then
+				DoDamage(ray.Instance.Parent.Humanoid, nil, true)
+			end
+		end
+	until anim1Track.isPlaying == false
+	StringValue:Destroy()
+	StringValue2:Destroy()
+	hit:Destroy()
+	db[plr] = false
+	plr.Character.BodyEffects.Attacking.Value = false
+end)
+]]
+	elseif v.Parent.Name == "[Lettuce]" then
+		source = [[local Tool = script.Parent
+local EatSound = Instance.new("Sound")
+EatSound.SoundId = "rbxassetid://101083978"
+local EatAnim = Instance.new("Animation")
+EatAnim.AnimationId = "rbxassetid://12377226506"
+local EatTrack
+--
+local Eat1Toggle = Instance.new("BoolValue")
+Eat1Toggle.Value = false
+local Eat2Toggle = Instance.new("BoolValue")
+Eat2Toggle.Value = false
+local Eat3Toggle = Instance.new("BoolValue")
+Eat3Toggle.Value = false
+local Eat4Toggle = Instance.new("BoolValue")
+Eat4Toggle.Value = false
+local Eat5Toggle = Instance.new("BoolValue")
+Eat5Toggle.Value = false
+--
+enabled = false
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == false then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatSound.Parent = rootpart
+		EatTrack:Play()
+		Eat1Toggle.Value = true
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat1Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = true
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat2Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = true
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat3Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = true
+		Eat5Toggle.Value = false
+		hum.Health = hum.Health + 15
+		wait(1)
+		enabled = false
+	end
+end)
+Tool.Activated:Connect(function()
+	if Eat4Toggle.Value == true then
+		if enabled then
+			return
+		end
+		local vCharacter = Tool.Parent
+		local hum = vCharacter:FindFirstChild("Humanoid")
+		local rootpart = vCharacter:FindFirstChild("HumanoidRootPart")
+		enabled = true
+		EatTrack = script.Parent.Parent.Humanoid:LoadAnimation(EatAnim)
+		EatTrack.Priority = Enum.AnimationPriority.Action
+		EatTrack.Looped = false
+		EatSound:Play()
+		EatTrack:Play()
+		Eat1Toggle.Value = false
+		Eat2Toggle.Value = false
+		Eat3Toggle.Value = false
+		Eat4Toggle.Value = false
+		Eat5Toggle.Value = true
+		hum.Health = hum.Health + 15
+		wait(1.5)
+		Tool:Destroy()
+		enabled = false
+	end
+end)
+
+local Equipped = false
+local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+script.Parent.Activated:Connect(function()
+	if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+		return
+	end
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+			return
+		end
+		if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+			return
+		end
+		if Player.Character:FindFirstChild('Christmas_Sock') then
+			return
+		end
+		if Player.Character.BodyEffects.Reload.Value ~= false then
+			return
+		end
+		_G.PlayerData.Players[Player].Debounces.Action.Action = true
+		if not Player.DataFolder.Information:FindFirstChild('MuscleInformation') then
+			local MuscleInformation = Instance.new('StringValue', Player.DataFolder.Information)
+			MuscleInformation.Name = 'MuscleInformation'
+			MuscleInformation.Value = '0'
+			MuscleInformation.Value = tostring(75)
+		else
+			if tonumber(Player.DataFolder.Information.MuscleInformation.Value) - 15000 > -15000 then
+				Player.DataFolder.Information.MuscleInformation.Value = tostring(tonumber(Player.DataFolder.Information.MuscleInformation.Value) - 15000)
+			else
+				Player.DataFolder.Information.MuscleInformation.Value = tostring(-15000)
+			end
+		end
+		pcall(function()
+			Player.Character:FindFirstChildOfClass('Humanoid').Health += 25
+		end)
+		local Animation = Instance.new('Animation')
+		Animation.AnimationId = 'rbxassetid://11816201135'
+		local AnimationTrack = Player.Character:FindFirstChildOfClass('Humanoid'):LoadAnimation(Animation)
+		AnimationTrack:Play()
+		local Sound = Instance.new('Sound', script.Parent.Handle)
+		Sound.Name = 'Eat'
+		Sound.Volume = 1
+		Sound.SoundId = 'rbxassetid://101083978'
+		Sound:Play()
+		AnimationTrack.Stopped:Connect(function()
+			task.wait(.1)
+			_G.PlayerData.Players[Player].Debounces.Action.Action = false
+			script.Parent:Destroy()
+		end)
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	Equipped = true
+end)
+
+script.Parent.Unequipped:Connect(function()
+	Equipped = false
+end)]]
+	elseif v.Parent.Name == "[LockPicker]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Debounce = false
+
+script.Parent.Activated:Connect(function()
+	if Debounce then
+		return
+	end
+	if not Player:FindFirstChild('LOAD_SAVE_DATA') then
+		return
+	end
+	if script.Parent:IsDescendantOf(Player.Character) then
+		pcall(function()
+			if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+				return
+			end
+			if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+				return
+			end
+			if Player.Character:FindFirstChild('Christmas_Sock') then
+				return
+			end
+			if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+				return
+			end
+			if Player.Character.BodyEffects.Reload.Value ~= false then
+				return
+			end
+			if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+				for i,v in pairs(workspace.MAP:GetDescendants()) do
+					if v.Name == 'Door' and v:IsA('Model') then
+						local Door = v 
+						if Door:FindFirstChild('LOCKKK') then
+							if Door:FindFirstChild('Lock') then
+								if Door.Lock:IsA('Model') then
+									if Door.Lock:FindFirstChild('Locker') then
+										local Lock = Door.Lock.Locker
+										if (script.Parent.Handle.Position - Lock.Position).magnitude < 2 then
+											Debounce = true
+											local Result = require(game:GetService('ReplicatedStorage').RemoteFunction).InvokeClient(nil, Player, 'LOCK_PICK')
+											if Result == true then
+												if Door:FindFirstChild('LOCKKK') then
+													Door.LOCKKK.Name = 'UnLOCK'
+													Door.Door.Lock:Play()
+													Lock.CFrame = Lock.CFrame * CFrame.Angles(0, 0, math.rad(-90))
+													script.Parent:Destroy()
+												end
+											end
+											task.spawn(function()
+												
+												Debounce = false
+											end)
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end)
+	end
+end)]]
+	elseif v.Parent.Name == "[Money Gun]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Equipped = false
+local Debounce = false 
+local Drops = _G.PlayerData.Players[Player].Stats.Misc.Data.Drops
+local Changed
+
+script.Parent.Activated:Connect(function()
+	if Debounce == true then
+		return
+	end
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+			return
+		end
+		if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+			return
+		end
+		if Player.Character:FindFirstChild('Christmas_Sock') then
+			return
+		end
+		if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+			return
+		end
+		if Player.Character.BodyEffects.Reload.Value ~= false then
+			return
+		end
+		if Player.DataFolder.Currency.Value >= 100 then
+			if #Drops < 10 then
+				task.spawn(function()
+					if Debounce ~= true then
+						Debounce = true
+						task.wait(10)
+						Debounce = false
+					end
+				end)
+				local Amount = 10 - #Drops 
+				script.Parent.Handle.Shoot:Play()
+				for i = 1, Amount do 
+					if Player.DataFolder.Currency.Value >= 100 then
+						local Money = game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.SpawnCash:Invoke(Player, 'Paid', script.Parent.Handle.CFrame * CFrame.new(-2.2, 0, 0), Vector3.new(0, 0.65, 0), 100, Player.Character.HumanoidRootPart.CFrame.LookVector * 24)
+						table.insert(Drops, Money)
+						task.wait(0.3)
+					end
+				end
+				script.Parent.Handle.Shoot:Stop()
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	Drops = _G.PlayerData.Players[Player].Stats.Misc.Data.Drops	
+	Equipped = true
+	script.Parent.Handle.BillboardGui.Enabled = true
+	script.Parent.Handle.BillboardGui.TextLabel.Text = '$'..require(game:GetService('ReplicatedStorage').MainModule).AddComma(Player.DataFolder.Currency.Value)
+	if Changed then
+		Changed:Disconnect()
+	end
+	Changed = Player.DataFolder.Currency:GetPropertyChangedSignal('Value'):Connect(function()
+		script.Parent.Handle.BillboardGui.TextLabel.Text = '$'..require(game:GetService('ReplicatedStorage').MainModule).AddComma(Player.DataFolder.Currency.Value)
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	Equipped = false
+	script.Parent.Handle.BillboardGui.Enabled = false
+end)
+
+workspace.Ignored.Drop.ChildRemoved:Connect(function(Child)
+	if table.find(Drops, Child) then
+		table.remove(Drops, table.find(Drops, Child))
+	end
+end)]]
+	elseif v.Parent.Name == "[PepperSpray]" then
+		source = [[local GunModule = require(game.ServerStorage.Modules.GunModule)
+
+local GetPlayer = (script.Parent:FindFirstAncestorWhichIsA("Player") or script.Parent:FindFirstAncestorWhichIsA("Model"))
+local Player = game:GetService("Players"):WaitForChild(GetPlayer.Name)
+
+local OwnerTag = script.Parent.OwnerTag
+GunModule.SetOwnerTag(OwnerTag, script.Parent, Player)
+
+
+local DB = false
+local val, blood, reducewalk, playanimation
+local oldface = nil
+local Character1
+local Value = 0
+local touched = false
+script.Parent.Activated:Connect(function()
+	if GunModule.Activated(Player, script.Parent) then
+		if DB == false then
+			DB = true
+			script.Parent.Handle.Spray:Play()
+			script.Parent.Handle.Smoke.Enabled = true
+			script.Parent.Default.Touched:Connect(function(touched)
+				if touched.Parent:FindFirstChild("Humanoid") and script.Parent.Handle.Smoke.Enabled == true then
+					if touched.Name == "Head" then
+						local Character = touched.Parent
+						local BodyEffects = touched.Parent:FindFirstChild("BodyEffects")
+						Character1 = Character
+						touched = true
+						if not BodyEffects:FindFirstChild("PepperSpray") then
+							val = Instance.new("IntValue", BodyEffects)
+							val.Name = "PepperSpray"
+							reducewalk = Instance.new("IntValue", BodyEffects.Movement)
+							reducewalk.Name = "ReduceWalk"
+							
+							if oldface == nil then
+								oldface = Character.Head.face.Texture
+							end
+							Character.Head.face.Texture = "http://www.roblox.com/asset/?id=879265491"
+							blood = Instance.new("Decal", Character.Head)
+							blood.Texture = "rbxassetid://1927066320"
+							blood.Transparency = 0.3
+							playanimation = Character.Humanoid:LoadAnimation(game.StarterGui.Framework.FBAnimation)
+							playanimation:Play()
+							playanimation:AdjustSpeed(0.5)
+							for i = 1, 10 do
+								Value += 1
+								if Value <= 10 then
+									Character.Humanoid:TakeDamage(6)
+								end
+								wait(1)
+							end 
+						end
+					end
+				end
+			end)
+			task.wait(1.5)
+			script.Parent.Handle.Spray:Stop()
+			script.Parent.Handle.Smoke.Enabled = false
+			task.wait(1)
+			DB = false
+		end
+	end
+end)
+while true do
+	if Value == 10 then
+		val:Destroy()
+		reducewalk:Destroy()
+		blood:Destroy()
+		playanimation:Stop()
+		Character1.Head.face.Texture = oldface
+		Value = 0
+		touched = false
+		oldface = nil
+	end
+	wait(1)
+end]]
+	elseif v.Parent.Name == "[SprayCan]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local TweenService = game:GetService('TweenService')
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local Module = require(ReplicatedStorage.MainModule)
+local Range = 12.5
+local Debounce = false
+
+script.Parent.Activated:Connect(function()
+	pcall(function()
+		if Player.Character then
+			if script.Parent:IsDescendantOf(Player.Character) then
+				if Player.Character:FindFirstChild('BodyEffects') then
+					if not Module.CheckInCrew(Player) then
+						script.Parent:Destroy()
+					end
+					if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if Player.Character.BodyEffects.Reload.Value ~= false then
+						return
+					end
+					local Graffiti = {}
+					for i,v in pairs(workspace.MAP.Graffiti:GetChildren()) do
+						if v.Name == Player.Name then
+							table.insert(Graffiti, v)
+						end
+					end
+					if Debounce then
+						return
+					end
+					if #Graffiti < 8 then
+						if Player.Character:FindFirstChild('HumanoidRootPart') then
+							Debounce = true
+							local Position = ReplicatedStorage.RemoteFunction.RemoteFunction:InvokeClient(Player, 'MOUSEPOS')
+							if (Player.Character.HumanoidRootPart.Position - Position).magnitude <= Range then
+								task.spawn(function()
+									task.spawn(function()
+										script.Parent.Handle.Spray:Play()
+										script.Parent.Handle.Smoke.Enabled = true
+										task.wait(1.5)
+										script.Parent.Handle.Smoke.Enabled = false
+									end)
+									task.wait(2.5)
+									Debounce = false
+								end)
+								local rayParams = RaycastParams.new()
+								rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+								rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+								rayParams.IgnoreWater = true
+								local ray = Ray.new(script.Parent.Handle.Position, (Position - script.Parent.Handle.Position).Unit * 25)
+								local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams)
+								local Image = Module.GroupImage(Player)
+								local Template = game:GetService('ServerStorage').Storage.Misc.Graffiti.Template:Clone()
+								Template.Name = Player.Name
+								Template.Decal.Texture = Image
+								Template.Decal.Transparency = 1
+								Template.CFrame = CFrame.new(result.Position, result.Position + result.Normal)
+								Template.Parent = workspace.MAP.Graffiti
+								local Info = TweenInfo.new(1)
+								local Tween = TweenService:Create(Template.Decal, Info, {Transparency = 0})
+								Tween:Play()
+								Player.DataFolder.Currency.Value += 4
+							else 
+								Debounce = false
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[Surgeon Mask]" then
+		source = [[local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+local Connection = nil
+
+script.Parent.Activated:Connect(function()
+	if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+		return
+	end
+	if script.Parent:IsDescendantOf(Player.Character) then
+		pcall(function()
+			if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+				return
+			end
+			if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+				return
+			end
+			if Player.Character:FindFirstChild('Christmas_Sock') then
+				return
+			end
+			if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+				return
+			end
+			if Player.Character.BodyEffects.Reload.Value ~= false then
+				return
+			end
+			task.spawn(function()
+				_G.PlayerData.Players[Player].Debounces.Action.Action = true
+				task.wait(1.25)
+				_G.PlayerData.Players[Player].Debounces.Action.Action = false
+			end)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Mask = Player.Character.BodyEffects.Mask.Value
+			local Hat = game:GetService('ServerStorage').Storage.Tools.Misc.Masks["[Surgeon Mask]"]:FindFirstChildOfClass('Accessory'):Clone()
+			local Weld1 = Hat.Handle.AccessoryWeld
+			local Weld2 = Hat:FindFirstChildOfClass('Model').Weld
+			Weld1.Part0 = Weld1.Parent
+			Weld1.Part1 = Weld1.Parent.Parent:FindFirstChildOfClass('Model').Head
+			Weld2.Part0 = Weld2.Parent.Head
+			Weld2.Part1 = Player.Character.Head
+			if Player.Character:FindFirstChild('In-gameMask') then
+				if Connection ~= nil then
+					Connection:Disconnect()
+					Connection = nil
+				end
+				Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
+				Player.Character['In-gameMask']:Destroy()
+				local Animation = Instance.new('Animation')
+				Animation.AnimationId = 'rbxassetid://12377279227'
+				local Track = Humanoid:LoadAnimation(Animation)
+				Track:Play()
+			else 
+				if Connection ~= nil then
+					Connection:Disconnect()
+					Connection = nil
+				end
+				pcall(function()
+					Hat:FindFirstChildOfClass('Model'):FindFirstChildOfClass('Humanoid').Health = Humanoid.Health
+					Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+					Connection = Humanoid:GetPropertyChangedSignal('Health'):Connect(function()
+						Hat:FindFirstChildOfClass('Model'):FindFirstChildOfClass('Humanoid').Health = Humanoid.Health
+					end)
+					Hat.Parent = Player.Character
+				end)
+				local Animation = Instance.new('Animation')
+				Animation.AnimationId = 'rbxassetid://12377282666'
+				local Track = Humanoid:LoadAnimation(Animation)
+				Track:Play()
+			end
+		end)
+	end
+end)]]
+	elseif v.Parent.Name == "[Weights]" then
+		source = [[local Equipped = false
+local Player
+
+script.Parent:WaitForChild('OwnerTag')
+Player = script.Parent.OwnerTag.Value
+
+script.Parent.Activated:Connect(function()
+	if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+		return
+	end
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		if (Player.Character.BodyEffects.Cuff.Value ~= false or Player.Character.BodyEffects['K.O'].Value ~= false or Player.Character.BodyEffects['Grabbed'].Value ~= nil) then
+			return
+		end
+		if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+			return
+		end
+		if Player.Character:FindFirstChild('Christmas_Sock') then
+			return
+		end
+		if Player.Character.BodyEffects.Reload.Value ~= false then
+			return
+		end
+		_G.PlayerData.Players[Player].Debounces.Action.Action = true
+		if not Player.DataFolder.Information:FindFirstChild('MuscleInformation') then
+			local MuscleInformation = Instance.new('StringValue', Player.DataFolder.Information)
+			MuscleInformation.Name = 'MuscleInformation'
+			MuscleInformation.Value = tostring(1)
+		else
+			if tonumber(Player.DataFolder.Information.MuscleInformation.Value) + 1 < game:GetService('ReplicatedStorage').MaxMuscle.Value then
+				Player.DataFolder.Information.MuscleInformation.Value = tostring(tonumber(Player.DataFolder.Information.MuscleInformation.Value) + 1)
+			else
+				Player.DataFolder.Information.MuscleInformation.Value = tostring(game:GetService('ReplicatedStorage').MaxMuscle.Value)
+			end
+		end
+		local Animation = Instance.new('Animation')
+		Animation.AnimationId = 'rbxassetid://11831738782'
+		local AnimationTrack = Player.Character:FindFirstChildOfClass('Humanoid'):LoadAnimation(Animation)
+		AnimationTrack:Play()
+		task.wait(5)
+		pcall(function()
+			_G.PlayerData.Players[Player].Debounces.Action.Action = false
+			AnimationTrack:Stop()
+		end)
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	Equipped = true
+end)
+
+script.Parent.Unequipped:Connect(function()
+	Equipped = false
+end)]]
+	elseif v.Parent.Name == "[AK47]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Firing = false
+local Loop = nil
+local RunService = game:GetService('RunService')
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 14,
+	Cooldown = 1/8,
+	Stopped = false,
+	CooldownAfterStopped = 0.2,
+	Range = 250,
+	LastFX = 0,
+	Color = 'Default'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if script.Parent.Ammo.Value > 0 then
+					if Config.Stopped == true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					if Loop ~= nil then
+						return
+					end
+					Firing = true
+					Loop = RunService.Heartbeat:Connect(function()
+						if not script.Parent:IsDescendantOf(Player.Character) then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Cuff.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['K.O'].Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['Grabbed'].Value ~= nil then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.GunFiring.Value ~= false then
+							return
+						end
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							if tick() - Config.LastFX < 0.2 then
+								Config.LastFX = tick()
+								return
+							end
+							local last = tick()
+							Config.LastFX = last
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										task.spawn(function()
+											local Check
+											Check = RunService.Heartbeat:Connect(function()
+												if last ~= Config.LastFX then
+													Tween:Cancel()
+													Check:Disconnect()
+												end
+											end)
+										end)
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Deactivated:Connect(function()
+	Firing = false
+	if Loop then
+		task.spawn(function()
+			if Config.Stopped ~= true then
+				Config.Stopped = true
+				task.wait(Config.CooldownAfterStopped)
+				Config.Stopped = false
+			end
+		end)
+		Loop:Disconnect()
+		Loop = nil
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[AR]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Firing = false
+local Loop = nil
+local RunService = game:GetService('RunService')
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 10,
+	Cooldown = 1/10,
+	Stopped = false,
+	CooldownAfterStopped = 0.2,
+	Range = 250,
+	LastFX = 0,
+	Color = 'Default',
+	Particle = 'None'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end		
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	if Config.Particle ~= 'None' then
+		if Config.Particle == 'Halloween' then
+			local Particles = game:GetService('ServerStorage').Storage.Misc.Particles.ShootFX.HalloweenAR:GetChildren()
+			local Particle = Particles[math.random(1, #Particles)]:Clone()
+			Particle.Parent = Attachment0
+			Particle:Emit(4)
+		end
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if script.Parent.Ammo.Value > 0 then
+					if Config.Stopped == true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					if Loop ~= nil then
+						return
+					end
+					Firing = true
+					Loop = RunService.Heartbeat:Connect(function()
+						if not script.Parent:IsDescendantOf(Player.Character) then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Cuff.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['K.O'].Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['Grabbed'].Value ~= nil then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.GunFiring.Value ~= false then
+							return
+						end
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							if tick() - Config.LastFX < 0.2 then
+								Config.LastFX = tick()
+								return
+							end
+							local last = tick()
+							Config.LastFX = last
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										task.spawn(function()
+											local Check
+											Check = RunService.Heartbeat:Connect(function()
+												if last ~= Config.LastFX then
+													Tween:Cancel()
+													Check:Disconnect()
+												end
+											end)
+										end)
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Deactivated:Connect(function()
+	Firing = false
+	if Loop then
+		task.spawn(function()
+			if Config.Stopped ~= true then
+				Config.Stopped = true
+				task.wait(Config.CooldownAfterStopped)
+				Config.Stopped = false
+			end
+		end)
+		Loop:Disconnect()
+		Loop = nil
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	if typeof(Color) ~= 'table' then
+		Config.Particle = 'None'
+		Config.Color = Color
+	else 
+		if Color[1] == 'Halloween' then
+			Config.Particle = Color[1]
+			Config.Color = Color[2]
+		end
+	end
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[AUG]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 16.25,
+	Cooldown = 0.6,
+	Burst = {
+		Count = 3,
+		Interval = 0.08
+	},
+	Range = 250,
+	Color = 'Default'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value >= Config.Burst.Count then
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					for i = 1, Config.Burst.Count do
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Burst.Interval)
+					end
+					task.wait(Config.Cooldown)
+					pcall(function()
+						ReduceWalk:Destroy()
+						BodyEffects.GunFiring.Value = false
+					end)
+				else
+					if script.Parent.Ammo.Value > 0 then
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						for i = 1, script.Parent.Ammo.Value do
+							script.Parent.Ammo.Value -= 1
+							local Sound = script.Parent.Handle.ShootSound:Clone()
+							Sound.Parent = script.Parent.Handle
+							Sound:Play()
+							Sound.Ended:Connect(function()
+								Sound:Destroy()
+							end)
+							task.spawn(function()
+								task.wait(.05)
+								local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+							end)
+							BodyEffects.GunFiring.Value = true
+							CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+							task.spawn(function()
+								task.wait(0.2)
+								pcall(function()
+									task.spawn(function()
+										pcall(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+											script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+											local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												local Info = TweenInfo.new(0.1)
+												local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+												Tween:Play()
+												Tween.Completed:Connect(function()
+													script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+												end)
+											end)
+										end)
+									end)
+								end)
+							end)
+							task.wait(0.15)
+						end
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					else 
+						if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							script.Parent.Handle.NoAmmo:Play()
+							RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+							BodyEffects.GunFiring.Value = true
+							task.wait(0.3)
+							pcall(function()
+								BodyEffects.GunFiring.Value = false
+							end)
+							return
+						end
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[Double-Barrel SG]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local RunService = game:GetService('RunService')
+local Config = {
+	Damage = 35,
+	Cooldown = 0.3,
+	Range = 250,
+	CanShoot = true,
+	ShowsStars = false,
+	Color = 'Default',
+	LastFX = 0
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(ActualMouse, Position, Mouse, RandomNum)
+	local result = Raycast(Position, Mouse)
+	local Distance = (ActualMouse - Position).magnitude
+	local DMGMultiplier = 1
+	if Distance < 5 then 
+		DMGMultiplier = 1.5
+	elseif Distance >= 5 and Distance < 15 then
+		DMGMultiplier = 1
+	elseif Distance >= 15 and Distance < 25 then
+		DMGMultiplier = 0.6
+	elseif Distance >= 25 then
+		DMGMultiplier = 0.4
+	end
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	if Config.ShowsStars == true then
+		for i = 1, 2 do 
+			local Stars = game:GetService('ServerStorage').Storage.Misc.Particles.ShootFX.StarDB.Stars:Clone()
+			Stars.Name = 'ParticleEmitter'
+			Stars.Parent = Attachment0
+			Stars:Emit(1)
+		end
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	local Damage = Config.Damage * DMGMultiplier
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Damage > 0 then
+							Humanoid:TakeDamage(Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Damage
+								if Humanoid.Health - (Damage) > 0 then
+									Humanoid:TakeDamage(Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Damage > 0 then
+								Humanoid:TakeDamage(Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Damage * 2
+							if Humanoid.Health - (Damage * 2) > 0 then
+								Humanoid:TakeDamage((Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Damage * 2 > 0 then
+							Humanoid:TakeDamage(Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if Config.CanShoot ~= true then
+					return
+				end
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value > 0 then
+					script.Parent.Ammo.Value -= 1
+					local Sound = script.Parent.Handle.ShootSound:Clone()
+					Sound.Parent = script.Parent.Handle
+					Sound:Play()
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+					task.spawn(function()
+						task.wait(.05)
+						local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					end)	
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					BodyEffects.GunFiring.Value = true
+					local RandomNum = Random.new():NextNumber(0.3, 0.5)
+					local Offsets = {
+						{ 
+							Vector3.new(0,0.09),
+							Vector3.new(0,0.14),
+							Vector3.new(0,-0.3),
+							Vector3.new(0,-0.22),
+							Vector3.new(0,0.2)
+						},
+						{ 
+							Vector3.new(0,-0.15),
+							Vector3.new(0,0.14),
+							Vector3.new(0,-0.28),
+							Vector3.new(0,-0.22),
+							Vector3.new(0,0.2)
+						},
+						{ 
+							Vector3.new(0.3,-0.045),
+							Vector3.new(-0.38,-0.045),
+							Vector3.new(-0.3,-0.045),
+							Vector3.new(-0.22,-0.045),
+							Vector3.new(0.2,-0.045)
+						},
+						{ 
+							Vector3.new(0.3,0.045),
+							Vector3.new(-0.38,0.045),
+							Vector3.new(-0.28,0.045),
+							Vector3.new(-0.18,0.045),
+							Vector3.new(0.2,0.045)
+						},
+						{
+							Vector3.new(-0.23,-0.2),
+							Vector3.new(-0.4,-0.33),
+							Vector3.new(0.13,0.2),
+							Vector3.new(0.05,0.12),
+							Vector3.new(-0.32,-0.27)
+						},
+						{
+							Vector3.new(-0.23,-0.2),
+							Vector3.new(-0.32,-0.27),
+							Vector3.new(0.13,0.2),
+							Vector3.new(0.05,0.12),
+							Vector3.new(0.2,0.27)
+						},
+						{
+							Vector3.new(0.23,-0.2),
+							Vector3.new(0.32,-0.27),
+							Vector3.new(-0.13,0.2),
+							Vector3.new(-0.05,0.12),
+							Vector3.new(-0.2,0.27)
+						},
+						{
+							Vector3.new(0.23,-0.2),
+							Vector3.new(0.32,-0.28),
+							Vector3.new(-0.13,0.2),
+							Vector3.new(0.14,-0.12),
+							Vector3.new(-0.2,0.27)
+						}
+
+					}
+					local Offset = Offsets[math.random(1, #Offsets)]
+					for i = 1,5 do 
+						local Origin = script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace)
+						CreateBullet(BodyEffects.MousePos.Value, Origin, (Origin + (BodyEffects.MousePos.Value - Origin).Unit * 5) - Offset[i], RandomNum)
+					end
+					task.spawn(function()
+						if tick() - Config.LastFX < 0.75 then
+							Config.LastFX = tick()
+							return
+						end
+						local last = tick()
+						Config.LastFX = last
+						task.wait(0.2)
+						pcall(function()
+							task.spawn(function()
+								pcall(function()
+									script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+									script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+									local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+									local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+									Tween:Play()
+									task.spawn(function()
+										local Check
+										Check = RunService.Heartbeat:Connect(function()
+											if last ~= Config.LastFX then
+												Tween:Cancel()
+												Check:Disconnect()
+											end
+										end)
+									end)
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.1)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+										end)
+									end)
+								end)
+							end)
+						end)
+					end)
+					task.wait(Config.Cooldown)
+					pcall(function()
+						ReduceWalk:Destroy()
+						BodyEffects.GunFiring.Value = false
+					end)
+				else
+					if Config.CanShoot ~= true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Skin = _G.ApplySkin(Player, script.Parent)
+	if Skin == true then
+		Config.ShowsStars = Skin
+		Config.Color = 'Default'
+	else 
+		Config.ShowsStars = false
+		Config.Color = Skin
+	end
+end)
+
+script.Parent:WaitForChild('Ammo'):GetPropertyChangedSignal('Value'):Connect(function()
+	local Ammo = script.Parent.Ammo
+	if Ammo.Value == 0 then
+		task.spawn(function()
+			Config.CanShoot = false
+			task.wait(2)
+			Config.CanShoot = true
+		end)
+	end
+end)]]
+	elseif v.Parent.Name == "[DrumGun]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Firing = false
+local Fired = 0
+local Loop = nil
+local RunService = game:GetService('RunService')
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 10,
+	Cooldown = 1/11,
+	Stopped = false,
+	CooldownAfterStopped = 0.2,
+	Range = 250,
+	LastFX = 0,
+	Color = 'Default'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if script.Parent.Ammo.Value > 0 then
+					if Config.Stopped == true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					if Loop ~= nil then
+						return
+					end
+					Firing = true
+					Loop = RunService.Heartbeat:Connect(function()
+						if not script.Parent:IsDescendantOf(Player.Character) then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Cuff.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['K.O'].Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['Grabbed'].Value ~= nil then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.GunFiring.Value ~= false then
+							return
+						end
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							if tick() - Config.LastFX < 0.2 then
+								Config.LastFX = tick()
+								return
+							end
+							local last = tick()
+							Config.LastFX = last
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										task.spawn(function()
+											local Check
+											Check = RunService.Heartbeat:Connect(function()
+												if last ~= Config.LastFX then
+													Tween:Cancel()
+													Check:Disconnect()
+												end
+											end)
+										end)
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Deactivated:Connect(function()
+	Firing = false
+	if Loop then
+		task.spawn(function()
+			if Config.Stopped ~= true then
+				Config.Stopped = true
+				task.wait(Config.CooldownAfterStopped)
+				Config.Stopped = false
+			end
+		end)
+		Loop:Disconnect()
+		Loop = nil
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+end)]]
+	elseif v.Parent.Name == "[Flamethrower]" then
+		source = [[local debounce = .1
+local equipped = false
+local beginning = false
+local began = "NotStarted"
+local AmmoT = "KeepAmmo"
+local Handle = script.Parent.Handle
+
+local Config = {
+	Color = 'Default',
+	LastFX = 0
+}
+
+local db = {}
+
+local IgnoredConcrete = {"medium stone grey","dark grey metallic","fossil","seashell"}
+local BlackListedMaterials = {"Enum.Material.CorrodedMetal","Enum.Material.Plastic","Enum.Material.DiamondPlate","Enum.Material.Grass","Enum.Material.Slate","Enum.Material.Slate","Enum.Material.Wood"}
+
+local function checkPartMaterial(part)
+	if part:IsDescendantOf(workspace.MAP) or part:IsDescendantOf(workspace.Ignored) then
+		if part.Material == Enum.Material.Concrete then
+			if table.find(IgnoredConcrete,string.lower(tostring(part.BrickColor))) == nil then
+				return true;	
+			end
+		elseif not table.find(BlackListedMaterials,tostring(part.Material)) then
+			return true;
+		end
+		return nil;
+	end
+	return nil;
+end
+
+function NoAmmo(plr)
+	plr.Character.BodyEffects.GunFiring.Value = true
+	Handle.NoAmmo:Play()
+	local StringValue = Instance.new("StringValue", plr.Character.BodyEffects.Movement)
+	StringValue.Name = "ReduceWalk"
+	game.Debris:AddItem(StringValue, .1)
+	wait(.1)
+	plr.Character.BodyEffects.GunFiring.Value = false
+end
+script.Parent.Activated:Connect(function()
+	local plr = game.Players:GetPlayerFromCharacter(script.Parent.Parent)
+	if not require(game.ReplicatedStorage.MainModule).Activate(plr.Character.BodyEffects) then return end
+	if script.Parent.Ammo.Value == 0 then return NoAmmo(plr) end
+	if db[plr] ~= nil then return end
+	db[plr] = true
+	equipped = true
+
+	local function HP(humanoid,dmg)
+		humanoid.Health = math.clamp(humanoid.Health - dmg, 0.2, humanoid.MaxHealth)
+	end
+	repeat wait()
+		if require(game.ReplicatedStorage.MainModule).Activate(plr.Character.BodyEffects) then
+			if AmmoT == "KeepAmmo" then
+				AmmoT = "RemoveAmmo"
+			elseif AmmoT == "RemoveAmmo" then
+				AmmoT = "KeepAmmo"
+				script.Parent.Ammo.Value -= 1
+			end
+			if beginning == false then
+				beginning = true
+				began = "Started"
+				Handle.BeginSound:Play()
+				script.Parent.Part.Flame:Emit(1)
+			end
+			if began == "Started" then
+				began = "Flaming"
+				Handle.ShootSound:Play()
+			end
+			script.Parent.Part.Flame.Rate = 500
+			local params = RaycastParams.new()
+			params.FilterType = Enum.RaycastFilterType.Blacklist
+			params.FilterDescendantsInstances = {plr.Character,workspace.Ignored}
+			local direction = (plr.Character.UpperTorso.CFrame.LookVector * 100).Unit*30
+			local result = workspace:Raycast(script.Parent.Part.Position,direction,params)
+			if result then
+				script.Parent.Part.Flame.Speed = NumberRange.new((result.Position - script.Parent.Part.Position).Magnitude*2)
+				local Humanoid
+				if result.Instance:IsDescendantOf(workspace.Players) then
+					Humanoid = result.Instance.Parent:FindFirstChild("Humanoid") or (result.Instance.Parent.Parent:FindFirstChild("Humanoid") or result.Instance.Parent.Parent.Parent:FindFirstChild("Humanoid"))
+					local Character = Humanoid.Parent
+					HP(Humanoid,10)
+					if not Character.UpperTorso:FindFirstChild("Fire") then
+						local FireParticle = game.ServerStorage.Storage.Misc.Particles.FireParticle:Clone()
+						FireParticle.Name = "Fire"
+						FireParticle.Parent = Character.UpperTorso
+						game.Debris:AddItem(FireParticle,7)
+					end
+				else
+					local FlamedPart = result.Instance
+					if checkPartMaterial(FlamedPart) then
+						if not FlamedPart:FindFirstChild("Fire") then
+							local FireParticle = game.ServerStorage.Storage.Misc.Particles.FireParticle:Clone()
+							FireParticle.Name = "Fire"
+							FireParticle.Parent = FlamedPart
+							local FlamedPartSize = Instance.new("Vector3Value")
+							FlamedPartSize.Value  = FlamedPart.Size
+							local FlamedPartColor = Instance.new("Color3Value")
+							FlamedPartColor.Value = FlamedPart.Color
+							local ColorTween = game:GetService("TweenService"):Create(FlamedPart,TweenInfo.new(5,Enum.EasingStyle.Linear,Enum.EasingDirection.In,0,false,3),{Color = Color3.fromRGB(255,0,0)})
+							ColorTween:Play()
+							ColorTween.Completed:Connect(function()
+								wait()
+								local FlameDestroyTween = game:GetService("TweenService"):Create(FlamedPart,TweenInfo.new(2,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,0),{Size = Vector3.new(0,0,0)})
+								FlameDestroyTween:Play()
+								FlameDestroyTween.Completed:Connect(function()
+									local Signal = Instance.new("ObjectValue",game.ServerStorage.FlamedParts)
+									Signal.Name = FlamedPart.name
+									FlamedPartSize.Name = "SIZE"
+									FlamedPartColor.Parent = Signal
+									FlamedPartColor.Name = "COLOR"
+									FlamedPartSize.Parent = Signal
+									Signal.Value = FlamedPart
+									FireParticle:Destroy()
+								end)
+							end)
+						end
+					end
+				end
+			else
+				script.Parent.Part.Flame.Speed = NumberRange.new(60)
+			end
+			plr.Character:WaitForChild("BodyEffects").GunShotChanges.Value += 1
+			local StringValue = Instance.new("StringValue", plr.Character.BodyEffects.Movement)
+			StringValue.Name = "ReduceWalk"
+			game.Debris:AddItem(StringValue, .1)
+			plr.Character.BodyEffects.GunFiring.Value = true
+		else
+			script.Parent.Part.Flame.Rate = 0
+			began = "Started"
+			Handle.ShootSound:Stop()
+		end
+	until script.Parent.Ammo.Value == 0 or equipped == false
+	script.Parent.Part.Flame.Rate = 0
+	plr.Character.BodyEffects.GunFiring.Value = false
+	began = "NotStarted"
+	beginning = false
+	Handle.ShootSound:stop()
+	wait(.3)
+	db[plr] = nil
+end)
+
+script.Parent.Deactivated:Connect(function()
+	equipped = false
+end)
+
+script.Parent.Unequipped:Connect(function()
+	equipped = false
+	began = "NotStarted"
+	beginning = false
+end)
+
+
+script.Parent.Equipped:Connect(function()
+	local plr = game.Players:GetPlayerFromCharacter(script.Parent.Parent)
+	local Color = _G.ApplySkin(plr, script.Parent)
+	Config.Color = Color
+end)
+
+while wait() do
+	if script.Parent.Default.TextureID == "rbxassetid://9400558000" then
+		local new = Instance.new("Color3Value")
+		new.Value = Color3.new(0.173022, 0.290806, 1)
+		script.Parent.Part.Flame.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, new.Value),
+			ColorSequenceKeypoint.new(1,new.Value)
+		}
+	elseif script.Parent.Default.TextureID == "rbxassetid://9400503673" then
+		local new = Instance.new("Color3Value")
+		new.Value = Color3.new(0.925948, 0.225986, 0.195468)
+		script.Parent.Part.Flame.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, new.Value),
+			ColorSequenceKeypoint.new(1,new.Value)
+		}
+	else
+		local new = Instance.new("Color3Value")
+		new.Value = Color3.new(0.965728, 0.512245, 0.279225)
+		script.Parent.Part.Flame.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, new.Value),
+			ColorSequenceKeypoint.new(1,new.Value)
+		}
+	end
+end]]
+	elseif v.Parent.Name == "[Glock]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local RunService = game:GetService('RunService')
+local Config = {
+	Damage = 35,
+	Cooldown = 0.5,
+	Range = 250,
+	Color = 'Default',
+	LastFX = 0
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value > 0 then
+					script.Parent.Ammo.Value -= 1
+					local Sound = script.Parent.Handle.ShootSound:Clone()
+					Sound.Parent = script.Parent.Handle
+					Sound:Play()
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+					task.spawn(function()
+						task.wait(.05)
+						local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					end)
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					BodyEffects.GunFiring.Value = true
+					CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+					task.spawn(function()
+						if tick() - Config.LastFX < 0.75 then
+							Config.LastFX = tick()
+							return
+						end
+						local last = tick()
+						Config.LastFX = last
+						task.wait(0.2)
+						pcall(function()
+							task.spawn(function()
+								pcall(function()
+									script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+									script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+									local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+									local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+									Tween:Play()
+									task.spawn(function()
+										local Check
+										Check = RunService.Heartbeat:Connect(function()
+											if last ~= Config.LastFX then
+												Tween:Cancel()
+												Check:Disconnect()
+											end
+										end)
+									end)
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.1)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+										end)
+									end)
+								end)
+							end)
+						end)
+					end)
+					task.wait(Config.Cooldown)
+					pcall(function()
+						ReduceWalk:Destroy()
+						BodyEffects.GunFiring.Value = false
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+end)]]
+	elseif v.Parent.Name == "[LMG]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Firing = false
+local Loop = nil
+local RunService = game:GetService('RunService')
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 9,
+	Cooldown = 1/11,
+	Stopped = false,
+	CooldownAfterStopped = 0.2,
+	Range = 250,
+	LastFX = 0,
+	Color = 'Default'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if script.Parent.Ammo.Value > 0 then
+					if Config.Stopped == true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					if Loop ~= nil then
+						return
+					end
+					Firing = true
+					Loop = RunService.Heartbeat:Connect(function()
+						if not script.Parent:IsDescendantOf(Player.Character) then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Cuff.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['K.O'].Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['Grabbed'].Value ~= nil then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.GunFiring.Value ~= false then
+							return
+						end
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							if tick() - Config.LastFX < 0.2 then
+								Config.LastFX = tick()
+								return
+							end
+							local last = tick()
+							Config.LastFX = last
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										task.spawn(function()
+											local Check
+											Check = RunService.Heartbeat:Connect(function()
+												if last ~= Config.LastFX then
+													Tween:Cancel()
+													Check:Disconnect()
+												end
+											end)
+										end)
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Deactivated:Connect(function()
+	Firing = false
+	if Loop then
+		task.spawn(function()
+			if Config.Stopped ~= true then
+				Config.Stopped = true
+				task.wait(Config.CooldownAfterStopped)
+				Config.Stopped = false
+			end
+		end)
+		Loop:Disconnect()
+		Loop = nil
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[P90]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Firing = false
+local Loop = nil
+local RunService = game:GetService('RunService')
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 6.25,
+	Cooldown = 1/13,
+	Stopped = false,
+	CooldownAfterStopped = 0.2,
+	Range = 250,
+	LastFX = 0,
+	Color = 'Default'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if script.Parent.Ammo.Value > 0 then
+					if Config.Stopped == true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					if Loop ~= nil then
+						return
+					end
+					Firing = true
+					Loop = RunService.Heartbeat:Connect(function()
+						if not script.Parent:IsDescendantOf(Player.Character) then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Cuff.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['K.O'].Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['Grabbed'].Value ~= nil then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.GunFiring.Value ~= false then
+							return
+						end
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							if tick() - Config.LastFX < 0.2 then
+								Config.LastFX = tick()
+								return
+							end
+							local last = tick()
+							Config.LastFX = last
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										task.spawn(function()
+											local Check
+											Check = RunService.Heartbeat:Connect(function()
+												if last ~= Config.LastFX then
+													Tween:Cancel()
+													Check:Disconnect()
+												end
+											end)
+										end)
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Deactivated:Connect(function()
+	Firing = false
+	if Loop then
+		task.spawn(function()
+			if Config.Stopped ~= true then
+				Config.Stopped = true
+				task.wait(Config.CooldownAfterStopped)
+				Config.Stopped = false
+			end
+		end)
+		Loop:Disconnect()
+		Loop = nil
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+end)]]
+	elseif v.Parent.Name == "[RPG]" then
+		source = [[local Config = {
+	Color = 'Default',
+	LastFX = 0
+}
+
+local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+
+local db = {}
+
+
+
+script.Parent.Activated:Connect(function()
+	local plr = game.Players:GetPlayerFromCharacter(script.Parent.Parent)
+	if plr.Character:FindFirstChild("FULLY_LOADED_CHAR") == nil then return end
+	if db[plr] == true then return end
+	db[plr] = true
+	if script.Parent.Ammo.Value >= 1 then
+		script.Parent.Ammo.Value -= 1
+		plr.Character.BodyEffects.GunShotChanges.Value += 0
+		local Rocket = script.Parent.Launcher:Clone()
+		script.Parent.Launcher.Transparency = 1
+		Rocket.Parent = workspace.Ignored
+		local ShootSound = Instance.new("Sound",Rocket)
+		ShootSound.SoundId = "rbxassetid://12222095"
+		ShootSound.Looped = true
+		ShootSound:Play()
+		local ToLookAt = plr.Character.BodyEffects.MousePos.Value
+		Rocket.CFrame = CFrame.lookAt(script.Parent.Launcher.Position,plr.Character.BodyEffects.MousePos.Value)
+		local VEL = Instance.new("BodyVelocity",Rocket)
+		local String = Instance.new("StringValue",plr.Character.BodyEffects.Movement)
+		String.Name = "ReduceWalk"
+		game.Debris:AddItem(String,.6)
+		VEL.Velocity = (Vector3.new(plr.Character.BodyEffects.MousePos.Value.x,plr.Character.BodyEffects.MousePos.Value.y,plr.Character.BodyEffects.MousePos.Value.z)-Rocket.Position).Unit*50
+		local waited = 0
+		local maxWaitTime = 25
+		local Exploding = true
+		local par = RaycastParams.new()
+		par.FilterType = Enum.RaycastFilterType.Blacklist
+		par.FilterDescendantsInstances = {Rocket,workspace.Ignored,script.Parent,plr.Character}
+		while wait() do
+			if waited > maxWaitTime then
+				Exploding = false
+				break
+			end
+			waited += .1
+			Rocket.CFrame = CFrame.lookAt(Rocket.Position,ToLookAt)
+			local result = workspace:Raycast(Rocket.Position,(Rocket.CFrame.p + Rocket.CFrame.LookVector * 60).Unit*5,par)
+			if result then
+				break
+			else
+				if (Rocket.Position-ToLookAt).Magnitude < 3 then
+					break
+				end
+			end
+		end
+		db[plr] = nil
+		if Exploding == true then
+			game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.Explosion:Fire(plr, Rocket.Position)
+			ShootSound:Destroy()
+		end
+		Rocket:Destroy()
+	else
+		script.Parent.Handle.NoAmmo:Play()
+		wait(.4)
+		db[plr] = nil
+	end
+end)
+script.Parent.Ammo.Changed:Connect(function()
+	if script.Parent.Ammo.Value == 1 then
+		script.Parent.Launcher.Transparency = 0
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+end)
+
+script.Parent:WaitForChild('Ammo'):GetPropertyChangedSignal('Value'):Connect(function()
+	local Ammo = script.Parent.Ammo
+	if Ammo.Value == 0 then
+		task.spawn(function()
+			Config.CanShoot = false
+			task.wait(6)
+			Config.CanShoot = true
+		end)
+	end
+end)]]
+	elseif v.Parent.Name == "[Revolver]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local RunService = game:GetService('RunService')
+local Config = {
+	Damage = 35,
+	Cooldown = 0.2,
+	Range = 250,
+	Color = 'Default',
+	LastFX = 0
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value > 0 then
+					script.Parent.Ammo.Value -= 1
+					local Sound = script.Parent.Handle.ShootSound:Clone()
+					Sound.Parent = script.Parent.Handle
+					Sound:Play()
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+					task.spawn(function()
+						task.wait(.05)
+						local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					end)	
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					BodyEffects.GunFiring.Value = true
+					CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+					task.spawn(function()
+						if tick() - Config.LastFX < 0.75 then
+							Config.LastFX = tick()
+							return
+						end
+						local last = tick()
+						Config.LastFX = last
+						task.wait(0.2)
+						pcall(function()
+							task.spawn(function()
+								pcall(function()
+									script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+									script.Parent.Handle.ShootBBGUI.Shoot.ImageTransparency = 0
+									script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0.015, 0, 0.015, 0)
+									local Tween1 = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot, TweenInfo.new(0.015), {Size = UDim2.new(0.004, 0, 0.004, 0)})
+									local Tween2 = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot, TweenInfo.new(0.035), {Size = UDim2.new(0.06, 0, 0.06, 0)})
+									local Tween3 = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot, TweenInfo.new(0.045), {Size = UDim2.new(0.004, 0, 0.004, 0)})
+									local Tween4 = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot, TweenInfo.new(0.065), {Size = UDim2.new(0.25, 0, 0.25, 0)})
+									local Tween5 = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot, TweenInfo.new(0.075), {Size = UDim2.new(0.03, 0, 0.03, 0)})
+									local Tween6 = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot, TweenInfo.new(0.075), {Size = UDim2.new(0.03, 0, 0.03, 0)})
+									local Tween7 = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot, TweenInfo.new(0.15, Enum.EasingStyle.Circular), {Size = UDim2.new(1, 0, 1, 0)})
+									Tween1:Play()
+									Tween1.Completed:Connect(function()
+										Tween2:Play() 
+										Tween2.Completed:Connect(function()
+											Tween3:Play()
+											Tween3.Completed:Connect(function()
+												Tween4:Play()
+												Tween4.Completed:Connect(function()
+													Tween5:Play()
+													Tween5.Completed:Connect(function()
+														Tween6:Play()
+														Tween6.Completed:Connect(function()
+															Tween7:Play()
+															Tween7.Completed:Connect(function()
+																script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+															end)
+														end)
+													end)
+												end)
+											end)
+										end)
+									end)
+									task.spawn(function()
+										local Check
+										Check = RunService.Heartbeat:Connect(function()
+											if last ~= Config.LastFX then
+												Tween1:Cancel()
+												Tween2:Cancel()
+												Tween3:Cancel()
+												Tween4:Cancel()
+												Tween5:Cancel()
+												Tween6:Cancel()
+												Tween7:Cancel()
+												Check:Disconnect()
+											end
+										end)
+									end)
+									--[[Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.1)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+										end)
+									end)]
+	end)
+	end)
+	end)
+	end)
+	task.wait(Config.Cooldown)
+pcall(function()
+	ReduceWalk:Destroy()
+	BodyEffects.GunFiring.Value = false
+end)
+else
+	if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+		return
+	end
+	if BodyEffects.Reload.Value ~= false then
+		return
+	end
+	if BodyEffects.Attacking.Value ~= false then
+		return
+	end
+	if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+		return
+	end
+	if Player.Character:FindFirstChild('Christmas_Sock') then
+		return
+	end
+	if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+		return
+	end
+	if BodyEffects:FindFirstChild('Block') then
+		script.Parent.Handle.NoAmmo:Play()
+		RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+		BodyEffects.GunFiring.Value = true
+		task.wait(0.3)
+		pcall(function()
+			BodyEffects.GunFiring.Value = false
+		end)
+		return
+	end
+	script.Parent.Handle.NoAmmo:Play()
+	RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+	BodyEffects.GunFiring.Value = true
+	task.wait(0.3)
+	pcall(function()
+		BodyEffects.GunFiring.Value = false
+	end)
+end
+end
+end
+end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+end)]]
+	elseif v.Parent.Name == "[Rifle]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local RunService = game:GetService('RunService')
+local Config = {
+	Damage = 99,
+	Cooldown = 2,
+	Range = 250,
+	Color = 'Default',
+	LastFX = 0
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if BodyEffects.Reload.Value ~= false then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value > 0 then
+					script.Parent.Ammo.Value -= 1
+					local Sound = script.Parent.Handle.ShootSound:Clone()
+					Sound.Parent = script.Parent.Handle
+					Sound:Play()
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+					task.spawn(function()
+						task.wait(.05)
+						local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					end)
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					BodyEffects.GunFiring.Value = true
+					CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+					task.spawn(function()
+						if tick() - Config.LastFX < 0.75 then
+							Config.LastFX = tick()
+							return
+						end
+						local last = tick()
+						Config.LastFX = last
+						task.wait(0.2)
+						pcall(function()
+							task.spawn(function()
+								pcall(function()
+									script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+									script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+									local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+									local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+									Tween:Play()
+									task.spawn(function()
+										local Check
+										Check = RunService.Heartbeat:Connect(function()
+											if last ~= Config.LastFX then
+												Tween:Cancel()
+												Check:Disconnect()
+											end
+										end)
+									end)
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.1)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+										end)
+									end)
+								end)
+							end)
+						end)
+					end)
+					task.wait(Config.Cooldown)
+					pcall(function()
+						ReduceWalk:Destroy()
+						BodyEffects.GunFiring.Value = false
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[SMG]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Firing = false
+local Loop = nil
+local RunService = game:GetService('RunService')
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 9,
+	Cooldown = 1/13,
+	Stopped = false,
+	CooldownAfterStopped = 0.2,
+	Range = 250,
+	LastFX = 0,
+	Color = 'Default'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if script.Parent.Ammo.Value > 0 then
+					if Config.Stopped == true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					if Loop ~= nil then
+						return
+					end
+					Firing = true
+					Loop = RunService.Heartbeat:Connect(function()
+						if not script.Parent:IsDescendantOf(Player.Character) then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Cuff.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['K.O'].Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['Grabbed'].Value ~= nil then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.GunFiring.Value ~= false then
+							return
+						end
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							if tick() - Config.LastFX < 0.2 then
+								Config.LastFX = tick()
+								return
+							end
+							local last = tick()
+							Config.LastFX = last
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										task.spawn(function()
+											local Check
+											Check = RunService.Heartbeat:Connect(function()
+												if last ~= Config.LastFX then
+													Tween:Cancel()
+													Check:Disconnect()
+												end
+											end)
+										end)
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Deactivated:Connect(function()
+	Firing = false
+	if Loop then
+		task.spawn(function()
+			if Config.Stopped ~= true then
+				Config.Stopped = true
+				task.wait(Config.CooldownAfterStopped)
+				Config.Stopped = false
+			end
+		end)
+		Loop:Disconnect()
+		Loop = nil
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+end)]]
+	elseif v.Parent.Name == "[Shotgun]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local RunService = game:GetService('RunService')
+local Config = {
+	Damage = 25,
+	Cooldown = 1.25,
+	Range = 100,
+	Color = 'Default',
+	LastFX = 0
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(ActualMouse, Position, Mouse, RandomNum)
+	local result = Raycast(Position, Mouse)
+	local Distance = (ActualMouse - Position).magnitude
+	local DMGMultiplier = 1
+	if Distance < 5 then 
+		DMGMultiplier = 1.5
+	elseif Distance >= 5 and Distance < 15 then
+		DMGMultiplier = 1
+	elseif Distance >= 15 and Distance < 25 then
+		DMGMultiplier = 0.6
+	elseif Distance >= 25 then
+		DMGMultiplier = 0.4
+	end
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	local Damage = Config.Damage * DMGMultiplier
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Damage > 0 then
+							Humanoid:TakeDamage(Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Damage
+								if Humanoid.Health - (Damage) > 0 then
+									Humanoid:TakeDamage(Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Damage > 0 then
+								Humanoid:TakeDamage(Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Damage * 2
+							if Humanoid.Health - (Damage * 2) > 0 then
+								Humanoid:TakeDamage((Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Damage * 2 > 0 then
+							Humanoid:TakeDamage(Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value > 0 then
+					script.Parent.Ammo.Value -= 1
+					local Sound = script.Parent.Handle.ShootSound:Clone()
+					Sound.Parent = script.Parent.Handle
+					Sound:Play()
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+					task.spawn(function()
+						task.wait(.05)
+						local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					end)
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					BodyEffects.GunFiring.Value = true
+					local RandomNum = Random.new():NextNumber(0.3, 0.5)
+					local Offsets = {
+						{ 
+							Vector3.new(0,0.09),
+							Vector3.new(0,0.14),
+							Vector3.new(0,-0.3),
+							Vector3.new(0,-0.22),
+							Vector3.new(0,0.2)
+						},
+						{ 
+							Vector3.new(0,-0.15),
+							Vector3.new(0,0.14),
+							Vector3.new(0,-0.28),
+							Vector3.new(0,-0.22),
+							Vector3.new(0,0.2)
+						},
+						{ 
+							Vector3.new(0.3,-0.045),
+							Vector3.new(-0.38,-0.045),
+							Vector3.new(-0.3,-0.045),
+							Vector3.new(-0.22,-0.045),
+							Vector3.new(0.2,-0.045)
+						},
+						{ 
+							Vector3.new(0.3,0.045),
+							Vector3.new(-0.38,0.045),
+							Vector3.new(-0.28,0.045),
+							Vector3.new(-0.18,0.045),
+							Vector3.new(0.2,0.045)
+						},
+						{
+							Vector3.new(-0.23,-0.2),
+							Vector3.new(-0.4,-0.33),
+							Vector3.new(0.13,0.2),
+							Vector3.new(0.05,0.12),
+							Vector3.new(-0.32,-0.27)
+						},
+						{
+							Vector3.new(-0.23,-0.2),
+							Vector3.new(-0.32,-0.27),
+							Vector3.new(0.13,0.2),
+							Vector3.new(0.05,0.12),
+							Vector3.new(0.2,0.27)
+						},
+						{
+							Vector3.new(0.23,-0.2),
+							Vector3.new(0.32,-0.27),
+							Vector3.new(-0.13,0.2),
+							Vector3.new(-0.05,0.12),
+							Vector3.new(-0.2,0.27)
+						},
+						{
+							Vector3.new(0.23,-0.2),
+							Vector3.new(0.32,-0.28),
+							Vector3.new(-0.13,0.2),
+							Vector3.new(0.14,-0.12),
+							Vector3.new(-0.2,0.27)
+						}
+
+					}
+					local Offset = Offsets[math.random(1, #Offsets)]
+					for i = 1,5 do 
+						local Origin = script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace)
+						CreateBullet(BodyEffects.MousePos.Value, Origin, (Origin + (BodyEffects.MousePos.Value - Origin).Unit * 5) - Offset[i], RandomNum)
+					end
+					task.spawn(function()
+						if tick() - Config.LastFX < 0.75 then
+							Config.LastFX = tick()
+							return
+						end
+						local last = tick()
+						Config.LastFX = last
+						task.wait(0.2)
+						pcall(function()
+							task.spawn(function()
+								pcall(function()
+									script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+									script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+									local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+									local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+									Tween:Play()
+									task.spawn(function()
+										local Check
+										Check = RunService.Heartbeat:Connect(function()
+											if last ~= Config.LastFX then
+												Tween:Cancel()
+												Check:Disconnect()
+											end
+										end)
+									end)
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.1)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+										end)
+									end)
+								end)
+							end)
+						end)
+					end)
+					task.wait(Config.Cooldown)
+					pcall(function()
+						ReduceWalk:Destroy()
+						BodyEffects.GunFiring.Value = false
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[SilencerAR]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Firing = false
+local Loop = nil
+local RunService = game:GetService('RunService')
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local Config = {
+	Damage = 10,
+	Cooldown = 1/10,
+	Stopped = false,
+	CooldownAfterStopped = 0.2,
+	Range = 250,
+	LastFX = 0,
+	Color = 'Default'
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if script.Parent.Ammo.Value > 0 then
+					if Config.Stopped == true then
+						return
+					end
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					if Loop ~= nil then
+						return
+					end
+					Firing = true
+					Loop = RunService.Heartbeat:Connect(function()
+						if not script.Parent:IsDescendantOf(Player.Character) then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Reload.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Cuff.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['K.O'].Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects['Grabbed'].Value ~= nil then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects:FindFirstChild('Block') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.Attacking.Value ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if Player.Character:FindFirstChild('Christmas_Sock') then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if script.Parent.Ammo.Value <= 0 then
+							Loop:Disconnect()
+							Loop = nil
+							return
+						end
+						if BodyEffects.GunFiring.Value ~= false then
+							return
+						end
+						script.Parent.Ammo.Value -= 1
+						local Sound = script.Parent.Handle.ShootSound:Clone()
+						Sound.Parent = script.Parent.Handle
+						Sound:Play()
+						Sound.Ended:Connect(function()
+							Sound:Destroy()
+						end)
+						task.spawn(function()
+							task.wait(.05)
+							local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						end)
+						local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+						BodyEffects.GunFiring.Value = true
+						CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+						task.spawn(function()
+							if tick() - Config.LastFX < 0.2 then
+								Config.LastFX = tick()
+								return
+							end
+							local last = tick()
+							Config.LastFX = last
+							task.wait(0.2)
+							pcall(function()
+								task.spawn(function()
+									pcall(function()
+										script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+										script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+										local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										task.spawn(function()
+											local Check
+											Check = RunService.Heartbeat:Connect(function()
+												if last ~= Config.LastFX then
+													Tween:Cancel()
+													Check:Disconnect()
+												end
+											end)
+										end)
+										Tween.Completed:Connect(function()
+											local Info = TweenInfo.new(0.1)
+											local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+											Tween:Play()
+											Tween.Completed:Connect(function()
+												script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+											end)
+										end)
+									end)
+								end)
+							end)
+						end)
+						task.wait(Config.Cooldown)
+						pcall(function()
+							ReduceWalk:Destroy()
+							BodyEffects.GunFiring.Value = false
+						end)
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Deactivated:Connect(function()
+	Firing = false
+	if Loop then
+		task.spawn(function()
+			if Config.Stopped ~= true then
+				Config.Stopped = true
+				task.wait(Config.CooldownAfterStopped)
+				Config.Stopped = false
+			end
+		end)
+		Loop:Disconnect()
+		Loop = nil
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "[Silencer]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local RunService = game:GetService('RunService')
+local Config = {
+	Damage = 35,
+	Cooldown = 0.5,
+	Range = 250,
+	Color = 'Default',
+	LastFX = 0
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(Position, Mouse)
+	local RandomNum = Random.new():NextNumber(0.3, 0.5)
+	local result = Raycast(Position, Mouse)
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Config.Damage > 0 then
+							Humanoid:TakeDamage(Config.Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage
+								if Humanoid.Health - (Config.Damage) > 0 then
+									Humanoid:TakeDamage(Config.Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Config.Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Config.Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Config.Damage > 0 then
+								Humanoid:TakeDamage(Config.Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Config.Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Config.Damage * 2
+							if Humanoid.Health - (Config.Damage * 2) > 0 then
+								Humanoid:TakeDamage((Config.Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Config.Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Config.Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Config.Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Config.Damage * 2 > 0 then
+							Humanoid:TakeDamage(Config.Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Config.Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value > 0 then
+					script.Parent.Ammo.Value -= 1
+					local Sound = script.Parent.Handle.ShootSound:Clone()
+					Sound.Parent = script.Parent.Handle
+					Sound:Play()
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+					task.spawn(function()
+						task.wait(.05)
+						local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					end)
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					BodyEffects.GunFiring.Value = true
+					CreateBullet(script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace), BodyEffects.MousePos.Value)
+					task.spawn(function()
+						if tick() - Config.LastFX < 0.75 then
+							Config.LastFX = tick()
+							return
+						end
+						local last = tick()
+						Config.LastFX = last
+						task.wait(0.2)
+						pcall(function()
+							task.spawn(function()
+								pcall(function()
+									script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+									script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+									local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+									local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+									Tween:Play()
+									task.spawn(function()
+										local Check
+										Check = RunService.Heartbeat:Connect(function()
+											if last ~= Config.LastFX then
+												Tween:Cancel()
+												Check:Disconnect()
+											end
+										end)
+									end)
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.1)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+										end)
+									end)
+								end)
+							end)
+						end)
+					end)
+					task.wait(Config.Cooldown)
+					pcall(function()
+						ReduceWalk:Destroy()
+						BodyEffects.GunFiring.Value = false
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+end)]]
+	elseif v.Parent.Name == "[TacticalShotgun]" then
+		source = [[local Player
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local TweenService = game:GetService('TweenService')
+local RemoteFunction = require(game:GetService('ReplicatedStorage').RemoteFunction)
+local RunService = game:GetService('RunService')
+local Config = {
+	Damage = 20,
+	Cooldown = 0.6,
+	Range = 70,
+	Color = 'Default',
+	LastFX = 0
+}
+
+function Raycast(Position, Mouse)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.FilterDescendantsInstances = {Player.Character, script.Parent}
+	rayParams.IgnoreWater = true
+	local ray = Ray.new(Position, (Mouse - Position).Unit * Config.Range)
+	local result = workspace:Raycast(ray.Origin, ray.Direction, rayParams) or (ray.Origin + ray.Direction)
+	return result
+end
+
+function CreateBullet(ActualMouse, Position, Mouse, RandomNum)
+	local result = Raycast(Position, Mouse)
+	local Distance = (ActualMouse - Position).magnitude
+	local DMGMultiplier = 1
+	if Distance < 5 then 
+		DMGMultiplier = 1.5
+	elseif Distance >= 5 and Distance < 15 then
+		DMGMultiplier = 1
+	elseif Distance >= 15 and Distance < 25 then
+		DMGMultiplier = 0.6
+	elseif Distance >= 25 then
+		DMGMultiplier = 0.4
+	end
+	local Part = Instance.new('Part', workspace.Ignored)
+	Part.Name = 'BULLET_RAYS'
+	Part.Transparency = 1
+	Part.Size = Vector3.new(0.001, 0.001, 0.001)
+	Part.Position = Position
+	Part.Anchored = true
+	Part.CanCollide = false
+	local Beam = Instance.new('Beam', Part)
+	Beam.Name = 'GunBeam'
+	Beam.Brightness = 1
+	Beam.TextureLength = 0.5
+	if Config.Color == 'Default' then
+		Beam.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 242, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 209, 41))		
+		}
+		Beam.LightEmission = 1
+	else 
+		if Config.Color ~= 'Patriot' then
+			Beam.Color = ColorSequence.new(Config.Color)
+		else 
+			Beam.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.509, Color3.fromRGB(25, 163, 255)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 19, 23))
+			}
+		end
+		if Config.Color == Color3.fromRGB(25, 59, 255) then
+			Beam.LightEmission = 0.2
+		else 
+			if Config.Color == Color3.fromRGB(255, 60, 46) or Config.Color == 'Patriot' then
+				Beam.LightEmission = 0.9
+			else
+				Beam.LightEmission = 1
+			end
+		end
+	end	
+	Beam.LightInfluence = 0.1
+	Beam.Segments = 5
+	Beam.Texture = 'rbxassetid://1215691065'
+	Beam.Transparency = NumberSequence.new(0.819, 0.225)
+	Beam.Width0 = 0
+	Beam.Width1 = 0.1
+	Beam.FaceCamera = true
+	local Light = Instance.new('PointLight', Part)
+	Light.Brightness = 0.5
+	Light.Range = 14.766
+	Light.Shadows = true
+	local Tween = TweenService:Create(Light, TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), {Range = 0})
+	Tween:Play()
+	local Attachment0 = Instance.new('Attachment', Part)
+	local Attachment1 = Instance.new('Attachment', Part)
+	Beam.Attachment0 = Attachment0
+	Beam.Attachment1 = Attachment1
+	Attachment0.WorldCFrame = CFrame.new(Position)
+	if typeof(result) ~= 'Vector3' then
+		Attachment1.WorldCFrame = CFrame.new(result.Position)
+	else
+		Attachment1.WorldCFrame = CFrame.new(result)
+	end
+	game:GetService('Debris'):AddItem(Part, RandomNum)
+	local Damage = Config.Damage * DMGMultiplier
+	task.spawn(function()
+		if typeof(result) ~= 'Vector3' and result.Instance then
+			if result.Instance.Parent.Parent ~= workspace.Cashiers and (result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')) then
+				local Humanoid = result.Instance.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent:FindFirstChildOfClass('Humanoid') or result.Instance.Parent.Parent.Parent:FindFirstChildOfClass('Humanoid')
+				local Plr = game:GetService('Players'):GetPlayerFromCharacter(Humanoid.Parent)
+				if Plr == nil then
+					return
+				end
+				if not Plr:FindFirstChild('LOAD_SAVE_DATA') then
+					return
+				end
+				task.spawn(function()
+					local Sound = Instance.new('Sound', result.Instance)
+					Sound.Name = 'BloodSplatter'
+					Sound.Volume = 0.5
+					Sound.SoundId = 'rbxassetid://330595293'
+					Sound:Play()
+					local Particle = Instance.new('ParticleEmitter', result.Instance)
+					Particle.Name = 'BloodParticle'
+					Particle.LightEmission = 0
+					Particle.Size = NumberSequence.new(0.3, 2)
+					Particle.Texture = 'rbxassetid://2271208303'
+					Particle.Transparency = NumberSequence.new(0.5, 1)
+					Particle.ZOffset = 0.5
+					Particle.Lifetime = NumberRange.new(0.5)
+					Particle.Rate = 100
+					Particle.Rotation = NumberRange.new(-360, 360)
+					Particle.Speed = NumberRange.new(9)
+					Particle.Enabled = false
+					Particle.Acceleration = Vector3.new(Random.new():NextNumber(-25, 25), Random.new():NextNumber(-100, -50), Random.new():NextNumber(-25, 25))
+					Particle:Emit(5)
+					game:GetService('Debris'):AddItem(Particle, 1)
+					game:GetService('ReplicatedStorage').MainEvent:FireClient(Plr, 'ShotFrom', Player.Character.LowerTorso.Position)
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+				end)
+				local MainModule = require(game:GetService('ReplicatedStorage').MainModule)
+				if MainModule.CheckTeam(Plr, Player, nil) ~= false then
+					return
+				end
+				if (Plr.Backpack:FindFirstChild('Fly') or Plr.Character:FindFirstChild('Fly')) then
+					return
+				end
+				if Humanoid.Parent.BodyEffects['K.O'].Value == true then
+					return
+				end
+				if result.Instance.Name ~= 'Head' and (not result.Instance:FindFirstChild('FaceFrontAttachment') and not result.Instance:FindFirstChild('HairAttachment')) then
+					if Humanoid.Parent.BodyEffects.Armor.Value <= 0 then
+						if Humanoid.Health - Damage > 0 then
+							Humanoid:TakeDamage(Damage)
+						else
+							Humanoid.Health = 0.5
+						end
+					else
+						if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+							if Humanoid.Parent.BodyEffects.Armor.Value - (Damage) > 0 then
+								Humanoid.Parent.BodyEffects.Armor.Value -= Damage
+								if Humanoid.Health - (Damage) > 0 then
+									Humanoid:TakeDamage(Damage/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							else
+								local LeftoverDamage = Damage - Humanoid.Parent.BodyEffects.Armor.Value
+								Humanoid.Parent.BodyEffects.Armor.Value = 0
+								if Humanoid.Health - (Damage/10 + LeftoverDamage) > 0 then
+									Humanoid:TakeDamage((Damage + LeftoverDamage)/10)
+								else
+									Humanoid.Health = 0.5
+								end	
+								pcall(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+									Tween:Play()
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.25)
+										local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+										Tween:Play()
+									end)
+								end)
+							end
+						else 
+							if Humanoid.Health - Damage > 0 then
+								Humanoid:TakeDamage(Damage)
+							else
+								Humanoid.Health = 0.5
+							end
+						end
+					end
+				else
+					if Humanoid.Parent.BodyEffects.Armor.Value > 0 then
+						if Humanoid.Parent.BodyEffects.Armor.Value - (Damage * 2) > 0 then
+							Humanoid.Parent.BodyEffects.Armor.Value -= Damage * 2
+							if Humanoid.Health - (Damage * 2) > 0 then
+								Humanoid:TakeDamage((Damage * 2)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						else
+							local LeftoverDamage = Damage - Humanoid.Parent.BodyEffects.Armor.Value
+							Humanoid.Parent.BodyEffects.Armor.Value = 0
+							if Humanoid.Health - ((Damage/10 * 2) + LeftoverDamage) > 0 then
+								Humanoid:TakeDamage(((Damage * 2) + LeftoverDamage)/10)
+							else
+								Humanoid.Health = 0.5
+							end	
+							pcall(function()
+								local Info = TweenInfo.new(0.25)
+								local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=0.2})
+								Tween:Play()
+								Tween.Completed:Connect(function()
+									local Info = TweenInfo.new(0.25)
+									local Tween = TweenService:Create(Humanoid.Parent.HumanoidRootPart.DefenseBBGUI.Vest,Info,{ImageTransparency=1})
+									Tween:Play()
+								end)
+							end)
+						end						
+					else 
+						if Humanoid.Health - Damage * 2 > 0 then
+							Humanoid:TakeDamage(Damage * 2)
+						else
+							Humanoid.Health = 0.5
+						end
+					end
+				end
+			else 
+				if result.Instance.Parent.Parent == workspace.Cashiers then
+					game:GetService('ServerStorage').Storage.Misc.Server.BindableEvents.ATM:Fire(Player, result.Instance.Parent:FindFirstChildOfClass('Humanoid'), Damage)
+				end
+			end
+		end
+	end)
+end
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		local Character = Player.Character
+		if Character:FindFirstChild('BodyEffects') then
+			local BodyEffects = Character.BodyEffects
+			if Character:FindFirstChildOfClass('Humanoid') and BodyEffects:FindFirstChild('MousePos') and BodyEffects:FindFirstChild('Reload') and BodyEffects:FindFirstChild('GunFiring') and BodyEffects:FindFirstChild('Movement') and BodyEffects:FindFirstChild('GunShotChanges') then
+				if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Reload.Value ~= false or Character.BodyEffects['K.O'].Value == true) then
+					return
+				end
+				if (BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+					return
+				end
+				if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+					return
+				end
+				if Player.Character:FindFirstChild('Christmas_Sock') then
+					return
+				end
+				if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+					return
+				end
+				if BodyEffects.Attacking.Value ~= false then
+					return
+				end
+				if BodyEffects:FindFirstChild('Block') then
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+					return
+				end
+				if script.Parent.Ammo.Value > 0 then
+					script.Parent.Ammo.Value -= 1
+					local Sound = script.Parent.Handle.ShootSound:Clone()
+					Sound.Parent = script.Parent.Handle
+					Sound:Play()
+					Sound.Ended:Connect(function()
+						Sound:Destroy()
+					end)
+					task.spawn(function()
+						task.wait(.05)
+						local Hit = RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					end)
+					local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 5)
+					BodyEffects.GunFiring.Value = true
+					local RandomNum = Random.new():NextNumber(0.3, 0.5)
+					local Offsets = {
+						{ 
+							Vector3.new(0,0.09),
+							Vector3.new(0,0.14),
+							Vector3.new(0,-0.3),
+							Vector3.new(0,-0.22),
+							Vector3.new(0,0.2)
+						},
+						{ 
+							Vector3.new(0,-0.15),
+							Vector3.new(0,0.14),
+							Vector3.new(0,-0.28),
+							Vector3.new(0,-0.22),
+							Vector3.new(0,0.2)
+						},
+						{ 
+							Vector3.new(0.3,-0.045),
+							Vector3.new(-0.38,-0.045),
+							Vector3.new(-0.3,-0.045),
+							Vector3.new(-0.22,-0.045),
+							Vector3.new(0.2,-0.045)
+						},
+						{ 
+							Vector3.new(0.3,0.045),
+							Vector3.new(-0.38,0.045),
+							Vector3.new(-0.28,0.045),
+							Vector3.new(-0.18,0.045),
+							Vector3.new(0.2,0.045)
+						},
+						{
+							Vector3.new(-0.23,-0.2),
+							Vector3.new(-0.4,-0.33),
+							Vector3.new(0.13,0.2),
+							Vector3.new(0.05,0.12),
+							Vector3.new(-0.32,-0.27)
+						},
+						{
+							Vector3.new(-0.23,-0.2),
+							Vector3.new(-0.32,-0.27),
+							Vector3.new(0.13,0.2),
+							Vector3.new(0.05,0.12),
+							Vector3.new(0.2,0.27)
+						},
+						{
+							Vector3.new(0.23,-0.2),
+							Vector3.new(0.32,-0.27),
+							Vector3.new(-0.13,0.2),
+							Vector3.new(-0.05,0.12),
+							Vector3.new(-0.2,0.27)
+						},
+						{
+							Vector3.new(0.23,-0.2),
+							Vector3.new(0.32,-0.28),
+							Vector3.new(-0.13,0.2),
+							Vector3.new(0.14,-0.12),
+							Vector3.new(-0.2,0.27)
+						}
+
+					}
+					local Offset = Offsets[math.random(1, #Offsets)]
+					for i = 1,5 do 
+						local Origin = script.Parent.Handle.Position + script.Parent.Handle.CFrame:VectorToWorldSpace(script.Parent.Handle.ShootBBGUI.StudsOffsetWorldSpace)
+						CreateBullet(BodyEffects.MousePos.Value, Origin, (Origin + (BodyEffects.MousePos.Value - Origin).Unit * 5) - Offset[i], RandomNum)
+					end
+					task.spawn(function()
+						if tick() - Config.LastFX < 0.75 then
+							Config.LastFX = tick()
+							return
+						end
+						local last = tick()
+						Config.LastFX = last
+						task.wait(0.2)
+						pcall(function()
+							task.spawn(function()
+								pcall(function()
+									script.Parent.Handle.ShootBBGUI.Shoot.Visible = true
+									script.Parent.Handle.ShootBBGUI.Shoot.Size = UDim2.new(0, 0, 0, 0)
+									local Info = TweenInfo.new(0.4, Enum.EasingStyle.Circular)
+									local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=0.4, Size = UDim2.new(1, 0, 1, 0)})
+									Tween:Play()
+									task.spawn(function()
+										local Check
+										Check = RunService.Heartbeat:Connect(function()
+											if last ~= Config.LastFX then
+												Tween:Cancel()
+												Check:Disconnect()
+											end
+										end)
+									end)
+									Tween.Completed:Connect(function()
+										local Info = TweenInfo.new(0.1)
+										local Tween = TweenService:Create(script.Parent.Handle.ShootBBGUI.Shoot,Info,{ImageTransparency=1, Size = UDim2.new(1, 0, 1, 0)})
+										Tween:Play()
+										Tween.Completed:Connect(function()
+											script.Parent.Handle.ShootBBGUI.Shoot.Visible = false
+										end)
+									end)
+								end)
+							end)
+						end)
+					end)
+					task.wait(Config.Cooldown)
+					pcall(function()
+						ReduceWalk:Destroy()
+						BodyEffects.GunFiring.Value = false
+					end)
+				else
+					if (BodyEffects.GunFiring.Value ~= false or BodyEffects.Cuff.Value ~= false or BodyEffects['K.O'].Value ~= false or BodyEffects['Grabbed'].Value ~= nil) then
+						return
+					end
+					if BodyEffects.Reload.Value ~= false then
+						return
+					end
+					if BodyEffects.Attacking.Value ~= false then
+						return
+					end
+					if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') then
+						return
+					end
+					if Player.Character:FindFirstChild('Christmas_Sock') then
+						return
+					end
+					if _G.PlayerData.Players[Player].Debounces.Action.Action ~= false then
+						return
+					end
+					if BodyEffects:FindFirstChild('Block') then
+						script.Parent.Handle.NoAmmo:Play()
+						RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+						BodyEffects.GunFiring.Value = true
+						task.wait(0.3)
+						pcall(function()
+							BodyEffects.GunFiring.Value = false
+						end)
+						return
+					end
+					script.Parent.Handle.NoAmmo:Play()
+					RemoteFunction.InvokeClient(Player.Character, Player, 'Aim', script.Parent.Handle.Position)
+					BodyEffects.GunFiring.Value = true
+					task.wait(0.3)
+					pcall(function()
+						BodyEffects.GunFiring.Value = false
+					end)
+				end
+			end
+		end
+	end
+end)
+
+script.Parent.Equipped:Connect(function()
+	local Color = _G.ApplySkin(Player, script.Parent)
+	Config.Color = Color
+	pcall(function()
+		local function Play(Humanoid)
+			local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+			local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+			local Track = Humanoid:LoadAnimation(Animation)
+			Track:Play()
+			Track.Stopped:Connect(function()
+				if script.Parent:IsDescendantOf(Player.Character) then
+					Play()
+				end
+			end)
+		end
+		Play()
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		local Humanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+		local Animation = game:GetService('ReplicatedStorage').ClientAnimations.SmallGunAim 
+		for i,v in pairs(Humanoid:GetPlayingAnimationTracks()) do
+			if v.Animation.AnimationId == Animation.AnimationId then
+				v:Stop()
+				v:Destroy()
+				break
+			end
+		end
+	end)
+end)]]
+	elseif v.Parent.Name == "Wallet" and v.Name == "wallet" then
+		source = [[local Player
+	Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Equipped = false
+local Debounce = false
+local Changed
+
+script.Parent.Activated:Connect(function()
+	if Player.Character and script.Parent:IsDescendantOf(Player.Character) then
+		if Player.PlayerGui:FindFirstChild('MainScreenGui') then
+			if Debounce == false then
+				game:GetService('ReplicatedStorage').MainEvent:FireClient(Player, 'DropMoney')
+				Debounce = true
+				wait(0.1)
+				Debounce = false
+			end
+		end
+		end
+end)
+
+script.Parent.Equipped:Connect(function()
+	pcall(function()
+		Equipped = true
+		Player = game:GetService('Players')[script.Parent.Parent.Name]
+		script.Parent.Handle.BillboardGui.Enabled = true
+		script.Parent.Handle.BillboardGui.TextLabel.Text = '$'..require(game:GetService('ReplicatedStorage').MainModule).AddComma(Player.DataFolder.Currency.Value)
+		if Changed then
+			Changed:Disconnect()
+		end
+		Changed = Player.DataFolder.Currency:GetPropertyChangedSignal('Value'):Connect(function()
+			script.Parent.Handle.BillboardGui.TextLabel.Text = '$'..require(game:GetService('ReplicatedStorage').MainModule).AddComma(Player.DataFolder.Currency.Value)
+		end)
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		Equipped = false
+		game:GetService('ReplicatedStorage').MainEvent:FireClient(Player, 'DropMoney', false)
+		script.Parent.Handle.BillboardGui.Enabled = false
+	end)
+end)]]
+	elseif v.Parent.Name == "[Katana]" and v.Name == "Assets" then
+		source = [[local dmg = false
+script.Parent.Handle.Touched:Connect(function(damage, player)
+	if damage.Parent:FindFirstChild("Humanoid") and dmg == false or player then
+		local humanoid = damage.Parent.Humanoid
+		local function DoDamage()
+			humanoid.Health = math.clamp(humanoid.Health - 21, 0.5, humanoid.MaxHealth)
+		end
+		
+		DoDamage(humanoid.MaxHealth,humanoid)
+		script.Parent.Handle.Slash:Play()
+		dmg = true
+
+	end
+end)
+]]
+	elseif v.Parent.Name == "[Katana]" and v.Name == "Code" then
+		source = [[script.Parent.Assets.Disabled = true
+local Slash1 = Instance.new("Sound")
+Slash1.SoundId = "rbxassetid://260430060"
+local tool = script.Parent
+local tool2 = script.Parent
+Attack1Toggle = Instance.new("BoolValue")
+Attack1Toggle.Value = false
+Attack2Toggle = Instance.new("BoolValue")
+Attack2Toggle.Value = false
+
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+local Character = Player.Character
+local BodyEffects = Character.BodyEffects
+local Attack1 = Instance.new("Animation")
+Attack1.AnimationId = "rbxassetid://12377210471"
+local Attack2 = Instance.new("Animation")
+Attack2.AnimationId = "rbxassetid://12377214387"
+local slowdown = 8
+local slowdown2 = 8
+local normalSpeed = 16
+local normalSpeed2 = 16
+local enabled = false
+local track1
+local track2
+tool.Activated:Connect(function()
+	if Attack1Toggle.Value == false then
+		local player = game.Players:FindFirstChild(tool.Parent.Name)
+		if enabled then
+			return
+		end
+		enabled = true
+		Attack1Toggle.Value = true
+		Attack2Toggle.Value = false
+
+		track1 = script.Parent.Parent.Humanoid:LoadAnimation(Attack1)
+		track1.Priority = Enum.AnimationPriority.Action
+		track1.Looped = false
+		local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 10)
+		track1:Play()
+		script.Parent.Handle.SFX_Slash:Play()
+		script.Parent.Assets.Disabled = false
+		wait(0.97)
+		script.Parent.Assets.Disabled = true
+        wait(0.3)
+        ReduceWalk:Destroy()
+		enabled = false
+	end
+end)
+tool2.Activated:Connect(function()
+	if Attack1Toggle.Value == true then
+		local player = game.Players:FindFirstChild(tool.Parent.Name)
+		if enabled then
+			return
+		end
+		enabled = true
+		Attack1Toggle.Value = false
+		Attack2Toggle.Value = true
+
+		track2 = script.Parent.Parent.Humanoid:LoadAnimation(Attack2)
+		track2.Priority = Enum.AnimationPriority.Action
+		track2.Looped = false
+		local ReduceWalk = require(game:GetService('ReplicatedStorage').MainModule).MovementChange(BodyEffects.Movement, 'ReduceWalk', 10)
+		track2:Play()
+		script.Parent.Handle.SFX_Slash:Play()
+		script.Parent.Assets.Disabled = false
+
+		wait(0.98)
+		script.Parent.Assets.Disabled = true
+		wait(0.3)
+        ReduceWalk:Destroy()
+		enabled = false
+	end
+end)
+
+
+]]
+	elseif v.Parent.Name == "[Phone]" then
+		source = [[local Player
+Player = game:GetService('Players')[script.Parent.Parent.Parent.Name]
+script.Parent.Equipped:Connect(function()
+	if Player.DataFolder.Information:FindFirstChild('NewPhone') then
+		if Player.DataFolder.Information.NewPhone.Value == '[iPhone]' then
+			pcall(function()
+				script.Parent['[iPhone]'].Transparency = 0
+				script.Parent['[iPhone]'].TextureID = 'rbxassetid://430345284'
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= '[iPhone]' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end)
+		elseif Player.DataFolder.Information.NewPhone.Value == '[iPhoneB]' then
+			pcall(function()
+				script.Parent['[iPhone]'].Transparency = 0
+				script.Parent['[iPhone]'].TextureID = 'rbxassetid://3188884604'
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= '[iPhone]' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end)
+		elseif Player.DataFolder.Information.NewPhone.Value == '[iPhoneG]' then
+			pcall(function()
+				script.Parent['[iPhone]'].Transparency = 0
+				script.Parent['[iPhone]'].TextureID = 'rbxassetid://3188884779'
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= '[iPhone]' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end)
+		elseif Player.DataFolder.Information.NewPhone.Value == '[iPhoneP]' then
+			pcall(function()
+				script.Parent['[iPhone]'].Transparency = 0
+				script.Parent['[iPhone]'].TextureID = 'rbxassetid://3188884956'
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= '[iPhone]' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end)
+		elseif Player.DataFolder.Information.NewPhone.Value == '[PinkPhone]' then
+			pcall(function()
+				script.Parent['[PinkPhone]'].Transparency = 0
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= '[PinkPhone]' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end)
+		elseif Player.DataFolder.Information.NewPhone.Value == '[Old Phone]' then
+			pcall(function()
+				script.Parent['[Old Phone]'].Transparency = 0
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= '[Old Phone]' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end)
+		elseif Player.DataFolder.Information.NewPhone.Value == '[Orange Phone]' then
+			pcall(function()
+				script.Parent['[Orange Phone]'].Transparency = 0
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= '[Orange Phone]' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end)
+		elseif Player.DataFolder.Information.NewPhone.Value == '[Original Phone]' then
+			pcall(function()
+				script.Parent.Handle.Transparency = 0
+				for i,v in pairs(script.Parent:GetChildren()) do
+					if v.Name ~= 'Handle' then
+						pcall(function()
+							v.Transparency = 1
+						end)
+					end
+				end
+				for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+					pcall(function()
+						v.Transparency = 0
+					end)
+				end
+			end)
+		end
+	else 
+		pcall(function()
+			script.Parent.Handle.Transparency = 0
+			for i,v in pairs(script.Parent:GetChildren()) do
+				if v.Name ~= 'Handle' then
+					pcall(function()
+						v.Transparency = 1
+					end)
+				end
+			end
+			for i,v in pairs(script.Parent.Handle:GetDescendants()) do
+				pcall(function()
+					v.Transparency = 0
+				end)
+			end
+		end)
+	end
+	pcall(function()
+		if Player.Character then
+			if Player.Character:FindFirstChild('BodyEffects') then
+				if Player.Character.BodyEffects:FindFirstChild('Calling') and Player.Character.BodyEffects:FindFirstChild('CallFrom') then
+					if Player.Character.BodyEffects.CallFrom.Value ~= nil then
+						local Player2 = Player.Character.BodyEffects.CallFrom.Value
+						if Player.Character.BodyEffects.Calling.Value == true then
+							return
+						end
+						Player.Character.BodyEffects.Calling.Value = true
+						if Player2.Character:FindFirstChild('[Phone]') then
+							Player2.Character.BodyEffects.Calling.Value = true
+							Player2.Character.BodyEffects.CallFrom.Value = Player
+							Player.Character['[Phone]'].Handle.PickUp:Play()
+							Player2.Character['[Phone]'].Handle.PickUp:Play()
+							game:GetService('Chat'):Chat(Player.Character['[Phone]'].Handle, '*pick up*', Enum.ChatColor.Green)
+							game:GetService('Chat'):Chat(Player2.Character['[Phone]'].Handle, '*pick up*', Enum.ChatColor.Green)
+						end
+					end
+				end
+			end
+		end
+	end)
+end)
+
+script.Parent.Unequipped:Connect(function()
+	pcall(function()
+		if Player.Character then
+			if Player.Character then
+				if Player.Character:FindFirstChild('BodyEffects') then
+					if Player.Character.BodyEffects:FindFirstChild('Calling') and Player.Character.BodyEffects:FindFirstChild('CallFrom') then
+						pcall(function()
+							if Player.Character.BodyEffects.CallFrom.Value ~= nil then
+								local Player2 = Player.Character.BodyEffects.CallFrom.Value
+								if Player2.Character:FindFirstChild('[Phone]') then
+									Player2.Character.BodyEffects.Calling.Value = false 
+									Player2.Character.BodyEffects.CallFrom.Value = nil
+									script.Parent.Handle.EndCalls:Play()
+									Player2.Character['[Phone]'].Handle.EndCalls:Play()
+									game:GetService('Chat'):Chat(Player2.Character['[Phone]'].Handle, '*beep*', Enum.ChatColor.Red)
+								end
+							end
+						end)
+						Player.Character.BodyEffects.Calling.Value = false 
+						Player.Character.BodyEffects.CallFrom.Value = nil
+					end
+				end
+			end
+		end
+	end)
+end)]]
+	elseif v.Name == "FerrisWheelScript" then
+		source = [[local CD = script.Parent:FindFirstChildOfClass('ClickDetector')
+local Activated = false
+
+CD.MouseClick:Connect(function(Player)
+	pcall(function()
+		if not Player:FindFirstChild('LOAD_SAVE_DATA') then
+			return
+		end
+		if Activated then
+			return
+		end
+		if Player:DistanceFromCharacter(script.Parent.Position) <= CD.MaxActivationDistance then
+			Activated = true
+			for i = 1, 4 do
+				game:GetService('ReplicatedStorage').MainEvent:FireAllClients('FerrisWheelUPDATE', script.Parent.Parent.Parent, script.Parent.Parent.Parent.Wheel.Center.CFrame * CFrame.Angles(math.rad(90 * i), 0, 0), 10)
+				task.wait(15)
+			end
+			task.wait(15)
+			Activated = false
+		end
+	end)
+end)]]
 	end
 	return source
 end
