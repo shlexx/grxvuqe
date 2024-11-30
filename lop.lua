@@ -187,6 +187,28 @@ local Button14 = Tab:CreateButton({
    end
    end,
 })
+local Button18 = Tab:CreateButton({
+   Name = "0/10 All",
+   Callback = function()
+   for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
+   game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="0/10",Key="x5",Cash=0})
+   game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
+   end
+   end,
+})
+local Button19 = Tab:CreateButton({
+   Name = "Boo All",
+   Callback = function()
+   for _,v in pairs(game.Players:GetPlayers()) do
+   if v ~= game.Players.LocalPlayer then
+   game.ReplicatedStorage.Events.PurchaseTroll:InvokeServer({ItemName="Boo",Key="x5",Cash=0})
+   game.ReplicatedStorage.Events.TrollPlayer:FireServer(v.Name)
+   end
+   end
+   end,
+})
 local Button10 = Tab:CreateButton({
    Name = "Kill All (~4 secs)",
    Callback = function()
@@ -254,7 +276,7 @@ local Button12 = Tab:CreateButton({
    end
    end,
 })
-local Button12 = Tab:CreateButton({
+local Button17 = Tab:CreateButton({
    Name = "Korblox On/Off",
    Callback = function()
    if iskorblox then
