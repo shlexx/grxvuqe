@@ -56,22 +56,22 @@ command.FocusLost:Connect(function(enter)
 		elseif args[1] == "loopkill" then
 			apply(function(v)
 				loopkill = true
-                pcall(function()
-				    repeat
+				pcall(function()
+					repeat
 						damage:FireServer(v.Character.Humanoid,math.huge)
 						task.wait(.1)
-				    until loopkill == false
-                end)
+					until loopkill == false
+				end)
 			end)
 		elseif args[1] == "loopheal" then
 			apply(function(v)
 				loopheal = true
 				pcall(function()
-				    repeat
+					repeat
 						damage:FireServer(v.Character.Humanoid,-math.huge)
 						task.wait(.1)
-				    until loopheal == false
-                end)
+					until loopheal == false
+				end)
 			end)
 		elseif t == "unloopkill" then
 			loopkill = false
@@ -83,9 +83,9 @@ command.FocusLost:Connect(function(enter)
 			firetouchinterest(hrp,workspace.Stages:FindFirstChild(tostring(game.Players.LocalPlayer.CurrentStage.Value+1)),0)
 		elseif t == "skiptoend" then
 			repeat
-                firetouchinterest(hrp,workspace.Stages:FindFirstChild(tostring(game.Players.LocalPlayer.CurrentStage.Value+1)),0)
-                task.wait(.1)
-            until game.Players.LocalPlayer.CurrentStage.Value == 181
+				firetouchinterest(hrp,workspace.Stages:FindFirstChild(tostring(game.Players.LocalPlayer.CurrentStage.Value+1)),0)
+				task.wait(.1)
+			until game.Players.LocalPlayer.CurrentStage.Value == 181
 		elseif t == "coils" then
 			local spcoil = Instance.new("Tool", game.Players.LocalPlayer.Backpack)
 			local hum = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
@@ -125,21 +125,21 @@ command.FocusLost:Connect(function(enter)
 				workspace.Gravity = getgenv().gravity
 				hum.WalkSpeed = getgenv().speed
 			end)
-        elseif args[1] == "opencrate" then
-            if args[2] == "1" then
-                crate:InvokeServer("Crate1","Trail",true)
-            elseif args[2] == "2" then
-                crate:InvokeServer("Crate2","Trail",true)
-            elseif args[2] == "3" then
-                crate:InvokeServer("Crate1","Halo",true)
-            elseif args[2] == "4" then
-                crate:InvokeServer("Crate2","Halo",true)
-            end
-        elseif t == "crates" then
-            print("1 - Trail Crate #1\n2 - Trail Crate #2\n3 - Halo Crate #1\n4 - Halo Crate #2")
-	elseif t == "cmds" then
+		elseif args[1] == "opencrate" then
+			if args[2] == "1" then
+				crate:InvokeServer("Crate1","Trail",true)
+			elseif args[2] == "2" then
+				crate:InvokeServer("Crate2","Trail",true)
+			elseif args[2] == "3" then
+				crate:InvokeServer("Crate1","Halo",true)
+			elseif args[2] == "4" then
+				crate:InvokeServer("Crate2","Halo",true)
+			end
+		elseif t == "crates" then
+			print("1 - Trail Crate #1\n2 - Trail Crate #2\n3 - Halo Crate #1\n4 - Halo Crate #2")
+		elseif t == "cmds" then
 			print("\ncmds\nkill <name>\nheal <name>\nloopkill <name>\nloopheal <name>\nunloopkill\nunloopheal\neasymode\nskipstage\nskiptoend\ncoils\nopencrate <number>\ncrates")
-        end
+		end
 		task.wait()
 		command.Text = ""
 	end
@@ -147,7 +147,7 @@ end)
 game:GetService("UserInputService").InputBegan:Connect(function(input,e)
 	if not e and input.KeyCode == Enum.KeyCode.Quote then
 		command:CaptureFocus()
-        	spawn(function()
+		spawn(function()
 			repeat command.Text = '' until command.Text == ''
 		end)
 	end
