@@ -144,3 +144,8 @@ command.FocusLost:Connect(function(enter)
 		command.Text = ""
 	end
 end)
+game:GetService("UserInputService").InputBegan:Connect(function(input,e)
+	if not e and input.KeyCode == Enum.KeyCode.Quote then
+		command:CaptureFocus()
+	end
+end)
