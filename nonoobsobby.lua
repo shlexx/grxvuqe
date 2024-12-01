@@ -137,7 +137,7 @@ command.FocusLost:Connect(function(enter)
             end
         elseif t == "crates" then
             print("1 - Trail Crate #1\n2 - Trail Crate #2\n3 - Halo Crate #1\n4 - Halo Crate #2")
-		elseif t == "cmds" then
+	elseif t == "cmds" then
 			print("\ncmds\nkill <name>\nheal <name>\nloopkill <name>\nloopheal <name>\nunloopkill\nunloopheal\neasymode\nskipstage\nskiptoend\ncoils\nopencrate <number>\ncrates")
         end
 		task.wait()
@@ -147,5 +147,8 @@ end)
 game:GetService("UserInputService").InputBegan:Connect(function(input,e)
 	if not e and input.KeyCode == Enum.KeyCode.Quote then
 		command:CaptureFocus()
+        	spawn(function()
+			repeat command.Text = '' until command.Text == ''
+		end)
 	end
 end)
