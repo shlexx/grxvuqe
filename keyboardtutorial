@@ -1,0 +1,17 @@
+this isnt a script, it's a tutorial on how to make your own keyboard script!!!
+recently ive seen a LOT of obfuscated keyboard scripts, so i decided to make it open source.
+okay so first, we need to learn about the service that makes this possible. it's called VirtualUser.
+VirtualUser is a service that hasn't been maintained for several years, but still works. you can find all the things about in in the roblox reference:
+  [[ https://robloxapi.github.io/ref/class/VirtualUser.html ]]
+
+so to make a keyboard, you need to make the gui first and the buttons you're gonna make. its outdated so it doesn't use Enum.KeyCode. you have to use it like "esc"
+
+if you want to press a key, you do game:GetService("VirtualUser"):TypeKey(key: string)
+if you want to hold down or release it, you do game:GetService("VirtualUser"):SetKeyDown(key: string) and game:GetService("VirtualUser"):SetKeyUp(key: string).
+if you want to press a mouse button, you do game:GetService("VirtualUser"):ClickButton1(position: Vector2, camera: CFrame = Identity) and game:GetService("VirtualUser"):ClickButton2(position: Vector2, camera: CFrame = Identity)
+if you want to hold down a mouse button, you do game:GetService("VirtualUser"):Button1Down(position: Vector2, camera: CFrame = Identity), game:GetService("VirtualUser"):Button1Up(position: Vector2, camera: CFrame = Identity), game:GetService("VirtualUser"):Button2Down(position: Vector2, camera: CFrame = Identity) and game:GetService("VirtualUser"):Button2Up(position: Vector2, camera: CFrame = Identity)
+
+and some extra things are game:GetService("VirtualUser"):CaptureController(), game:GetService("VirtualUser"):MoveMouse(position: Vector2, camera: CFrame = Identity), game:GetService("VirtualUser"):StartRecording() and game:GetService("VirtualUser"):StopRecording()
+
+you can find some keycodes here:
+  [[ https://create.roblox.com/docs/reference/engine/enums/KeyCode ]]
