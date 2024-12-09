@@ -546,7 +546,7 @@ local TextButton = Instance.new("TextButton")
 --Properties:
 
 CheatEngineDeleteMob.Name = "CheatEngineDeleteMob"
-CheatEngineDeleteMob.Parent = game.CireGui.RobloxGui
+CheatEngineDeleteMob.Parent = game.CoreGui.RobloxGui
 CheatEngineDeleteMob.Enabled = true
 CheatEngineDeleteMob.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 CheatEngineDeleteMob.DisplayOrder = 10
