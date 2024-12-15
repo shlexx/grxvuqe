@@ -1,4 +1,4 @@
-ssdecompile = function(v:Script)
+function otherdecompile(v:Script)
 	local source
 	if v.Name == "Vehicle" and v.Parent:FindFirstChild("LocalVehiclePromptGui") then
 		source = [[local Players = game:GetService("Players")
