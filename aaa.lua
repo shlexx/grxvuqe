@@ -1,4 +1,3 @@
-local ignore = true
 local ignoretable = {
   "http://www.roblox.com/asset/?id=178130996",
   "http://www.roblox.com/asset/?id=180436148",
@@ -38,18 +37,27 @@ local ignoretable = {
 }
 for _,v in pairs(game:GetDescendants()) do
   if v:IsA("Animation") then
-    if ignore then
-      local nono = false
-      for i = 1,#ignoretable do
-        if (v.AnimationId == ignoretable[i]) or (v.Parent.Parent.Name == "Animate") then
-          nono = true
-        end
+    local nono = false
+    for i = 1,#ignoretable do
+      if (v.AnimationId == ignoretable[i]) or (v.Parent.Parent.Name == "Animate") then
+        nono = true
       end
-      if nono == false then
-        print("@ game." .. v:GetFullName() .. " / " .. v.AnimationId)
-      end
-    else
+    end
+    if nono == false then
       print("@ game." .. v:GetFullName() .. " / " .. v.AnimationId)
     end
   end
 end
+game.DescendantAdded:Connect(function(v)
+  if v:IsA("Animation") then
+    local nono = false
+    for i = 1,#ignoretable do
+      if (v.AnimationId == ignoretable[i]) or (v.Parent.Parent.Name == "Animate") then
+        nono = true
+      end
+    end
+    if nono == false then
+      print("@/ game." .. v:GetFullName() .. " / " .. v.AnimationId)
+    end
+  end
+end)
