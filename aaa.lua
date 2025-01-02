@@ -35,6 +35,7 @@ local ignoretable = {
   "http://www.roblox.com/asset/?id=913402848",
   "http://www.roblox.com/asset/?id=7715096377"
 }
+local saved = {}
 for _,v in pairs(game:GetDescendants()) do
   if v:IsA("Animation") then
     local nono = false
@@ -43,7 +44,13 @@ for _,v in pairs(game:GetDescendants()) do
         nono = true
       end
     end
+    for r,t in pairs(saved) do
+      if v.AnimationId == t then
+        nono = true
+      end
+    end
     if nono == false then
+      table.insert(saved,v.AnimationId)
       print("@ game." .. v:GetFullName() .. " / " .. v.AnimationId)
     end
   end
@@ -56,8 +63,41 @@ game.DescendantAdded:Connect(function(v)
         nono = true
       end
     end
+    for r,t in pairs(saved) do
+      if v.AnimationId == t then
+        nono = true
+      end
+    end
     if nono == false then
-      print("@/ game." .. v:GetFullName() .. " / " .. v.AnimationId)
+      table.insert(saved,v.AnimationId)
+      print("@+ game." .. v:GetFullName() .. " / " .. v.AnimationId)
     end
   end
 end)
+while wait(0.1) do
+  for n,x in pairs(game.Players:GetPlayers()) do
+    if x.Character and x.Character:FindFirstChild("Humanoid") then
+      for i,v in pairs(x.Character.Humanoid:GetPlayingAnimationTracks()) do
+        if v:IsA("AnimationTrack") then
+          local nono = false
+          for r,t in pairs(ignoretable) do
+            if v.Animation and v.Animation.Parent and v.Animation.Parent.Parent then
+              if (v.Animation.AnimationId == t) or (v.Animation.Parent.Parent.Name == "Animate") then
+                nono = true
+              end
+            end
+          end
+          for r,t in pairs(saved) do
+            if v.Animation.AnimationId == t then
+              nono = true
+            end
+          end
+          if nono == false then
+            table.insert(saved,v.Animation.AnimationId)
+            print("@* game." .. v.Animation:GetFullName() .. " / " .. v.Animation.AnimationId)
+          end
+        end
+      end
+    end
+  end
+end
