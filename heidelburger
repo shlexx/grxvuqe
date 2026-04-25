@@ -1,0 +1,520 @@
+-- deepseek ai script because im too fucking lazy
+
+-- INFINITE YIELD STYLE FLY & NOCLIP SYSTEM (MOBILE COMPATIBLE)
+-- Place this in a LocalScript inside StarterPlayerScripts or StarterGui
+
+local player = game.Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+local players = game:GetService("Players")
+
+-- Detect if on mobile
+local isMobile = userInputService.TouchEnabled and not userInputService.KeyboardEnabled
+
+-- GUI Creation
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AdminPanel"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main Frame (Draggable)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 200, 0, 100)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BackgroundTransparency = 0.1
+mainFrame.BorderSizePixel = 2
+mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+-- Title Bar
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 25)
+titleBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+titleBar.BackgroundTransparency = 0.2
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleText = Instance.new("TextLabel")
+titleText.Size = UDim2.new(1, 0, 1, 0)
+titleText.BackgroundTransparency = 1
+titleText.Text = "Admin Panel"
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.TextScaled = true
+titleText.Font = Enum.Font.GothamBold
+titleText.Parent = titleBar
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 20, 0, 20)
+closeButton.Position = UDim2.new(1, -25, 0, 2.5)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextScaled = true
+closeButton.Parent = titleBar
+
+closeButton.MouseButton1Click:Connect(function()
+    if FLYING then NOFLY() end
+    if Noclipping then Noclipping:Disconnect() end
+    if moveJoystick then moveJoystick:Destroy() end
+    if flyUpButton then flyUpButton:Destroy() end
+    if flyDownButton then flyDownButton:Destroy() end
+    screenGui:Destroy()
+end)
+
+-- Fly Toggle
+local flyToggle = Instance.new("TextButton")
+flyToggle.Size = UDim2.new(0, 150, 0, 25)
+flyToggle.Position = UDim2.new(0.5, -75, 0, 40)
+flyToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+flyToggle.Text = "Fly: OFF"
+flyToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+flyToggle.TextScaled = true
+flyToggle.Parent = mainFrame
+
+-- Noclip Toggle
+local noclipToggle = Instance.new("TextButton")
+noclipToggle.Size = UDim2.new(0, 150, 0, 25)
+noclipToggle.Position = UDim2.new(0.5, -75, 0, 70)
+noclipToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+noclipToggle.Text = "Noclip: OFF"
+noclipToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+noclipToggle.TextScaled = true
+noclipToggle.Parent = mainFrame
+
+-- ========== MOBILE CONTROLS (created when fly enables) ==========
+local moveJoystick = nil
+local flyUpButton = nil
+local flyDownButton = nil
+local joystickActive = false
+local joystickDirection = Vector2.new(0, 0)
+local joystickCenter = nil
+
+local function createMobileControls()
+    if not isMobile then return end
+    
+    -- Movement Joystick (Bottom Left)
+    moveJoystick = Instance.new("ImageButton")
+    moveJoystick.Name = "MoveJoystick"
+    moveJoystick.Size = UDim2.new(0, 120, 0, 120)
+    moveJoystick.Position = UDim2.new(0, 20, 1, -140)
+    moveJoystick.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    moveJoystick.BackgroundTransparency = 0.7
+    moveJoystick.Image = "rbxassetid://2585949478" -- Joystick base
+    moveJoystick.ZIndex = 20
+    moveJoystick.Parent = screenGui
+    
+    local joystickKnob = Instance.new("ImageLabel")
+    joystickKnob.Name = "Knob"
+    joystickKnob.Size = UDim2.new(0, 40, 0, 40)
+    joystickKnob.Position = UDim2.new(0.5, -20, 0.5, -20)
+    joystickKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    joystickKnob.BackgroundTransparency = 0.5
+    joystickKnob.Image = "rbxassetid://2585949479" -- Joystick knob
+    joystickKnob.Parent = moveJoystick
+    
+    -- Fly Up Button (Right side, bottom)
+    flyUpButton = Instance.new("TextButton")
+    flyUpButton.Name = "FlyUp"
+    flyUpButton.Size = UDim2.new(0, 60, 0, 60)
+    flyUpButton.Position = UDim2.new(1, -80, 1, -140)
+    flyUpButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+    flyUpButton.Text = "↑"
+    flyUpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    flyUpButton.TextSize = 30
+    flyUpButton.ZIndex = 20
+    flyUpButton.Parent = screenGui
+    
+    -- Fly Down Button (Right side, above up button)
+    flyDownButton = Instance.new("TextButton")
+    flyDownButton.Name = "FlyDown"
+    flyDownButton.Size = UDim2.new(0, 60, 0, 60)
+    flyDownButton.Position = UDim2.new(1, -80, 1, -210)
+    flyDownButton.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+    flyDownButton.Text = "↓"
+    flyDownButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    flyDownButton.TextSize = 30
+    flyDownButton.ZIndex = 20
+    flyDownButton.Parent = screenGui
+    
+    -- Joystick touch handling
+    local function updateJoystick(input)
+        local touchPos = input.Position
+        local center = moveJoystick.AbsolutePosition + Vector2.new(moveJoystick.AbsoluteSize.X / 2, moveJoystick.AbsoluteSize.Y / 2)
+        local delta = touchPos - center
+        local distance = math.min(delta.Magnitude, 40)
+        local direction = delta.Unit
+        
+        joystickKnob.Position = UDim2.new(0.5, direction.X * distance, 0.5, direction.Y * distance)
+        joystickDirection = direction * (distance / 40)
+    end
+    
+    moveJoystick.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            joystickActive = true
+            updateJoystick(input)
+        end
+    end)
+    
+    moveJoystick.InputChanged:Connect(function(input)
+        if joystickActive and input.UserInputType == Enum.UserInputType.Touch then
+            updateJoystick(input)
+        end
+    end)
+    
+    moveJoystick.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            joystickActive = false
+            joystickDirection = Vector2.new(0, 0)
+            joystickKnob.Position = UDim2.new(0.5, 0, 0.5, 0)
+        end
+    end)
+    
+    -- Button touch events for up/down
+    local upPressed = false
+    local downPressed = false
+    
+    flyUpButton.MouseButton1Down:Connect(function()
+        upPressed = true
+    end)
+    
+    flyUpButton.MouseButton1Up:Connect(function()
+        upPressed = false
+    end)
+    
+    flyDownButton.MouseButton1Down:Connect(function()
+        downPressed = true
+    end)
+    
+    flyDownButton.MouseButton1Up:Connect(function()
+        downPressed = false
+    end)
+    
+    -- Touch hold for buttons
+    flyUpButton.TouchTap:Connect(function()
+        upPressed = not upPressed
+        if upPressed then
+            flyUpButton.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
+        else
+            flyUpButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+        end
+    end)
+    
+    flyDownButton.TouchTap:Connect(function()
+        downPressed = not downPressed
+        if downPressed then
+            flyDownButton.BackgroundColor3 = Color3.fromRGB(255, 150, 50)
+        else
+            flyDownButton.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+        end
+    end)
+    
+    -- Return button states for flight control
+    return {
+        getMoveVector = function()
+            return Vector3.new(joystickDirection.X, 0, joystickDirection.Y)
+        end,
+        getUpPressed = function() return upPressed end,
+        getDownPressed = function() return downPressed end
+    }
+end
+
+local mobileControls = nil
+
+-- ========== INFINITE YIELD FLY SYSTEM (MODIFIED FOR MOBILE) ==========
+local FLYING = false
+local QEfly = true
+local iyflyspeed = 1
+local flyKeyDown = nil
+local flyKeyUp = nil
+
+local function getRoot(char)
+    return char:FindFirstChild("HumanoidRootPart") or char.PrimaryPart
+end
+
+-- Mobile-compatible fly function
+function sFLY(vfly)
+    local plr = player
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    if not humanoid then
+        repeat task.wait() until char:FindFirstChildOfClass("Humanoid")
+        humanoid = char:FindFirstChildOfClass("Humanoid")
+    end
+
+    if flyKeyDown or flyKeyUp then
+        flyKeyDown:Disconnect()
+        flyKeyUp:Disconnect()
+    end
+
+    -- Create mobile controls if on mobile
+    if isMobile and not mobileControls then
+        mobileControls = createMobileControls()
+    end
+
+    local T = getRoot(char)
+    local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+    local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+    local SPEED = 0
+
+    local function FLY()
+        FLYING = true
+        local BG = Instance.new('BodyGyro')
+        local BV = Instance.new('BodyVelocity')
+        BG.P = 9e4
+        BG.Parent = T
+        BV.Parent = T
+        BG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        BG.CFrame = T.CFrame
+        BV.Velocity = Vector3.new(0, 0, 0)
+        BV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        task.spawn(function()
+            repeat task.wait()
+                local camera = workspace.CurrentCamera
+                if not vfly and humanoid then
+                    humanoid.PlatformStand = true
+                end
+
+                -- Mobile input handling
+                if isMobile and mobileControls then
+                    local moveVec = mobileControls.getMoveVector()
+                    CONTROL.F = moveVec.Z > 0 and (vfly and 1 or iyflyspeed) or 0
+                    CONTROL.B = moveVec.Z < 0 and -(vfly and 1 or iyflyspeed) or 0
+                    CONTROL.R = moveVec.X > 0 and (vfly and 1 or iyflyspeed) or 0
+                    CONTROL.L = moveVec.X < 0 and -(vfly and 1 or iyflyspeed) or 0
+                    
+                    if mobileControls.getUpPressed() then
+                        CONTROL.Q = (vfly and 1 or iyflyspeed) * 2
+                    else
+                        CONTROL.Q = 0
+                    end
+                    
+                    if mobileControls.getDownPressed() then
+                        CONTROL.E = -(vfly and 1 or iyflyspeed) * 2
+                    else
+                        CONTROL.E = 0
+                    end
+                end
+
+                if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
+                    SPEED = 50
+                elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0) and SPEED ~= 0 then
+                    SPEED = 0
+                end
+                
+                if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 or (CONTROL.Q + CONTROL.E) ~= 0 then
+                    BV.Velocity = ((camera.CFrame.LookVector * (CONTROL.F + CONTROL.B)) + ((camera.CFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - camera.CFrame.p)) * SPEED
+                    lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
+                elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and (CONTROL.Q + CONTROL.E) == 0 and SPEED ~= 0 then
+                    BV.Velocity = ((camera.CFrame.LookVector * (lCONTROL.F + lCONTROL.B)) + ((camera.CFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - camera.CFrame.p)) * SPEED
+                else
+                    BV.Velocity = Vector3.new(0, 0, 0)
+                end
+                BG.CFrame = camera.CFrame
+            until not FLYING
+            CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+            lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+            SPEED = 0
+            BG:Destroy()
+            BV:Destroy()
+
+            if humanoid then humanoid.PlatformStand = false end
+            
+            -- Destroy mobile controls when fly stops
+            if isMobile and mobileControls then
+                if moveJoystick then moveJoystick:Destroy() end
+                if flyUpButton then flyUpButton:Destroy() end
+                if flyDownButton then flyDownButton:Destroy() end
+                mobileControls = nil
+            end
+        end)
+    end
+
+    -- Keyboard inputs (for PC, also work on mobile if keyboard connected)
+    flyKeyDown = userInputService.InputBegan:Connect(function(input, processed)
+        if processed then return end
+        if input.KeyCode == Enum.KeyCode.W then
+            CONTROL.F = (vfly and 1 or iyflyspeed)
+        elseif input.KeyCode == Enum.KeyCode.S then
+            CONTROL.B = - (vfly and 1 or iyflyspeed)
+        elseif input.KeyCode == Enum.KeyCode.A then
+            CONTROL.L = - (vfly and 1 or iyflyspeed)
+        elseif input.KeyCode == Enum.KeyCode.D then
+            CONTROL.R = (vfly and 1 or iyflyspeed)
+        elseif input.KeyCode == Enum.KeyCode.E and QEfly then
+            CONTROL.Q = (vfly and 1 or iyflyspeed)*2
+        elseif input.KeyCode == Enum.KeyCode.Q and QEfly then
+            CONTROL.E = -(vfly and 1 or iyflyspeed)*2
+        end
+        pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Track end)
+    end)
+
+    flyKeyUp = userInputService.InputEnded:Connect(function(input, processed)
+        if processed then return end
+        if input.KeyCode == Enum.KeyCode.W then
+            CONTROL.F = 0
+        elseif input.KeyCode == Enum.KeyCode.S then
+            CONTROL.B = 0
+        elseif input.KeyCode == Enum.KeyCode.A then
+            CONTROL.L = 0
+        elseif input.KeyCode == Enum.KeyCode.D then
+            CONTROL.R = 0
+        elseif input.KeyCode == Enum.KeyCode.E then
+            CONTROL.Q = 0
+        elseif input.KeyCode == Enum.KeyCode.Q then
+            CONTROL.E = 0
+        end
+    end)
+    FLY()
+end
+
+function NOFLY()
+    FLYING = false
+    if flyKeyDown or flyKeyUp then 
+        flyKeyDown:Disconnect() 
+        flyKeyUp:Disconnect() 
+    end
+    if player.Character and player.Character:FindFirstChildOfClass('Humanoid') then
+        player.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+    end
+    pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
+    
+    -- Clean up mobile controls
+    if isMobile then
+        if moveJoystick then moveJoystick:Destroy() end
+        if flyUpButton then flyUpButton:Destroy() end
+        if flyDownButton then flyDownButton:Destroy() end
+        mobileControls = nil
+    end
+end
+
+local function toggleFly()
+    if FLYING then
+        NOFLY()
+        flyToggle.Text = "Fly: OFF"
+        flyToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    else
+        sFLY(false)
+        flyToggle.Text = "Fly: ON"
+        flyToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    end
+end
+
+flyToggle.MouseButton1Click:Connect(toggleFly)
+
+-- ========== INFINITE YIELD NOCLIP SYSTEM ==========
+local Noclipping = nil
+local Clip = true
+
+local function NoclipLoop()
+    if Clip == false and player.Character ~= nil then
+        for _, child in pairs(player.Character:GetDescendants()) do
+            if child:IsA("BasePart") and child.CanCollide == true then
+                child.CanCollide = false
+            end
+        end
+    end
+end
+
+local function enableNoclip()
+    Clip = false
+    task.wait(0.1)
+    Noclipping = runService.Stepped:Connect(NoclipLoop)
+end
+
+local function disableNoclip()
+    if Noclipping then
+        Noclipping:Disconnect()
+        Noclipping = nil
+    end
+    Clip = true
+    if player.Character then
+        for _, child in pairs(player.Character:GetDescendants()) do
+            if child:IsA("BasePart") then
+                child.CanCollide = true
+            end
+        end
+    end
+end
+
+local function toggleNoclip()
+    if Clip == false then
+        disableNoclip()
+        noclipToggle.Text = "Noclip: OFF"
+        noclipToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    else
+        enableNoclip()
+        noclipToggle.Text = "Noclip: ON"
+        noclipToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    end
+end
+
+noclipToggle.MouseButton1Click:Connect(toggleNoclip)
+
+-- ========== CHARACTER RESPAWN HANDLING ==========
+player.CharacterAdded:Connect(function(character)
+    repeat task.wait() until character:FindFirstChild("HumanoidRootPart") and character:FindFirstChildOfClass("Humanoid")
+    
+    if FLYING then
+        task.wait(0.5)
+        sFLY(false)
+    end
+    
+    if Clip == false then
+        task.wait(0.1)
+        for _, child in pairs(character:GetDescendants()) do
+            if child:IsA("BasePart") then
+                child.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- ========== DRAG FUNCTIONALITY ==========
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+userInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, 
+                                        startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Speed control (PC only - +/- keys)
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if FLYING then
+        if input.KeyCode == Enum.KeyCode.Equals or input.KeyCode == Enum.KeyCode.KeypadPlus then
+            iyflyspeed = math.min(iyflyspeed + 1, 10)
+        elseif input.KeyCode == Enum.KeyCode.Minus or input.KeyCode == Enum.KeyCode.KeypadMinus then
+            iyflyspeed = math.max(iyflyspeed - 1, 1)
+        end
+    end
+end)
+
+print("Admin Panel loaded - Mobile compatible! Fly and Noclip ready.")
+if isMobile then
+    print("Mobile mode detected - Touch controls enabled!")
+end
